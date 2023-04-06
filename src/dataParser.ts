@@ -1,6 +1,5 @@
 //import { DataFrameView } from '@grafana/data';
 // import { color } from 'd3';
-import dummydataframe from 'dummydataframe.json'
 
 
 export function parseData(data: { series: any[] }, options: any, theme: any) { // <- should that have proper typing?
@@ -13,30 +12,31 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     /* DataFrameView doesn't work */
     //const series = dummydataframe.series[0];
     //const frame = new DataFrameView(series);
-    var allData = dummydataframe.series[0].fields;
+    var allData = data.series[0].fields;
+    console.log(allData)
 
-    // get src and dst arrays and create array of unique nodes from them
-    let src = allData.find(obj => obj.name ==="meta.src_preferred_org.keyword")!.values
-    let dest = allData.find(obj => obj.name ==="meta.dst_preferred_org.keyword")!.values
+    // get source and target arrays and create array of unique nodes from them
+    let src = allData[0].values
+    let dest = allData[1].values
     const uniqueNodes = Array.from([...new Set([...src, ...dest])]).map((str, index) => ({
       id: index,
       name: str
     }));
 
-    let srcById = src.map(name => {
+    let srcById = src.map((name: any) => {
       const dictionaryItem = uniqueNodes.find(item => item.name === name);
       return dictionaryItem ? dictionaryItem.id : null;
     });
 
-    let dstById = dest.map(name => {
+    let dstById = dest.map((name: any) => {
       const dictionaryItem = uniqueNodes.find(item => item.name === name);
       return dictionaryItem ? dictionaryItem.id : null;
     });
 
-    const links = srcById.map((element, index) => ({
+    const links = srcById.map((element: any, index: string | number) => ({
       source: element,
       target: dstById[index],
-      sum: <number>(allData.find(obj => obj.name ==="Sum")!.values[index])/100000000000000
+      sum: <number>(allData.find((e: { name: string; }) => e.name ==="Sum")!.values[index])/100000000000000
     }));
     
     // color

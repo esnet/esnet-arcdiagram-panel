@@ -115,8 +115,7 @@ function Arc(props: any) {
       })
       .attr("stroke", props.parsedData.hexColors.linkColor)
       .attr("stroke-width", (l: any) => { 
-        console.log(props.graphOptions.normalizeArcs, props.graphOptions.arcThickness)
-        return props.graphOptions.normalizeArcs ? l?.sum : props.graphOptions.arcThickness })
+        return !props.graphOptions.normalizeArcs ? props.graphOptions.arcThickness :  l?.sum })
 
     // update labels
     text
@@ -124,7 +123,6 @@ function Arc(props: any) {
 
 
     // highlighting
-
     var nodes = d3.selectAll("circle")
     var paths = d3.selectAll("path")
     var labels = d3.selectAll("text")
@@ -164,7 +162,6 @@ function Arc(props: any) {
           .style("font-size", 10)
           .style("opacity", 1)
       })
-
 
   }, [props.graphOptions]);
 
