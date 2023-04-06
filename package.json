@@ -1,0 +1,31 @@
+{
+  "name": "esnet-test",
+  "version": "1.0.0",
+  "description": "test",
+  "scripts": {
+    "build": "grafana-toolkit plugin:build",
+    "test": "grafana-toolkit plugin:test",
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "FAST_REFRESH=TRUE grafana-toolkit plugin:dev --watch",
+    "sign": "grafana-toolkit plugin:sign",
+    "start": "yarn watch"
+  },
+  "author": "test",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@grafana/toolkit": "latest",
+    "@types/d3": "^7.4.0"
+  },
+  "dependencies": {
+    "@grafana/data": "latest",
+    "@grafana/ui": "latest",
+    "d3": "^7.8.4",
+    "nvm": "^0.0.4",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "reload": "^3.2.1"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
