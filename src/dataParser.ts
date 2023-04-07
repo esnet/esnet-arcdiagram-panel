@@ -1,5 +1,13 @@
-//import { DataFrameView } from '@grafana/data';
-// import { color } from 'd3';
+/**
+ * Takes data from Grafana query and returns it in the format needed for this panel
+ *
+ * @param data the data returned by the query
+ * @param options the field options from the editor panel
+ * @param theme needed for utility functions for example to map color strings to hex values
+ * @return {uniqueNodes} list of unique nodes to be rendered on the x axis
+ * @return {links} array of objects with fields source, target, sum, strokewidth where each object represents one link
+ * @return {hexColors} colors converted to hex
+ */
 
 
 export function parseData(data: { series: any[] }, options: any, theme: any) { // <- should that have proper typing?
@@ -8,6 +16,13 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     // We need to return:
     // - list of unique nodes 
     // - links between nodes
+
+    // To do:
+    // DONE Work on conventions regarding commenting and general code
+    // Calculate bounding box heigth of nametags for correct margin from bottom
+    // Fix double node behavior
+    // Implement node radius by source
+    // Implement popup when hovering over nodess
 
     /* DataFrameView doesn't work */
     //const series = dummydataframe.series[0];
@@ -36,7 +51,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       source: element,
       target: dstById[index],
       // unit conversion to be added
-      sum: <number>allData[2].values.buffer[index]/10000000000000,
+      sum: <number>allData[2].values.buffer[index],
       strokeWidth: 0
     }));
 
