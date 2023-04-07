@@ -35,6 +35,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     const links = srcById.map((element: any, index: string | number) => ({
       source: element,
       target: dstById[index],
+      // unit conversion to be added
       sum: <number>allData[2].values.buffer[index]/10000000000000,
       strokeWidth: 0
     }));

@@ -146,6 +146,9 @@ function Arc(props: any) {
           .style('stroke-opacity', (l: any) => {
             return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? 1 : .1
           })
+          .attr('stroke-width', (l: any) => {
+            return l?.strokeWidth*2
+          })
 
         labels
           .style("font-size", function (label_d: any) {
@@ -161,6 +164,9 @@ function Arc(props: any) {
           .attr("r", props.graphOptions.nodeRadius)
         paths
           .style('stroke-opacity', 1)
+          .attr('stroke-width', (l: any) => {
+            return l?.strokeWidth
+          })
         labels
           .style("font-size", 10)
           .style("opacity", 1)
