@@ -162,10 +162,13 @@ function Arc(props: any) {
 
       })
       .on('mouseout', function (d) {
-        nodes.style('opacity', 1)
-          .transition()
-          .duration(duration)
+        nodes
+        .transition()
+        .duration(duration)
+        .style('opacity', 1)
         d3.select(this)
+        .transition()
+          .duration(duration)
           .attr("r", uniqueNodes[d.srcElement.id].radius)
         paths
           .transition()
