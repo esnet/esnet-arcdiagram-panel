@@ -1,7 +1,7 @@
 export interface SimpleOptions {
   text: string;
   labelsOnHover: boolean;
-  normalizeArcs: boolean;
+  arcFromSource: boolean;
   arcThickness: number;
   showSeriesCount: boolean;
   nodeRadius: number;

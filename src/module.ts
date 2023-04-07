@@ -10,7 +10,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: true,
     })
     .addBooleanSwitch({
-      path: 'normalizeArcs',
+      path: 'arcFromSource',
       name: 'Arc thickness from source',
       defaultValue: false,
     })
@@ -23,7 +23,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         max: 5,
         step: 1,
       },
-      showIf: config => !config.normalizeArcs,
+      showIf: config => !config.arcFromSource,
     })
     .addColorPicker({
       path: 'nodeColor',

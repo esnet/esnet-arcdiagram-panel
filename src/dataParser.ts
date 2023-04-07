@@ -13,7 +13,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     //const series = dummydataframe.series[0];
     //const frame = new DataFrameView(series);
     var allData = data.series[0].fields;
-    console.log(allData)
 
     // get source and target arrays and create array of unique nodes from them
     let src = allData[0].values
@@ -36,9 +35,10 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     const links = srcById.map((element: any, index: string | number) => ({
       source: element,
       target: dstById[index],
-      sum: <number>(allData.find((e: { name: string; }) => e.name ==="Sum")!.values[index])/100000000000000
+      sum: <number>allData[2].values.buffer[index]/10000000000000,
+      strokeWidth: 0
     }));
-    
+
     // color
     const hexColors = {
       nodeColor: theme.visualization.getColorByName(options.nodeColor),

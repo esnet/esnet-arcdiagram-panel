@@ -14,7 +14,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
   };
 
   const theme = useTheme2();
-
+  
   let parsedData: { uniqueNodes:any[]; links:any[] } = {
     uniqueNodes: [],
     links: []

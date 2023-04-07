@@ -15,6 +15,14 @@ function Arc(props: any) {
   const labelRef = useRef(null);
 
   useEffect(() => {
+
+    // either normalize stroke width or set it to weighted
+    links.forEach((e: { strokeWidth: any; sum: any; }) => {
+      e.strokeWidth = !props.graphOptions.arcFromSource ? props.graphOptions.arcThickness : e.sum;
+    });
+
+    console.log(links)
+    
     // get panel size and set the dimensions and margins of the graph
     const panelWidth = window.document.body.querySelector("div.panel-content") !.getBoundingClientRect().width;
     const panelHeight = window.document.body.querySelector("div.panel-content") !.getBoundingClientRect().height;
@@ -23,13 +31,13 @@ function Arc(props: any) {
       top: 20,
       right: 50,
       bottom: 200,
-      left: 50
+      left: 100
     },
     width = panelWidth - margin.left - margin.right,
     height = panelHeight - margin.top - margin.bottom;
 
     // get array of equally spaced values for positioning of nodes on x axis
-    const values = d3.range(margin.left, panelWidth - margin.right, width / uniqueNodes.length);
+    const values = d3.range(margin.left, panelWidth, width / uniqueNodes.length);
     
     const container = containerRef.current,
     graph = gRef.current
@@ -39,6 +47,8 @@ function Arc(props: any) {
     var svg = d3.select(container)
     .selectAll('circle')
     .data(uniqueNodes)
+
+    console.log(links)
 
     svg
       .enter()
@@ -72,9 +82,9 @@ function Arc(props: any) {
       .style("fill", "none")
       .attr("stroke", props.parsedData.hexColors.linkColor)
       .attr("id", "arc")
-      .attr("stroke-width", (l: any) => { return props.graphOptions.normalizeArcs ? l?.sum : props.graphOptions.arcThickness })
+      .attr("stroke-width", (l: any) => { return  l?.strokeWidth })
       .attr("source", (d, i) => links[i].source)
-      .attr("target", (d, i) => links[i].target);
+      .attr("target", (d, i) => links[i].target)
 
     // render labels
     var text = d3.select(labelBox)
@@ -114,8 +124,7 @@ function Arc(props: any) {
           .join(' ');
       })
       .attr("stroke", props.parsedData.hexColors.linkColor)
-      .attr("stroke-width", (l: any) => { 
-        return !props.graphOptions.normalizeArcs ? props.graphOptions.arcThickness :  l?.sum })
+      .attr("stroke-width", (l: any) => { return  l?.strokeWidth})
 
     // update labels
     text
@@ -134,11 +143,7 @@ function Arc(props: any) {
           .style("opacity", 1)
           .attr("r", 10)
         paths
-          .style('stroke', (l: any) => {
-            return d.srcElement.id === l?.source || d.srcElement.id === l?.target ? props.parsedData.hexColors.linkColor : props.parsedData.hexColors.linkColor
-          })
           .style('stroke-opacity', (l: any) => {
-            // why == instead of === idk but works
             return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? 1 : .1
           })
 
@@ -155,9 +160,7 @@ function Arc(props: any) {
         nodes.style('opacity', 1)
           .attr("r", props.graphOptions.nodeRadius)
         paths
-          .style('stroke', props.parsedData.hexColors.linkColor)
           .style('stroke-opacity', 1)
-          .style('stroke-width', (l: any) => {return props.graphOptions.normalizeArcs ? l?.sum : props.graphOptions.arcThickness})
         labels
           .style("font-size", 10)
           .style("opacity", 1)
