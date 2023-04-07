@@ -21,8 +21,17 @@ function Arc(props: any) {
     // either normalize stroke width or set it to weighted
     links.forEach((e: { strokeWidth: any; sum: any; }) => {
       // mapping from sum to strokewidth needs to be changed later
-      e.strokeWidth = !props.graphOptions.arcFromSource ? props.graphOptions.arcThickness : e.sum/10000000000000;
+      e.strokeWidth = !props.graphOptions.arcFromSource ? props.graphOptions.arcThickness : e.sum/1000000000000;
     });
+
+     // either normalize radius width or set it to weighted
+     uniqueNodes.forEach((e: { radius: any; sum: any; }) => {
+      // mapping from sum to strokewidth needs to be changed later
+      e.radius = !props.graphOptions.radiusFromSource ? props.graphOptions.nodeRadius : e.sum/10000000000000;
+    });
+
+    console.log("The nodes are: ", uniqueNodes)
+    console.log("The links are: ", links)
 
     // margins might be useful later
     /*const margin = {
@@ -82,10 +91,11 @@ function Arc(props: any) {
       .append("circle")
       .attr("cx", (d, i) => values[i])
       .attr("cy", height-offsetBottom)
-      .attr("r", props.graphOptions.nodeRadius)
+      .attr("r", (n: any) => { return  n?.radius })
       .style("fill", props.parsedData.hexColors.nodeColor)
       .attr("id", (d, i) => uniqueNodes[i].id)
-      .attr("name", (d, i) => uniqueNodes[i].name);
+      .attr("name", (d, i) => uniqueNodes[i].name)
+      .attr("radius", (d, i) => uniqueNodes[i].radius);
 
     // render links
     var g = d3.select(graph)
@@ -114,14 +124,11 @@ function Arc(props: any) {
       .attr("target", (d, i) => links[i].target)
 
     
-    // highlighting
+    /********************************** highlighting **********************************/ 
     var nodes = d3.selectAll("circle")
     var paths = d3.selectAll("path")
     var labels = d3.selectAll("text")
-
     var duration = 200;
-
-
     nodes
       .on("mouseover", function (d) {
         nodes
@@ -132,14 +139,14 @@ function Arc(props: any) {
           .style("opacity", 1)
           .transition()
           .duration(duration)
-          .attr("r", 10)
+          .attr("r", uniqueNodes[d.srcElement.id].radius*2)
         paths
           .transition()
           .style('stroke-opacity', (l: any) => {
             return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? 1 : .1
           })
           .attr('stroke-width', (l: any) => {
-            return l?.strokeWidth*2
+            return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? l?.strokeWidth*2 : l?.strokeWidth
           })
           .duration(duration)
 
@@ -158,7 +165,8 @@ function Arc(props: any) {
         nodes.style('opacity', 1)
           .transition()
           .duration(duration)
-          .attr("r", props.graphOptions.nodeRadius)
+        d3.select(this)
+          .attr("r", uniqueNodes[d.srcElement.id].radius)
         paths
           .transition()
           .duration(duration)
@@ -172,6 +180,12 @@ function Arc(props: any) {
           .attr("font-size", 10)
           .style("opacity", 1)
       })
+      /******************************************************************************/
+
+
+        
+
+        
 
   }, [props.graphOptions]);
 

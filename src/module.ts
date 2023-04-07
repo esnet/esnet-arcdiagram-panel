@@ -36,7 +36,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: 'blue',
     })
     .addBooleanSwitch({
-      path: 'normalizeRadius',
+      path: 'radiusFromSource',
       name: 'Node radius from source',
       defaultValue: false,
     })
@@ -49,7 +49,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         max: 30,
         step: 1,
       },
-      showIf: config => !config.normalizeRadius,
+      showIf: config => !config.radiusFromSource,
     })
     .addSliderInput({
       path: 'nodePadding',

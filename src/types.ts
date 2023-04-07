@@ -8,5 +8,5 @@ export interface SimpleOptions {
   nodePadding: number;
   nodeColor: string;
   linkColor: string;
-  normalizeRadius: boolean;
+  radiusFromSource: boolean;
 }

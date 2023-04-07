@@ -13,7 +13,6 @@ interface Props extends PanelProps<SimpleOptions> {}
  * @return { Arc } Arc diagram
  */
 export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: any) => {
-  console.log(width, height)
   let graphOptions = {
     ...options,
   };

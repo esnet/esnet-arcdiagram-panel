@@ -19,30 +19,33 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
 
     // To do:
     // DONE Work on conventions regarding commenting and general code
-    // Calculate bounding box heigth of nametags for correct margin from bottom
-    // Fix double node behavior
+    // DONE Calculate bounding box heigth of nametags for correct margin from bottom
+    // DONE Fix double node behavior
     // Implement node radius by source
-    // Implement popup when hovering over nodess
+    // Implement popup when hovering over nodes
 
     /* DataFrameView doesn't work */
     //const series = dummydataframe.series[0];
     //const frame = new DataFrameView(series);
     var allData = data.series[0].fields;
 
+    let source = allData[0].values
+    let target = allData[1].values
+
     // get source and target arrays and create array of unique nodes from them
-    let src = allData[0].values
-    let dest = allData[1].values
-    const uniqueNodes = Array.from([...new Set([...src, ...dest])]).map((str, index) => ({
+    const uniqueNodes = Array.from([...new Set([...source, ...target])]).map((str, index) => ({
       id: index,
-      name: str
+      name: str,
+      sum: 0,
+      radius: 0
     }));
 
-    let srcById = src.map((name: any) => {
+    let srcById = source.map((name: any) => {
       const dictionaryItem = uniqueNodes.find(item => item.name === name);
       return dictionaryItem ? dictionaryItem.id : null;
     });
 
-    let dstById = dest.map((name: any) => {
+    let dstById = target.map((name: any) => {
       const dictionaryItem = uniqueNodes.find(item => item.name === name);
       return dictionaryItem ? dictionaryItem.id : null;
     });
@@ -50,10 +53,46 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     const links = srcById.map((element: any, index: string | number) => ({
       source: element,
       target: dstById[index],
-      // unit conversion to be added
       sum: <number>allData[2].values.buffer[index],
       strokeWidth: 0
     }));
+
+
+    // Initialize object to store aggregated sums
+    const nodeSums: {[key: number]: number} = {};
+
+    // Loop through links array and populate nodeSums object
+    links.forEach((link: { source: any; sum: any; }) => {
+      const {source, sum} = link;
+      if (nodeSums[source]) {
+        nodeSums[source] += sum;
+      } else {
+        nodeSums[source] = sum;
+      }
+    });
+
+    // Create array of unique nodes with aggregated sums
+    const nodes  = Object.keys(nodeSums).map(nodeId => ({
+      id: parseInt(nodeId),
+      sum: nodeSums[parseInt(nodeId)],
+    }));
+
+    links.forEach(function(link: { target: any; }) {
+      const target = link.target;
+      if (!nodeSums[target]) {
+        nodes.push({id: target, sum: 0});
+        nodeSums[target] = 0;
+      }
+    });
+
+      uniqueNodes.map(function(element, index) {
+        element.sum = nodes[index].sum
+      });
+
+
+    
+
+    
 
     // color
     const hexColors = {
