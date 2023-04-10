@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import { idToName } from 'utils';
 
 const styles = {
   containerStyle: {
@@ -36,6 +37,7 @@ let toolTip = {
 }
 
 
+
 function Arc(props: any) {
   let uniqueNodes = props.parsedData.uniqueNodes;
   let links = props.parsedData.links;
@@ -45,10 +47,11 @@ function Arc(props: any) {
   tooltipRef = useRef(null);
   const [showTooltip, setShowTooltip] = useState(false);
 
+
   const handleToggleTooltip = (isActice: boolean | ((prevState: boolean) => boolean), id: number ) => {
 
     // map id to name
-    toolTip.source = uniqueNodes.find( (obj: any) => obj.id === id).name
+    toolTip.source = idToName(id,uniqueNodes)
 
     // get array of sources for the passed id 
     let sourcesForId = links
@@ -115,7 +118,7 @@ function Arc(props: any) {
       .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-30)"))
       .style("margin-right", "5px")
 
-    // after the labels are rendered, we can find out the amount of margin we need to apply
+      // after the labels are rendered, we can find out the amount of margin we need to apply
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
     // the boundingbox of the largest highlighted label and the most left label
     var offsetBottom = Math.max(...Array.from(document.getElementsByTagName("text"), (text) => text.getBoundingClientRect().height));
@@ -217,11 +220,11 @@ function Arc(props: any) {
         console.log(showTooltip)
 
         nodes
-        .transition()
-        .duration(duration)
-        .style('opacity', 1)
+          .transition()
+          .duration(duration)
+          .style('opacity', 1)
         d3.select(this)
-        .transition()
+          .transition()
           .duration(duration)
           .attr("r", uniqueNodes[d.srcElement.id].radius)
         paths
@@ -232,12 +235,40 @@ function Arc(props: any) {
             return l?.strokeWidth
           })
         labels
-        .transition()
+          .transition()
           .duration(duration)
           .attr("font-size", 10)
           .style("opacity", 1)
       })
       /******************************************************************************/
+
+      paths
+      .on("mouseover", function (d) {
+        //handleToggleTooltip(true, Number(d.srcElement.id));
+        console.log(d.srcElement)
+        paths
+          .style("opacity", .1)
+          .transition()
+          .duration(duration)
+        d3.select(this)
+          .transition()
+          .style('opacity', 1)
+          .duration(duration)
+
+      })
+      .on('mouseout', function (d) {
+        //handleToggleTooltip(false, Number(d.srcElement.id));
+        paths
+          .style("opacity", 1)
+          .transition()
+          .duration(duration)
+        d3.select(this)
+          .transition()
+          .style('opacity', 1)
+          .duration(duration)
+
+      })
+
   }, [props.graphOptions]);
 
   return ( 
@@ -248,8 +279,8 @@ function Arc(props: any) {
       </svg>
       {showTooltip && (
         <div ref={tooltipRef} style={styles.toolTipStyle.box}>
-          <text style={styles.toolTipStyle.text} >{toolTip.source}{`
-          ->`}</text>
+          <p style={styles.toolTipStyle.text} >{toolTip.source}{`
+          ->`}</p>
           <p style={styles.toolTipStyle.text} >{toolTip.target}</p>
 
         </div>
