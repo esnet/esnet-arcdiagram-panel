@@ -21,8 +21,15 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     // DONE Work on conventions regarding commenting and general code
     // DONE Calculate bounding box heigth of nametags for correct margin from bottom
     // DONE Fix double node behavior
-    // Implement node radius by source
-    // Implement popup when hovering over nodes
+    // DONE node radius by source
+    // popup when hovering over nodes
+    // group links by color
+    // Unit conversion
+    // fix nodes jumping when resizing panel
+    // highlight receiving labels
+
+    // log vs linear scale
+    // dropdown for choosing source and dest
 
     /* DataFrameView doesn't work */
     //const series = dummydataframe.series[0];

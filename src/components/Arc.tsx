@@ -1,18 +1,68 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 
-let containerStyle = {
-  width: "100%",
-  height: "100%"
+const styles = {
+  containerStyle: {
+    width: "100%",
+    height: "100%"
+  } as React.CSSProperties,
+  buttonStyle: {
+    width: "30px",
+    height: "30px",
+    top:0,
+    position: "absolute"
+  } as React.CSSProperties,
+  toolTipStyle: {
+    box: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      width: "200px",
+      height: "100px",
+      background: "white"
+    } as React.CSSProperties,
+    text: {
+      color: "black",
+      "font-size": "8px"
+    } as React.CSSProperties,
+    
+    
+  } 
+}
+
+let toolTip = {
+  source: "",
+  target: ""
 }
 
 
 function Arc(props: any) {
   let uniqueNodes = props.parsedData.uniqueNodes;
   let links = props.parsedData.links;
-  const containerRef = useRef(null);
-  const gRef = useRef(null);
-  const labelRef = useRef(null);
+  const containerRef = useRef(null),
+  gRef = useRef(null),
+  labelRef = useRef(null),
+  tooltipRef = useRef(null);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const handleToggleTooltip = (isActice: boolean | ((prevState: boolean) => boolean), id: number ) => {
+
+    // map id to name
+    toolTip.source = uniqueNodes.find( (obj: any) => obj.id === id).name
+
+    // get array of sources for the passed id 
+    let sourcesForId = links
+      .filter( (obj: any) => obj.source === id)
+      .map( (obj: any ) => obj.target);
+    // map them to names
+    toolTip.target = uniqueNodes
+      .filter( (obj: any) => sourcesForId.includes(obj.id))
+      .map( (obj: any) => obj.name)
+      .join(', ');
+
+    // toggle tooltip
+    setShowTooltip(isActice);
+  };
 
   useEffect(() => {
     // removes the graph if it exists in the dom so it gets rendered with updated dimensions
@@ -24,14 +74,14 @@ function Arc(props: any) {
       e.strokeWidth = !props.graphOptions.arcFromSource ? props.graphOptions.arcThickness : e.sum/1000000000000;
     });
 
-     // either normalize radius width or set it to weighted
-     uniqueNodes.forEach((e: { radius: any; sum: any; }) => {
+    // either normalize radius width or set it to weighted
+    uniqueNodes.forEach((e: { radius: any; sum: any; }) => {
       // mapping from sum to strokewidth needs to be changed later
       e.radius = !props.graphOptions.radiusFromSource ? props.graphOptions.nodeRadius : e.sum/10000000000000;
     });
 
-    console.log("The nodes are: ", uniqueNodes)
-    console.log("The links are: ", links)
+   // console.log("The nodes are: ", uniqueNodes)
+    //console.log("The links are: ", links)
 
     // margins might be useful later
     /*const margin = {
@@ -131,8 +181,9 @@ function Arc(props: any) {
     var duration = 200;
     nodes
       .on("mouseover", function (d) {
+        handleToggleTooltip(true, Number(d.srcElement.id));
         nodes
-          .style("opacity", .2)
+          .style("opacity", .5)
           .transition()
           .duration(duration)
         d3.select(this)
@@ -162,6 +213,9 @@ function Arc(props: any) {
 
       })
       .on('mouseout', function (d) {
+        handleToggleTooltip(false, Number(d.srcElement.id));
+        console.log(showTooltip)
+
         nodes
         .transition()
         .duration(duration)
@@ -184,22 +238,23 @@ function Arc(props: any) {
           .style("opacity", 1)
       })
       /******************************************************************************/
-
-
-        
-
-        
-
   }, [props.graphOptions]);
 
   return ( 
-      <div  style={containerStyle} > 
-        <svg style={containerStyle} ref = {containerRef}>
-        <g style={containerStyle} ref = {gRef}></g>
-        <svg style={containerStyle} ref = {labelRef}></svg>
+    <div  style={styles.containerStyle} > 
+      <svg style={styles.containerStyle} ref = {containerRef}>
+      <g style={styles.containerStyle} ref = {gRef}></g>
+      <svg style={styles.containerStyle} ref = {labelRef}></svg>
       </svg>
-      </div> 
-      
+      {showTooltip && (
+        <div ref={tooltipRef} style={styles.toolTipStyle.box}>
+          <text style={styles.toolTipStyle.text} >{toolTip.source}{`
+          ->`}</text>
+          <p style={styles.toolTipStyle.text} >{toolTip.target}</p>
+
+        </div>
+      )}
+    </div> 
   );
 }
 
