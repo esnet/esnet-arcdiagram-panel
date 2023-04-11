@@ -5,14 +5,33 @@ import { SimplePanel } from './SimplePanel';
 export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOptions(builder => {
   return builder
     .addBooleanSwitch({
-      path: 'labelsOnHover',
-      name: 'Labels on hover',
-      defaultValue: true,
-    })
-    .addBooleanSwitch({
       path: 'arcFromSource',
       name: 'Arc thickness from source',
       defaultValue: false,
+    })
+    .addBooleanSwitch({
+      path: 'radiusFromSource',
+      name: 'Node radius from source',
+      defaultValue: false,
+    })
+    .addSelect({
+      path: 'scaling',
+      name: 'Scaling',
+      description: 'Select the scaling of the diagram',
+      settings: {
+        allowCustomValue: false,
+        options: [
+          {
+            label: 'Logarithmic',
+            value: 'log',
+          },
+          {
+            label: 'Linear',
+            value: 'lin',
+          },
+        ],
+      },
+      showIf: config => config.radiusFromSource || config.arcFromSource
     })
     .addSliderInput({
       path: 'arcThickness',
@@ -35,11 +54,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Link Color',
       defaultValue: 'blue',
     })
-    .addBooleanSwitch({
-      path: 'radiusFromSource',
-      name: 'Node radius from source',
-      defaultValue: false,
-    })
+
     .addSliderInput({
       path: 'nodeRadius',
       name: 'Node radius',
@@ -60,5 +75,5 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         max: 100,
         step: 1,
       },
-    });
+    })
 });
