@@ -89,8 +89,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     links.forEach(function(link: { target: any; }) {
       const target = link.target;
       if (!nodeSums[target]) {
-        nodes.push({id: target, sum: 0});
-        nodeSums[target] = 0;
+        nodes.push({id: target, sum: 1});
+        nodeSums[target] = 1;
       }
     });
 
@@ -107,7 +107,12 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     
 
     /********************************** Scaling **********************************/ 
-    
+
+      const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
+      maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
+      minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
+      maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
+
       links.forEach((e: { strokeWidth: any; sum: any; }) => {
         // check if arc thickness is set to source
         if(options.arcFromSource) {
@@ -116,7 +121,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
           // check if we apply logarithmic or linear scaling
           if(options.scaling == "log") {
             //e.strokeWidth = mapToLogRange(e.sum)
-            e.strokeWidth = mapToLogRange(e.sum, Number(Math.min(...links.map(( e: any ) => e.sum))), Number(Math.max(...links.map(( e: any ) => e.sum))), 1, 15)
+            e.strokeWidth = mapToLogRange(e.sum, minLink, maxLink, 1, 15)
           } else {
             e.strokeWidth = e.sum/1000000000000
           }
@@ -125,14 +130,22 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         }
       });
 
-      uniqueNodes.forEach((e: { radius: any; sum: any; }) => {
+      console.log(uniqueNodes, links)
+
+      uniqueNodes.forEach((e: { id:any, radius: any; sum: any; }) => {
         // check if arc thickness is set to source
         if(options.radiusFromSource) {
           // check if we apply logarithmic or linear scaling
           if(options.scaling === "log") {
+            // check if node only receiving. if yes, give it the size of the largest incoming link
+            if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
+              // to do
+              e.radius = 5
+            } else {
+              e.radius = mapToLogRange(e.sum, minNode, maxNode, 5, 15)
+              console.log(e.radius!)
+            }
             
-            e.radius = mapToLogRange(e.sum, Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))), Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum))), 5, 15)
-            console.log(e.radius!)
           } else {
             e.radius = e.sum/10000000000000
           }

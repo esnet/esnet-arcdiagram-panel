@@ -2,42 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { idToName } from 'utils';
 import { getNodeTargets } from 'utils';
-
-
-const styles = {
-  containerStyle: {
-    width: "100%",
-    height: "100%"
-  } as React.CSSProperties,
-  buttonStyle: {
-    width: "30px",
-    height: "30px",
-    top:0,
-    position: "absolute"
-  } as React.CSSProperties,
-  toolTipStyle: {
-    box: {
-      position: "absolute",
-      left: 0,
-      top: 0,
-      width: "200px",
-      height: "100px",
-      background: "white"
-    } as React.CSSProperties,
-    text: {
-      color: "black",
-      "font-size": "8px"
-    } as React.CSSProperties,
-  } 
-}
+import { styles } from 'styles'
 
 let toolTip = {
   source: "",
   target: "",
   sum: ""
 }
-
-
 
 function Arc(props: any) {
   let uniqueNodes = props.parsedData.uniqueNodes;
@@ -266,8 +237,8 @@ function Arc(props: any) {
       </svg>
       {showTooltip && (
         <div ref={tooltipRef} style={styles.toolTipStyle.box}>
-          <p style={styles.toolTipStyle.text} >{toolTip.source}{`
-          ->`}</p>
+          <p style={styles.toolTipStyle.text} >{toolTip.source}</p>
+          <p style={styles.toolTipStyle.text}>{`->`}</p>
           <p style={styles.toolTipStyle.text} >{toolTip.target}</p>
 
           <p style={styles.toolTipStyle.text} >{toolTip.sum}</p>

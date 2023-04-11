@@ -62,7 +62,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: 5,
       settings: {
         min: 5,
-        max: 30,
+        max: 15,
         step: 1,
       },
       showIf: config => !config.radiusFromSource,

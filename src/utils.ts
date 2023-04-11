@@ -20,8 +20,7 @@ export function mapToLogRange(number: number, min: number, max: number, scaleFro
     const logScaleFactor = Math.log(max) - Math.log(min);
   
     // Map the input number to the range 1 to 10 using logarithmic scaling
-    const scaledValue = (Math.log(number) - Math.log(min)) / logScaleFactor * (scaleTo-1) + scaleFrom;
-  
+    const scaledValue = (Math.log(number) - Math.log(min)) / logScaleFactor * (scaleTo-scaleFrom) + 1
     // Round the result to two decimal places
     return Math.round(scaledValue * 100) / 100;
   }
