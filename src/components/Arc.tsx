@@ -26,14 +26,13 @@ const styles = {
       color: "black",
       "font-size": "8px"
     } as React.CSSProperties,
-    
-    
   } 
 }
 
 let toolTip = {
   source: "",
-  target: ""
+  target: "",
+  sum: ""
 }
 
 
@@ -47,25 +46,38 @@ function Arc(props: any) {
   tooltipRef = useRef(null);
   const [showTooltip, setShowTooltip] = useState(false);
 
+  const handleToggleTooltip = (isActive: boolean) => {
+    setShowTooltip(isActive);
+  }
 
-  const handleToggleTooltip = (isActice: boolean | ((prevState: boolean) => boolean), id: number ) => {
+  function updateToolkit(isActive: boolean, sourceId: number,  targetId?: number, sum?:number): void {
+    if(targetId == undefined) {
+        // map id to name
+      toolTip.source = idToName(sourceId,uniqueNodes)
 
-    // map id to name
-    toolTip.source = idToName(id,uniqueNodes)
+      // get array of sources for the passed id 
+      let sourcesForId = links
+        .filter( (obj: any) => obj.source === sourceId)
+        .map( (obj: any ) => obj.target);
+      // map them to names
+      toolTip.target = uniqueNodes
+        .filter( (obj: any) => sourcesForId.includes(obj.id))
+        .map( (obj: any) => obj.name)
+        .join(', ');
 
-    // get array of sources for the passed id 
-    let sourcesForId = links
-      .filter( (obj: any) => obj.source === id)
-      .map( (obj: any ) => obj.target);
-    // map them to names
-    toolTip.target = uniqueNodes
-      .filter( (obj: any) => sourcesForId.includes(obj.id))
-      .map( (obj: any) => obj.name)
-      .join(', ');
+      toolTip.sum = ""
 
+    } else {
+      toolTip.source = idToName(sourceId,uniqueNodes)
+      toolTip.target = idToName(targetId,uniqueNodes)
+      toolTip.sum = "Sum: " + String(sum)
+    }
+    
     // toggle tooltip
-    setShowTooltip(isActice);
+    handleToggleTooltip(isActive)
   };
+
+
 
   useEffect(() => {
     // removes the graph if it exists in the dom so it gets rendered with updated dimensions
@@ -175,6 +187,7 @@ function Arc(props: any) {
       .attr("stroke-width", (l: any) => { return  l?.strokeWidth })
       .attr("source", (d, i) => links[i].source)
       .attr("target", (d, i) => links[i].target)
+      .attr("sum", (d, i) => links[i].sum)
 
     
     /********************************** highlighting **********************************/ 
@@ -184,7 +197,7 @@ function Arc(props: any) {
     var duration = 200;
     nodes
       .on("mouseover", function (d) {
-        handleToggleTooltip(true, Number(d.srcElement.id));
+        updateToolkit(true, Number(d.srcElement.id));
         nodes
           .style("opacity", .5)
           .transition()
@@ -216,7 +229,7 @@ function Arc(props: any) {
 
       })
       .on('mouseout', function (d) {
-        handleToggleTooltip(false, Number(d.srcElement.id));
+        handleToggleTooltip(false);
         console.log(showTooltip)
 
         nodes
@@ -244,7 +257,7 @@ function Arc(props: any) {
 
       paths
       .on("mouseover", function (d) {
-        //handleToggleTooltip(true, Number(d.srcElement.id));
+        updateToolkit(true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"));
         console.log(d.srcElement)
         paths
           .style("opacity", .1)
@@ -257,7 +270,7 @@ function Arc(props: any) {
 
       })
       .on('mouseout', function (d) {
-        //handleToggleTooltip(false, Number(d.srcElement.id));
+        handleToggleTooltip(false);
         paths
           .style("opacity", 1)
           .transition()
@@ -282,6 +295,9 @@ function Arc(props: any) {
           <p style={styles.toolTipStyle.text} >{toolTip.source}{`
           ->`}</p>
           <p style={styles.toolTipStyle.text} >{toolTip.target}</p>
+
+          <p style={styles.toolTipStyle.text} >{toolTip.sum}</p>
+
 
         </div>
       )}
