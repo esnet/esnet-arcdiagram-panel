@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { idToName } from 'utils';
+import { getNodeTargets } from 'utils';
+
 
 const styles = {
   containerStyle: {
@@ -16,8 +18,8 @@ const styles = {
   toolTipStyle: {
     box: {
       position: "absolute",
-      bottom: 0,
-      right: 0,
+      left: 0,
+      top: 0,
       width: "200px",
       height: "100px",
       background: "white"
@@ -50,23 +52,15 @@ function Arc(props: any) {
     setShowTooltip(isActive);
   }
 
-  function updateToolkit(isActive: boolean, sourceId: number,  targetId?: number, sum?:number): void {
+  function updateTooltip(isActive: boolean, sourceId: number,  targetId?: number, sum?:number): void {
+    // when only sourceId is passed, display node and its targets
     if(targetId == undefined) {
-        // map id to name
       toolTip.source = idToName(sourceId,uniqueNodes)
-
-      // get array of sources for the passed id 
-      let sourcesForId = links
-        .filter( (obj: any) => obj.source === sourceId)
-        .map( (obj: any ) => obj.target);
-      // map them to names
-      toolTip.target = uniqueNodes
-        .filter( (obj: any) => sourcesForId.includes(obj.id))
-        .map( (obj: any) => obj.name)
-        .join(', ');
-
+      // get targets for passed nodes as strings
+      toolTip.target = getNodeTargets(sourceId, links)
+                       .map((id) => idToName(id, uniqueNodes))
+                       .join(", ")
       toolTip.sum = ""
-
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target = idToName(targetId,uniqueNodes)
@@ -94,17 +88,6 @@ function Arc(props: any) {
       // mapping from sum to strokewidth needs to be changed later
       e.radius = !props.graphOptions.radiusFromSource ? props.graphOptions.nodeRadius : e.sum/10000000000000;
     });
-
-   // console.log("The nodes are: ", uniqueNodes)
-    //console.log("The links are: ", links)
-
-    // margins might be useful later
-    /*const margin = {
-      top: 20,
-      right: 50,
-      bottom: 20,
-      left: 50
-    },*/
 
     const width = props.width,
     height = props.height
@@ -197,7 +180,8 @@ function Arc(props: any) {
     var duration = 200;
     nodes
       .on("mouseover", function (d) {
-        updateToolkit(true, Number(d.srcElement.id));
+        // Tooltip
+        updateTooltip(true, Number(d.srcElement.id));
         nodes
           .style("opacity", .5)
           .transition()
@@ -257,7 +241,7 @@ function Arc(props: any) {
 
       paths
       .on("mouseover", function (d) {
-        updateToolkit(true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"));
+        updateTooltip(true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"));
         console.log(d.srcElement)
         paths
           .style("opacity", .1)
