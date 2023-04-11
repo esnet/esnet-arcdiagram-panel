@@ -77,17 +77,7 @@ function Arc(props: any) {
     // removes the graph if it exists in the dom so it gets rendered with updated dimensions
     d3.selectAll("circle, path, text").remove();
 
-    // either normalize stroke width or set it to weighted
-    links.forEach((e: { strokeWidth: any; sum: any; }) => {
-      // mapping from sum to strokewidth needs to be changed later
-      e.strokeWidth = !props.graphOptions.arcFromSource ? props.graphOptions.arcThickness : e.sum/1000000000000;
-    });
-
-    // either normalize radius width or set it to weighted
-    uniqueNodes.forEach((e: { radius: any; sum: any; }) => {
-      // mapping from sum to strokewidth needs to be changed later
-      e.radius = !props.graphOptions.radiusFromSource ? props.graphOptions.nodeRadius : e.sum/10000000000000;
-    });
+  
 
     const width = props.width,
     height = props.height
@@ -173,7 +163,7 @@ function Arc(props: any) {
       .attr("sum", (d, i) => links[i].sum)
 
     
-    /********************************** highlighting **********************************/ 
+    /********************************** Highlighting **********************************/ 
     var nodes = d3.selectAll("circle")
     var paths = d3.selectAll("path")
     var labels = d3.selectAll("text")
@@ -237,12 +227,12 @@ function Arc(props: any) {
           .attr("font-size", 10)
           .style("opacity", 1)
       })
-      /******************************************************************************/
+
+      /********************************** Link tooltip **********************************/ 
 
       paths
       .on("mouseover", function (d) {
         updateTooltip(true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"));
-        console.log(d.srcElement)
         paths
           .style("opacity", .1)
           .transition()

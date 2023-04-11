@@ -1,3 +1,5 @@
+import { mapToLogRange } from 'utils';
+
 /**
  * Takes data from Grafana query and returns it in the format needed for this panel
  *
@@ -96,16 +98,59 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         element.sum = nodes[index].sum
       });
 
-
-    
-
-    
-
     // color
     const hexColors = {
       nodeColor: theme.visualization.getColorByName(options.nodeColor),
       linkColor: theme.visualization.getColorByName(options.linkColor)
     }
+
+    
+
+    /********************************** Scaling **********************************/ 
+    
+      links.forEach((e: { strokeWidth: any; sum: any; }) => {
+        // check if arc thickness is set to source
+        if(options.arcFromSource) {
+          console.log(options.scaling)
+
+          // check if we apply logarithmic or linear scaling
+          if(options.scaling == "log") {
+            //e.strokeWidth = mapToLogRange(e.sum)
+            e.strokeWidth = mapToLogRange(e.sum, Number(Math.min(...links.map(( e: any ) => e.sum))), Number(Math.max(...links.map(( e: any ) => e.sum))), 1, 15)
+          } else {
+            e.strokeWidth = e.sum/1000000000000
+          }
+        } else {
+          e.strokeWidth = options.arcThickness
+        }
+      });
+
+      uniqueNodes.forEach((e: { radius: any; sum: any; }) => {
+        // check if arc thickness is set to source
+        if(options.radiusFromSource) {
+          // check if we apply logarithmic or linear scaling
+          if(options.scaling === "log") {
+            
+            e.radius = mapToLogRange(e.sum, Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))), Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum))), 5, 15)
+            console.log(e.radius!)
+          } else {
+            e.radius = e.sum/10000000000000
+          }
+          
+        } else {
+          e.radius = options.nodeRadius
+        }
+      });
+
+
+     
+
+
+
+
+    
+
+    
 
 
   return {uniqueNodes, links, hexColors};

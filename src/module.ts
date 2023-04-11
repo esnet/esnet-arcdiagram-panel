@@ -18,6 +18,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       path: 'scaling',
       name: 'Scaling',
       description: 'Select the scaling of the diagram',
+      defaultValue: "lin",
       settings: {
         allowCustomValue: false,
         options: [
@@ -39,7 +40,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: 1,
       settings: {
         min: 1,
-        max: 5,
+        max: 15,
         step: 1,
       },
       showIf: config => !config.arcFromSource,

@@ -9,4 +9,5 @@ export interface SimpleOptions {
   nodeColor: string;
   linkColor: string;
   radiusFromSource: boolean;
+  scaling: string;
 }
