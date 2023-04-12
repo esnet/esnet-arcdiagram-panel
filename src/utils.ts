@@ -23,4 +23,4 @@ export function mapToLogRange(number: number, min: number, max: number, scaleFro
     const scaledValue = (Math.log(number) - Math.log(min)) / logScaleFactor * (scaleTo-scaleFrom) + 1
     // Round the result to two decimal places
     return Math.round(scaledValue * 100) / 100;
-  }
+}

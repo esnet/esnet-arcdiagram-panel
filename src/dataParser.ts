@@ -120,8 +120,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
 
           // check if we apply logarithmic or linear scaling
           if(options.scaling == "log") {
-            //e.strokeWidth = mapToLogRange(e.sum)
-            e.strokeWidth = mapToLogRange(e.sum, minLink, maxLink, 1, 15)
+            e.strokeWidth = mapToLogRange(e.sum, minLink, maxLink, 1, 10)
           } else {
             e.strokeWidth = e.sum/1000000000000
           }
@@ -130,7 +129,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         }
       });
 
-      console.log(uniqueNodes, links)
 
       uniqueNodes.forEach((e: { id:any, radius: any; sum: any; }) => {
         // check if arc thickness is set to source
@@ -143,7 +141,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
               e.radius = 5
             } else {
               e.radius = mapToLogRange(e.sum, minNode, maxNode, 5, 15)
-              console.log(e.radius!)
             }
             
           } else {

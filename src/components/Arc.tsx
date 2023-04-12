@@ -143,8 +143,14 @@ function Arc(props: any) {
       .on("mouseover", function (d) {
         // Tooltip
         updateTooltip(true, Number(d.srcElement.id));
+        const nodeTargets = getNodeTargets(Number(d.srcElement.id), links)
+        
         nodes
-          .style("opacity", .5)
+          .style("opacity", ( n: any) => {
+            // if n is included in the sourceNodes for d, highlight n
+
+            return nodeTargets.includes(n.id) ? 1 : 0.5
+          })
           .transition()
           .duration(duration)
         d3.select(this)
@@ -166,17 +172,16 @@ function Arc(props: any) {
           .transition()
           .duration(duration)
           .attr("font-size", function (label_d: any) {
-            return label_d.name === d.srcElement.getAttribute("name") ? 16 : 10
+            
+            return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 16 : 10
+            
           })
           .style("opacity", function (label_d: any) {
-            return label_d.name === d.srcElement.getAttribute("name") ? 1 : .1
+            return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 1 : .1
           })
-
       })
       .on('mouseout', function (d) {
         handleToggleTooltip(false);
-        console.log(showTooltip)
-
         nodes
           .transition()
           .duration(duration)
