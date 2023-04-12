@@ -9,10 +9,32 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Arc thickness from source',
       defaultValue: false,
     })
+    .addSliderInput({
+      path: 'arcThickness',
+      name: 'Arc thickness',
+      defaultValue: 1,
+      settings: {
+        min: 1,
+        max: 15,
+        step: 1,
+      },
+      showIf: config => !config.arcFromSource,
+    })
     .addBooleanSwitch({
       path: 'radiusFromSource',
       name: 'Node radius from source',
       defaultValue: false,
+    })
+    .addSliderInput({
+      path: 'nodeRadius',
+      name: 'Node radius',
+      defaultValue: 5,
+      settings: {
+        min: 5,
+        max: 15,
+        step: 1,
+      },
+      showIf: config => !config.radiusFromSource,
     })
     .addSelect({
       path: 'scaling',
@@ -34,47 +56,22 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       },
       showIf: config => config.radiusFromSource || config.arcFromSource
     })
-    .addSliderInput({
-      path: 'arcThickness',
-      name: 'Arc thickness',
-      defaultValue: 1,
-      settings: {
-        min: 1,
-        max: 15,
-        step: 1,
-      },
-      showIf: config => !config.arcFromSource,
-    })
     .addColorPicker({
       path: 'nodeColor',
       name: 'Node Color',
       defaultValue: 'blue',
+      showIf: config => !config.groupLinkColor,
     })
     .addColorPicker({
       path: 'linkColor',
       name: 'Link Color',
       defaultValue: 'blue',
+      showIf: config => !config.groupLinkColor,
     })
-
-    .addSliderInput({
-      path: 'nodeRadius',
-      name: 'Node radius',
-      defaultValue: 5,
-      settings: {
-        min: 5,
-        max: 15,
-        step: 1,
-      },
-      showIf: config => !config.radiusFromSource,
-    })
-    .addSliderInput({
-      path: 'nodePadding',
-      name: 'Node padding',
-      defaultValue: 30,
-      settings: {
-        min: 1,
-        max: 100,
-        step: 1,
-      },
+    
+    .addBooleanSwitch({
+      path: 'groupLinkColor',
+      name: 'Link color by source',
+      defaultValue: false,
     })
 });

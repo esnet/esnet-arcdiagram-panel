@@ -5,7 +5,7 @@ export interface SimpleOptions {
   arcThickness: number;
   showSeriesCount: boolean;
   nodeRadius: number;
-  nodePadding: number;
+  groupLinkColor: boolean;
   nodeColor: string;
   linkColor: string;
   radiusFromSource: boolean;

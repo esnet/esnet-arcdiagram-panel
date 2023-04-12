@@ -1,4 +1,5 @@
 import { mapToLogRange } from 'utils';
+import { getEvenlySpacedColors } from 'utils';
 
 /**
  * Takes data from Grafana query and returns it in the format needed for this panel
@@ -63,7 +64,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       source: element,
       target: dstById[index],
       sum: <number>allData[2].values.buffer[index],
-      strokeWidth: 0
+      strokeWidth: 0,
+      color: ""
     }));
 
 
@@ -104,16 +106,28 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       linkColor: theme.visualization.getColorByName(options.linkColor)
     }
 
-    
-
-    /********************************** Scaling **********************************/ 
+    /********************************** Scaling/coloring **********************************/ 
 
       const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
       maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
       minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
       maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
 
-      links.forEach((e: { strokeWidth: any; sum: any; }) => {
+      // group links with same source together
+      
+      
+      var sourceGroups = [...new Set(links.map((item: { source: any; }) => item.source))].map( (source,i) => ({
+        source, 
+        color: ""
+      }));
+
+      const spacedColors = getEvenlySpacedColors(sourceGroups.length)
+
+      sourceGroups.forEach( (e, i) => {
+        e.color = spacedColors[i]
+      })
+
+      links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string}) => {
         // check if arc thickness is set to source
         if(options.arcFromSource) {
           console.log(options.scaling)
@@ -127,6 +141,14 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         } else {
           e.strokeWidth = options.arcThickness
         }
+        // set links color
+        if(options.groupLinkColor) {
+          e.color = sourceGroups.find( group => group.source === e.source)!.color
+          console.log(e.color)
+        } else {
+          e.color = hexColors.linkColor
+        }
+
       });
 
 

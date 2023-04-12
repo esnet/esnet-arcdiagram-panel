@@ -19,8 +19,22 @@ export function mapToLogRange(number: number, min: number, max: number, scaleFro
     // Calculate the logarithmic scale factor
     const logScaleFactor = Math.log(max) - Math.log(min);
   
-    // Map the input number to the range 1 to 10 using logarithmic scaling
+    // Map the input number to the range given by parameters using logarithmic scaling
     const scaledValue = (Math.log(number) - Math.log(min)) / logScaleFactor * (scaleTo-scaleFrom) + 1
     // Round the result to two decimal places
     return Math.round(scaledValue * 100) / 100;
 }
+
+// get an array of evenly spaced colors
+export function getEvenlySpacedColors(amount: number) {
+    const hues = [];
+    const increment = 360 / amount;
+  
+    for(let i = 0; i < amount; i++) {
+      const hue = Math.floor(Math.random() * 360);
+      hues.push((hue + i * increment) % 360);
+    }
+  
+    const colors = hues.map(hue => `hsl(${hue}, 50%, 50%)`);
+    return colors;
+  }

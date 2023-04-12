@@ -126,13 +126,12 @@ function Arc(props: any) {
           .join(' ');
       })
       .style("fill", "none")
-      .attr("stroke", props.parsedData.hexColors.linkColor)
+      .attr("stroke", (l: any) => { return  l?.color })
       .attr("id", "arc")
       .attr("stroke-width", (l: any) => { return  l?.strokeWidth })
       .attr("source", (d, i) => links[i].source)
       .attr("target", (d, i) => links[i].target)
       .attr("sum", (d, i) => links[i].sum)
-
     
     /********************************** Highlighting **********************************/ 
     var nodes = d3.selectAll("circle")
@@ -144,11 +143,8 @@ function Arc(props: any) {
         // Tooltip
         updateTooltip(true, Number(d.srcElement.id));
         const nodeTargets = getNodeTargets(Number(d.srcElement.id), links)
-        
         nodes
           .style("opacity", ( n: any) => {
-            // if n is included in the sourceNodes for d, highlight n
-
             return nodeTargets.includes(n.id) ? 1 : 0.5
           })
           .transition()
@@ -167,14 +163,11 @@ function Arc(props: any) {
             return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? l?.strokeWidth*2 : l?.strokeWidth
           })
           .duration(duration)
-
         labels
           .transition()
           .duration(duration)
           .attr("font-size", function (label_d: any) {
-            
             return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 16 : 10
-            
           })
           .style("opacity", function (label_d: any) {
             return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 1 : .1
