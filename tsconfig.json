@@ -2,10 +2,12 @@
   "extends": "./node_modules/@grafana/toolkit/src/config/tsconfig.plugin.json",
   "include": ["src", "types"],
   "compilerOptions": {
+    "ignoreDeprecations": "5.0",
     "rootDir": "./src",
     "baseUrl": "./src",
     "typeRoots": ["./node_modules/@types"],
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "suppressImplicitAnyIndexErrors": true,
   }
 }

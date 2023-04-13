@@ -112,9 +112,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
       minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
       maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
-
-      // group links with same source together
-      
       
       var sourceGroups = [...new Set(links.map((item: { source: any; }) => item.source))].map( (source,i) => ({
         source, 
@@ -132,7 +129,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         if(options.arcFromSource) {
           // check if we apply logarithmic or linear scaling
           if(options.scaling == "log") {
-            e.strokeWidth = mapToLogRange({ number: e.sum, min: minLink, max: maxLink, scaleFrom: 1, scaleTo: 20 })
+            e.strokeWidth = mapToLogRange({ number: e.sum, min: minLink, max: maxLink, scaleFrom: 1, scaleTo: 25 })
           } else {
             e.strokeWidth = e.sum/1000000000000
           }
@@ -145,7 +142,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         } else {
           e.color = hexColors.linkColor
         }
-
       });
 
 
@@ -156,10 +152,9 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
           if(options.scaling === "log") {
             // check if node only receiving. if yes, give it the size of the largest incoming link
             if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
-              // to do
-              e.radius = 5
+              e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
             } else {
-              e.radius = mapToLogRange({ number: e.sum, min: minNode, max: maxNode, scaleFrom: 5, scaleTo: 30 })
+              e.radius = mapToLogRange({ number: e.sum, min: minNode, max: maxNode, scaleFrom: 5, scaleTo: 15 })
             }
             
           } else {
@@ -170,17 +165,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
           e.radius = options.nodeRadius
         }
       });
-
-
-     
-
-
-
-
-    
-
-    
-
 
   return {uniqueNodes, links, hexColors};
 }

@@ -49,7 +49,7 @@ function Arc(props: any) {
     var offsetY = pos[1] - mapBounds.top
     var offsetX = pos[0] - mapBounds.left
     
-    var toolTipDom = document.querySelectorAll(".tooltip")[0];
+    var toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement;
     var toolTipBounds = toolTipDom.getBoundingClientRect();
     
     var leftOrRight = "left";
@@ -64,8 +64,6 @@ function Arc(props: any) {
       offsetY = mapBounds.bottom - pos[1]
     }
 
-    
-
     toolTipDom.style[topOrBottom] = `${offsetY}px`
     toolTipDom.style[leftOrRight] = `${offsetX}px`
     
@@ -77,8 +75,6 @@ function Arc(props: any) {
   useEffect(() => {
     // removes the graph if it exists in the dom so it gets rendered with updated dimensions
     d3.selectAll("circle, path, text").remove();
-
-  
 
     const width = props.width,
     height = props.height
@@ -189,10 +185,10 @@ function Arc(props: any) {
         paths
           .transition()
           .style('stroke-opacity', (l: any) => {
-            return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? 1 : .5
+            return d.srcElement.id == l?.source ? 1 : .5
           })
           .attr('stroke-width', (l: any) => {
-            return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? l?.strokeWidth*2 : l?.strokeWidth
+            return d.srcElement.id == l?.source ? l?.strokeWidth*2 : l?.strokeWidth
           })
           .duration(duration)
         labels
