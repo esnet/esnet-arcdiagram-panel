@@ -33,6 +33,9 @@ function Arc(props: any) {
       toolTip.target = getNodeTargets({ id: sourceId, links })
                        .map((id) => idToName(id, uniqueNodes))
                        .join(", ")
+      if(toolTip.target == "") {
+        toolTip.target = "NOT SENDING"
+      }
       toolTip.sum = ""
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
@@ -172,6 +175,9 @@ function Arc(props: any) {
             return nodeTargets.includes(n.id) ? 1 : 0.5
           })
           .transition()
+          .attr("r", (n: any) => {
+            return nodeTargets.includes(n.id) ? uniqueNodes[n.id].radius*2 : uniqueNodes[n.id].radius
+          } )
           .duration(duration)
         d3.select(this)
           .style("opacity", 1)
@@ -190,10 +196,10 @@ function Arc(props: any) {
         labels
           .transition()
           .duration(duration)
-          .attr("font-size", function (label_d: any) {
+          .attr("font-size", (label_d: any) => {
             return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 16 : 10
           })
-          .style("opacity", function (label_d: any) {
+          .style("opacity", (label_d: any) => {
             return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 1 : .1
           })
       })
@@ -202,6 +208,9 @@ function Arc(props: any) {
         nodes
           .transition()
           .duration(duration)
+          .attr("r", (n: any) => {
+            return uniqueNodes[n.id].radius
+          } )
           .style('opacity', 1)
         d3.select(this)
           .transition()
