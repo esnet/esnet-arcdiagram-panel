@@ -14,7 +14,8 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@grafana/toolkit": "latest",
-    "@types/d3": "^7.4.0"
+    "@types/d3": "^7.4.0",
+    "@types/jquery": "^3.5.16"
   },
   "dependencies": {
     "@grafana/data": "latest",

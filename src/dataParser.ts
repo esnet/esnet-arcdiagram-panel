@@ -130,11 +130,9 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string}) => {
         // check if arc thickness is set to source
         if(options.arcFromSource) {
-          console.log(options.scaling)
-
           // check if we apply logarithmic or linear scaling
           if(options.scaling == "log") {
-            e.strokeWidth = mapToLogRange(e.sum, minLink, maxLink, 1, 10)
+            e.strokeWidth = mapToLogRange(e.sum, minLink, maxLink, 1, 20)
           } else {
             e.strokeWidth = e.sum/1000000000000
           }
@@ -144,7 +142,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         // set links color
         if(options.groupLinkColor) {
           e.color = sourceGroups.find( group => group.source === e.source)!.color
-          console.log(e.color)
         } else {
           e.color = hexColors.linkColor
         }
@@ -162,7 +159,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
               // to do
               e.radius = 5
             } else {
-              e.radius = mapToLogRange(e.sum, minNode, maxNode, 5, 15)
+              e.radius = mapToLogRange(e.sum, minNode, maxNode, 5, 30)
             }
             
           } else {

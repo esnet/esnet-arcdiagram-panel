@@ -20,7 +20,8 @@ export const styles = {
         padding: "1em",
         margin: "1em",
         "max-width": "200px",
-        "border-radius": "5px"
+        "border-radius": "5px",
+        opacity: 1
       } as React.CSSProperties,
       text: {
         color: "black",

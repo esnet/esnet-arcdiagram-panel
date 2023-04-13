@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { idToName } from 'utils';
 import { getNodeTargets } from 'utils';
+
 import { styles } from 'styles'
 
 let toolTip = {
   source: "",
   target: "",
-  sum: ""
+  sum: "",
+  pos: [0,0]
 }
 
 function Arc(props: any) {
@@ -23,7 +25,7 @@ function Arc(props: any) {
     setShowTooltip(isActive);
   }
 
-  function updateTooltip(isActive: boolean, sourceId: number,  targetId?: number, sum?:number): void {
+  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, sum?:number): void {
     // when only sourceId is passed, display node and its targets
     if(targetId == undefined) {
       toolTip.source = idToName(sourceId,uniqueNodes)
@@ -38,11 +40,18 @@ function Arc(props: any) {
       toolTip.sum = "Sum: " + String(sum)
     }
     
+   
     // toggle tooltip
     handleToggleTooltip(isActive)
+
+    // update position
+    console.log(pos)
+    $(".tooltip").css({
+      "top": pos[1]/2,
+      "left": pos[0]
+    })
+
   };
-
-
 
   useEffect(() => {
     // removes the graph if it exists in the dom so it gets rendered with updated dimensions
@@ -77,7 +86,7 @@ function Arc(props: any) {
       // after the labels are rendered, we can find out the amount of margin we need to apply
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
     // the boundingbox of the largest highlighted label and the most left label
-    var offsetBottom = Math.max(...Array.from(document.getElementsByTagName("text"), (text) => text.getBoundingClientRect().height));
+    var offsetBottom = Math.max(...Array.from($("text"), (text) => text.getBoundingClientRect().height));
     var offsetLeft = document.getElementsByTagName("text")[0].getBoundingClientRect().width
     // Map to highlighted labels (size increases by 60%)
     offsetBottom*=1.6
@@ -141,8 +150,10 @@ function Arc(props: any) {
     nodes
       .on("mouseover", function (d) {
         // Tooltip
-        updateTooltip(true, Number(d.srcElement.id));
+        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.id));
+
         const nodeTargets = getNodeTargets(Number(d.srcElement.id), links)
+        console.log(d)
         nodes
           .style("opacity", ( n: any) => {
             return nodeTargets.includes(n.id) ? 1 : 0.5
@@ -157,7 +168,7 @@ function Arc(props: any) {
         paths
           .transition()
           .style('stroke-opacity', (l: any) => {
-            return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? 1 : .1
+            return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? 1 : .5
           })
           .attr('stroke-width', (l: any) => {
             return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? l?.strokeWidth*2 : l?.strokeWidth
@@ -201,7 +212,7 @@ function Arc(props: any) {
 
       paths
       .on("mouseover", function (d) {
-        updateTooltip(true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"));
+        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"));
         paths
           .style("opacity", .1)
           .transition()
@@ -210,7 +221,6 @@ function Arc(props: any) {
           .transition()
           .style('opacity', 1)
           .duration(duration)
-
       })
       .on('mouseout', function (d) {
         handleToggleTooltip(false);
@@ -233,8 +243,10 @@ function Arc(props: any) {
       <g style={styles.containerStyle} ref = {gRef}></g>
       <svg style={styles.containerStyle} ref = {labelRef}></svg>
       </svg>
+
+
       {showTooltip && (
-        <div ref={tooltipRef} style={styles.toolTipStyle.box}>
+        <div ref={tooltipRef} style={styles.toolTipStyle.box} className='tooltip'>
           <p style={styles.toolTipStyle.text} >{toolTip.source}</p>
           <p style={styles.toolTipStyle.text}>{`->`}</p>
           <p style={styles.toolTipStyle.text} >{toolTip.target}</p>
