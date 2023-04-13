@@ -132,7 +132,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         if(options.arcFromSource) {
           // check if we apply logarithmic or linear scaling
           if(options.scaling == "log") {
-            e.strokeWidth = mapToLogRange(e.sum, minLink, maxLink, 1, 20)
+            e.strokeWidth = mapToLogRange({ number: e.sum, min: minLink, max: maxLink, scaleFrom: 1, scaleTo: 20 })
           } else {
             e.strokeWidth = e.sum/1000000000000
           }
@@ -159,7 +159,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
               // to do
               e.radius = 5
             } else {
-              e.radius = mapToLogRange(e.sum, minNode, maxNode, 5, 30)
+              e.radius = mapToLogRange({ number: e.sum, min: minNode, max: maxNode, scaleFrom: 5, scaleTo: 30 })
             }
             
           } else {

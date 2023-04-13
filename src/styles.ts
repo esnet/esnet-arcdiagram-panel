@@ -12,8 +12,8 @@ export const styles = {
     toolTipStyle: {
       box: {
         position: "absolute",
-        left: 0,
-        top: 0,
+        left: "unset",
+        top: "unset",
         width: "auto",
         height: "auto",
         background: "white",

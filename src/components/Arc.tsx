@@ -30,7 +30,7 @@ function Arc(props: any) {
     if(targetId == undefined) {
       toolTip.source = idToName(sourceId,uniqueNodes)
       // get targets for passed nodes as strings
-      toolTip.target = getNodeTargets(sourceId, links)
+      toolTip.target = getNodeTargets({ id: sourceId, links })
                        .map((id) => idToName(id, uniqueNodes))
                        .join(", ")
       toolTip.sum = ""
@@ -45,11 +45,32 @@ function Arc(props: any) {
     handleToggleTooltip(isActive)
 
     // update position
-    console.log(pos)
-    $(".tooltip").css({
-      "top": pos[1]/2,
-      "left": pos[0]
-    })
+    var mapBounds = document.querySelectorAll(".panel-container")[0].getBoundingClientRect();
+    var offsetY = pos[1] - mapBounds.top
+    var offsetX = pos[0] - mapBounds.left
+    
+    var toolTipDom = document.querySelectorAll(".tooltip")[0];
+    var toolTipBounds = toolTipDom.getBoundingClientRect();
+    
+    var leftOrRight = "left";
+    if(offsetX + toolTipBounds.right > mapBounds.right) {
+      leftOrRight = "right";
+      offsetX = mapBounds.right - pos[0]
+    }
+
+    var topOrBottom = "top"
+    if(offsetY + toolTipBounds.bottom > mapBounds.bottom) {
+      topOrBottom = "bottom";
+      offsetY = mapBounds.bottom - pos[1]
+    }
+
+    
+
+    toolTipDom.style[topOrBottom] = `${offsetY}px`
+    toolTipDom.style[leftOrRight] = `${offsetX}px`
+    
+    console.log("left ", toolTipDom.style["left"])
+    console.log("right ", toolTipDom.style["right"])
 
   };
 
@@ -152,7 +173,7 @@ function Arc(props: any) {
         // Tooltip
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.id));
 
-        const nodeTargets = getNodeTargets(Number(d.srcElement.id), links)
+        const nodeTargets = getNodeTargets({ id: Number(d.srcElement.id), links })
         console.log(d)
         nodes
           .style("opacity", ( n: any) => {
