@@ -66,9 +66,6 @@ function Arc(props: any) {
 
     toolTipDom.style[topOrBottom] = `${offsetY}px`
     toolTipDom.style[leftOrRight] = `${offsetX}px`
-    
-    console.log("left ", toolTipDom.style["left"])
-    console.log("right ", toolTipDom.style["right"])
 
   };
 
@@ -170,7 +167,6 @@ function Arc(props: any) {
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.id));
 
         const nodeTargets = getNodeTargets({ id: Number(d.srcElement.id), links })
-        console.log(d)
         nodes
           .style("opacity", ( n: any) => {
             return nodeTargets.includes(n.id) ? 1 : 0.5

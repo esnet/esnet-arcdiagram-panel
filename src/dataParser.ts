@@ -158,7 +158,12 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
             }
             
           } else {
-            e.radius = e.sum/10000000000000
+            if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
+              e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
+            } else {
+              e.radius = (e.sum/1000000000000)/2
+                        }
+            
           }
           
         } else {
