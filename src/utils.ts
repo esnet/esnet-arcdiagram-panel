@@ -28,16 +28,19 @@ export function mapToLogRange({ number, min, max, scaleFrom, scaleTo }: { number
 
 // get an array of evenly spaced colors
 export function getEvenlySpacedColors(amount: number): string[] {
-    const hues = [];
-    const increment = 360 / amount;
-  
-    for(let i = 0; i < amount; i++) {
-      const hue = Math.floor(Math.random() * 360);
-      hues.push((hue + i * increment) % 360);
+
+    const colors = [];
+
+    for (let i = 0; i < amount; i++) {
+        const hue = (i * 36) % 360;
+        const saturation = 100;
+        const lightness = 50;
+        const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        colors.push(color);
     }
-  
-    const colors = hues.map(hue => `hsl(${hue}, 50%, 50%)`);
+
     return colors;
+
 }
 
 // get array of n equally spaced values in specific range
