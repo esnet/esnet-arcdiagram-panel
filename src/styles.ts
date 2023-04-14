@@ -3,6 +3,11 @@ export const styles = {
       width: "100%",
       height: "100%"
     } as React.CSSProperties,
+    labelStyle: {
+      width: "100%",
+      height: "100%",
+      "z-index": "10",
+    } as React.CSSProperties,
     buttonStyle: {
       width: "30px",
       height: "30px",
@@ -12,8 +17,8 @@ export const styles = {
     toolTipStyle: {
       box: {
         position: "absolute",
-        left: "unset",
-        top: "unset",
+        left: "",
+        top: "",
         width: "auto",
         height: "auto",
         background: "white",
@@ -21,7 +26,7 @@ export const styles = {
         margin: "1em",
         "max-width": "200px",
         "border-radius": "5px",
-        opacity: 1
+        opacity: 0.9
       } as React.CSSProperties,
       text: {
         color: "black",

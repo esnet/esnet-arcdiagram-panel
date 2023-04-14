@@ -37,21 +37,21 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       showIf: config => !config.radiusFromSource,
     })
     .addSelect({
-      path: 'scaling',
+      path: 'scale',
       name: 'Scaling',
-      description: 'Select the scaling of the diagram',
       defaultValue: "lin",
+      description: 'Select the scaling of the diagram',
       settings: {
         allowCustomValue: false,
         options: [
           {
-            label: 'Logarithmic',
-            value: 'log',
-          },
-          {
             label: 'Linear',
             value: 'lin',
           },
+          {
+            label: "Logarithmic",
+            value: "log"
+          }
         ],
       },
       showIf: config => config.radiusFromSource || config.arcFromSource

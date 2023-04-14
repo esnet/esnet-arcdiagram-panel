@@ -25,6 +25,7 @@ function Arc(props: any) {
   }
 
   function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, sum?:number): void {
+    
     // when only sourceId is passed, display node and its targets
     if(targetId == undefined) {
       toolTip.source = idToName(sourceId,uniqueNodes)
@@ -33,7 +34,7 @@ function Arc(props: any) {
                        .map((id) => idToName(id, uniqueNodes))
                        .join(", ")
       if(toolTip.target == "") {
-        toolTip.target = "NOT SENDING"
+        toolTip.target = ""
       }
       toolTip.sum = ""
     } else {
@@ -55,19 +56,23 @@ function Arc(props: any) {
     var toolTipBounds = toolTipDom.getBoundingClientRect();
     
     var leftOrRight = "left";
+    console.log(offsetX + toolTipBounds.right, mapBounds.right)
     if(offsetX + toolTipBounds.right > mapBounds.right) {
       leftOrRight = "right";
       offsetX = mapBounds.right - pos[0]
     }
 
     var topOrBottom = "top"
-    if(offsetY + toolTipBounds.bottom > mapBounds.bottom) {
+
+    if((offsetY + toolTipBounds.bottom - 250 > mapBounds.bottom)) {
       topOrBottom = "bottom";
       offsetY = mapBounds.bottom - pos[1]
     }
 
     toolTipDom.style[topOrBottom] = `${offsetY}px`
     toolTipDom.style[leftOrRight] = `${offsetX}px`
+
+    console.log("top",toolTipDom.style["top"],"bottom",toolTipDom.style["bottom"])
 
   };
 
@@ -90,8 +95,9 @@ function Arc(props: any) {
     text
       .enter()
       .append("text")
-      .attr("x", -10)
-      .attr("y", 10)
+      // if node has large radius, offset the label for readability
+      .attr("x", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 5 ? -(uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*2) : -10 })
+      .attr("y", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 5 ? (uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*2) : 10 })
       .text((d, i) => uniqueNodes[i].name)
       .style("text-anchor", "end")
       .attr('fill', 'white')
@@ -109,15 +115,16 @@ function Arc(props: any) {
     offsetLeft*=1.6
 
     // get array of equally spaced values for positioning of graph on x axis
-    const values = linSpace(0, width, uniqueNodes.length);
-    console.log(width)
-    console.log("Equally spaced values are:", values)
-    console.log("Nodelist:", uniqueNodes)
+    const values = linSpace(50, width-50, uniqueNodes.length);
+    //console.log(width)
+    //console.log("Equally spaced values are:", values)
+    //console.log("Nodelist:", uniqueNodes)
 
 
     // Update the labels position
     d3.selectAll("text")
     .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-30)"))
+    
 
     // render nodes
     var svg = d3.select(container)
@@ -233,6 +240,8 @@ function Arc(props: any) {
           .style("opacity", 1)
       })
 
+      
+
       /********************************** Link tooltip **********************************/ 
 
       paths
@@ -266,7 +275,7 @@ function Arc(props: any) {
     <div  style={styles.containerStyle} > 
       <svg style={styles.containerStyle} ref = {containerRef}>
       <g style={styles.containerStyle} ref = {gRef}></g>
-      <svg style={styles.containerStyle} ref = {labelRef}></svg>
+      <svg style={styles.labelStyle} ref = {labelRef}></svg>
       </svg>
 
 

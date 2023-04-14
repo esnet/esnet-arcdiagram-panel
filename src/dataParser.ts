@@ -106,6 +106,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       linkColor: theme.visualization.getColorByName(options.linkColor)
     }
 
+
     /********************************** Scaling/coloring **********************************/ 
 
       const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
@@ -118,17 +119,19 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         color: ""
       }));
 
-      const spacedColors = getEvenlySpacedColors({ amount: sourceGroups.length })
+      const spacedColors = getEvenlySpacedColors(sourceGroups.length)
 
       sourceGroups.forEach( (e, i) => {
         e.color = spacedColors[i]
       })
 
+      console.log(options.scale)
+
       links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string}) => {
         // check if arc thickness is set to source
         if(options.arcFromSource) {
           // check if we apply logarithmic or linear scaling
-          if(options.scaling == "log") {
+          if(options.scale == "log") {
             e.strokeWidth = mapToLogRange({ number: e.sum, min: minLink, max: maxLink, scaleFrom: 1, scaleTo: 25 })
           } else {
             e.strokeWidth = e.sum/1000000000000
@@ -149,7 +152,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         // check if arc thickness is set to source
         if(options.radiusFromSource) {
           // check if we apply logarithmic or linear scaling
-          if(options.scaling === "log") {
+          if(options.scale === "log") {
             // check if node only receiving. if yes, give it the size of the largest incoming link
             if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
               e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
