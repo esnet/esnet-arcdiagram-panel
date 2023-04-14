@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { idToName } from 'utils';
-import { getNodeTargets } from 'utils';
+import { idToName, getNodeTargets, linSpace } from 'utils';
 
 import { styles } from 'styles'
 
@@ -110,7 +109,11 @@ function Arc(props: any) {
     offsetLeft*=1.6
 
     // get array of equally spaced values for positioning of graph on x axis
-    const values = d3.range(offsetLeft, width, width / uniqueNodes.length);
+    const values = linSpace(0, width, uniqueNodes.length);
+    console.log(width)
+    console.log("Equally spaced values are:", values)
+    console.log("Nodelist:", uniqueNodes)
+
 
     // Update the labels position
     d3.selectAll("text")

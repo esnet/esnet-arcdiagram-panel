@@ -118,7 +118,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         color: ""
       }));
 
-      const spacedColors = getEvenlySpacedColors(sourceGroups.length)
+      const spacedColors = getEvenlySpacedColors({ amount: sourceGroups.length })
 
       sourceGroups.forEach( (e, i) => {
         e.color = spacedColors[i]

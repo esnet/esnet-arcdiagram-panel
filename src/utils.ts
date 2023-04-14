@@ -39,3 +39,9 @@ export function getEvenlySpacedColors(amount: number): string[] {
     const colors = hues.map(hue => `hsl(${hue}, 50%, 50%)`);
     return colors;
 }
+
+// get array of n equally spaced values in specific range
+export function linSpace(start: number, stop: number, n: number): number[] {
+    const step = (stop - start) / (n - 1);
+    return Array.from({ length: n }, (_, i) => start + i * step);
+  }
