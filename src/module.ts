@@ -1,6 +1,8 @@
-import { PanelPlugin } from '@grafana/data';
+import { PanelPlugin, getFieldDisplayName, FieldOverrideContext } from '@grafana/data';
 import { SimpleOptions } from './types';
 import { SimplePanel } from './SimplePanel';
+
+const OptionsCategory = ['Display'];
 
 export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOptions(builder => {
   return builder
@@ -8,6 +10,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       path: 'arcFromSource',
       name: 'Arc thickness from source',
       defaultValue: false,
+      category: OptionsCategory,
     })
     .addSliderInput({
       path: 'arcThickness',
@@ -19,11 +22,13 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         step: 1,
       },
       showIf: config => !config.arcFromSource,
+      category: OptionsCategory,
     })
     .addBooleanSwitch({
       path: 'radiusFromSource',
       name: 'Node radius from source',
       defaultValue: false,
+      category: OptionsCategory,
     })
     .addSliderInput({
       path: 'nodeRadius',
@@ -35,6 +40,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         step: 1,
       },
       showIf: config => !config.radiusFromSource,
+      category: OptionsCategory,
     })
     .addSelect({
       path: 'scale',
@@ -54,24 +60,94 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           }
         ],
       },
-      showIf: config => config.radiusFromSource || config.arcFromSource
+      showIf: config => config.radiusFromSource || config.arcFromSource,
+      category: OptionsCategory,
     })
     .addColorPicker({
       path: 'nodeColor',
       name: 'Node Color',
       defaultValue: 'blue',
       showIf: config => !config.groupLinkColor,
+      category: OptionsCategory,
     })
     .addColorPicker({
       path: 'linkColor',
       name: 'Link Color',
       defaultValue: 'blue',
       showIf: config => !config.groupLinkColor,
+      category: OptionsCategory,
     })
     
     .addBooleanSwitch({
       path: 'groupLinkColor',
       name: 'Link color by source',
       defaultValue: false,
+      category: OptionsCategory,
+    })
+    .addSelect({
+      path: 'Source',
+      name: 'src',
+      description: 'Source:',
+      settings: {
+        allowCustomValue: false,
+        options: [
+          {
+            label: 'Linear',
+            value: 'lin',
+          },
+          {
+            label: "Logarithmic",
+            value: "log"
+          }
+        ],
+      },
+      category: OptionsCategory,
+      showIf: config => config.radiusFromSource || config.arcFromSource
+    })
+    .addSelect({
+      path: 'src',
+      name: 'Source',
+      description: 'Source:',
+      category: OptionsCategory,
+      settings: {
+        allowCustomValue: false,
+        options: [],
+        getOptions: async (context: FieldOverrideContext) => {
+          const options = [];
+          if (context && context.data) {
+            for (const frame of context.data) {
+              for (const field of frame.fields) {
+                const name = getFieldDisplayName(field, frame, context.data);
+                const value = name;
+                options.push({ value, label: name });
+              }
+            }
+          }
+          return Promise.resolve(options);
+        },
+      },
+    })
+    .addSelect({
+      path: 'dest',
+      name: 'Destination',
+      description: 'Destination:',
+      category: OptionsCategory,
+      settings: {
+        allowCustomValue: false,
+        options: [],
+        getOptions: async (context: FieldOverrideContext) => {
+          const options = [];
+          if (context && context.data) {
+            for (const frame of context.data) {
+              for (const field of frame.fields) {
+                const name = getFieldDisplayName(field, frame, context.data);
+                const value = name;
+                options.push({ value, label: name });
+              }
+            }
+          }
+          return Promise.resolve(options);
+        },
+      },
     })
 });

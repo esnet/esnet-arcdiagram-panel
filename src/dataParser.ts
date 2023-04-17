@@ -12,167 +12,143 @@ import { getEvenlySpacedColors } from 'utils';
  * @return {hexColors} colors converted to hex
  */
 
-
 export function parseData(data: { series: any[] }, options: any, theme: any) { // <- should that have proper typing?
-    //const { valueFieldName } = options;
 
-    // We need to return:
-    // - list of unique nodes 
-    // - links between nodes
+  var allData = data.series[0].fields;
 
-    // To do:
-    // DONE Work on conventions regarding commenting and general code
-    // DONE Calculate bounding box heigth of nametags for correct margin from bottom
-    // DONE Fix double node behavior
-    // DONE node radius by source
-    // popup when hovering over nodes
-    // group links by color
-    // Unit conversion
-    // fix nodes jumping when resizing panel
-    // highlight receiving labels
+  // if src/dst not defined in options, take first/second group by as default
+  var source = options.src ? allData.find((obj: { name: any; }) => obj.name === options.src)?.values : allData[0].values;
+  var target = options.dest ? allData.find((obj: { name: any; }) => obj.name === options.dest)?.values : allData[1].values;
 
-    // log vs linear scale
-    // dropdown for choosing source and dest
+  // get source and target arrays and create array of unique nodes from them
+  const uniqueNodes = Array.from([...new Set([...source, ...target])]).map((str, index) => ({
+    id: index,
+    name: str,
+    sum: 0,
+    radius: 0
+  }));
 
-    /* DataFrameView doesn't work */
-    //const series = dummydataframe.series[0];
-    //const frame = new DataFrameView(series);
-    var allData = data.series[0].fields;
+  let srcById = source.map((name: any) => {
+    const dictionaryItem = uniqueNodes.find(item => item.name === name);
+    return dictionaryItem ? dictionaryItem.id : null;
+  });
 
-    let source = allData[0].values
-    let target = allData[1].values
+  let dstById = target.map((name: any) => {
+    const dictionaryItem = uniqueNodes.find(item => item.name === name);
+    return dictionaryItem ? dictionaryItem.id : null;
+  });
 
-    // get source and target arrays and create array of unique nodes from them
-    const uniqueNodes = Array.from([...new Set([...source, ...target])]).map((str, index) => ({
-      id: index,
-      name: str,
-      sum: 0,
-      radius: 0
-    }));
+  const links = srcById.map((element: any, index: string | number) => ({
+    source: element,
+    target: dstById[index],
+    sum: <number>allData[2].values.buffer[index],
+    strokeWidth: 0,
+    color: ""
+  }));
 
-    let srcById = source.map((name: any) => {
-      const dictionaryItem = uniqueNodes.find(item => item.name === name);
-      return dictionaryItem ? dictionaryItem.id : null;
+
+  // Initialize object to store aggregated sums
+  const nodeSums: {[key: number]: number} = {};
+
+  // Loop through links array and populate nodeSums object
+  links.forEach((link: { source: any; sum: any; }) => {
+    const {source, sum} = link;
+    if (nodeSums[source]) {
+      nodeSums[source] += sum;
+    } else {
+      nodeSums[source] = sum;
+    }
+  });
+
+  // Create array of unique nodes with aggregated sums
+  const nodes  = Object.keys(nodeSums).map(nodeId => ({
+    id: parseInt(nodeId),
+    sum: nodeSums[parseInt(nodeId)],
+  }));
+
+  links.forEach(function(link: { target: any; }) {
+    const target = link.target;
+    if (!nodeSums[target]) {
+      nodes.push({id: target, sum: 1});
+      nodeSums[target] = 1;
+    }
+  });
+
+    uniqueNodes.map(function(element, index) {
+      element.sum = nodes[index].sum
     });
 
-    let dstById = target.map((name: any) => {
-      const dictionaryItem = uniqueNodes.find(item => item.name === name);
-      return dictionaryItem ? dictionaryItem.id : null;
-    });
+  // color
+  const hexColors = {
+    nodeColor: theme.visualization.getColorByName(options.nodeColor),
+    linkColor: theme.visualization.getColorByName(options.linkColor)
+  }
 
-    const links = srcById.map((element: any, index: string | number) => ({
-      source: element,
-      target: dstById[index],
-      sum: <number>allData[2].values.buffer[index],
-      strokeWidth: 0,
+
+  /********************************** Scaling/coloring **********************************/ 
+
+    const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
+    maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
+    minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
+    maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
+    
+    var sourceGroups = [...new Set(links.map((item: { source: any; }) => item.source))].map( (source,i) => ({
+      source, 
       color: ""
     }));
 
+    const spacedColors = getEvenlySpacedColors(sourceGroups.length)
 
-    // Initialize object to store aggregated sums
-    const nodeSums: {[key: number]: number} = {};
+    sourceGroups.forEach( (e, i) => {
+      e.color = spacedColors[i]
+    })
 
-    // Loop through links array and populate nodeSums object
-    links.forEach((link: { source: any; sum: any; }) => {
-      const {source, sum} = link;
-      if (nodeSums[source]) {
-        nodeSums[source] += sum;
+    links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string}) => {
+      // check if arc thickness is set to source
+      if(options.arcFromSource) {
+        // check if we apply logarithmic or linear scaling
+        if(options.scale == "log") {
+          e.strokeWidth = mapToLogRange({ number: e.sum, min: minLink, max: maxLink, scaleFrom: 1, scaleTo: 25 })
+        } else {
+          e.strokeWidth = e.sum/1000000000000
+        }
       } else {
-        nodeSums[source] = sum;
+        e.strokeWidth = options.arcThickness
+      }
+      // set links color
+      if(options.groupLinkColor) {
+        e.color = sourceGroups.find( group => group.source === e.source)!.color
+      } else {
+        e.color = hexColors.linkColor
       }
     });
 
-    // Create array of unique nodes with aggregated sums
-    const nodes  = Object.keys(nodeSums).map(nodeId => ({
-      id: parseInt(nodeId),
-      sum: nodeSums[parseInt(nodeId)],
-    }));
 
-    links.forEach(function(link: { target: any; }) {
-      const target = link.target;
-      if (!nodeSums[target]) {
-        nodes.push({id: target, sum: 1});
-        nodeSums[target] = 1;
-      }
-    });
-
-      uniqueNodes.map(function(element, index) {
-        element.sum = nodes[index].sum
-      });
-
-    // color
-    const hexColors = {
-      nodeColor: theme.visualization.getColorByName(options.nodeColor),
-      linkColor: theme.visualization.getColorByName(options.linkColor)
-    }
-
-
-    /********************************** Scaling/coloring **********************************/ 
-
-      const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
-      maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
-      minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
-      maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
-      
-      var sourceGroups = [...new Set(links.map((item: { source: any; }) => item.source))].map( (source,i) => ({
-        source, 
-        color: ""
-      }));
-
-      const spacedColors = getEvenlySpacedColors(sourceGroups.length)
-
-      sourceGroups.forEach( (e, i) => {
-        e.color = spacedColors[i]
-      })
-
-      console.log(options.scale)
-
-      links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string}) => {
-        // check if arc thickness is set to source
-        if(options.arcFromSource) {
-          // check if we apply logarithmic or linear scaling
-          if(options.scale == "log") {
-            e.strokeWidth = mapToLogRange({ number: e.sum, min: minLink, max: maxLink, scaleFrom: 1, scaleTo: 25 })
+    uniqueNodes.forEach((e: { id:any, radius: any; sum: any; }) => {
+      // check if arc thickness is set to source
+      if(options.radiusFromSource) {
+        // check if we apply logarithmic or linear scaling
+        if(options.scale === "log") {
+          // check if node only receiving. if yes, give it the size of the largest incoming link
+          if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
+            e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
           } else {
-            e.strokeWidth = e.sum/1000000000000
-          }
-        } else {
-          e.strokeWidth = options.arcThickness
-        }
-        // set links color
-        if(options.groupLinkColor) {
-          e.color = sourceGroups.find( group => group.source === e.source)!.color
-        } else {
-          e.color = hexColors.linkColor
-        }
-      });
-
-
-      uniqueNodes.forEach((e: { id:any, radius: any; sum: any; }) => {
-        // check if arc thickness is set to source
-        if(options.radiusFromSource) {
-          // check if we apply logarithmic or linear scaling
-          if(options.scale === "log") {
-            // check if node only receiving. if yes, give it the size of the largest incoming link
-            if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
-              e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
-            } else {
-              e.radius = mapToLogRange({ number: e.sum, min: minNode, max: maxNode, scaleFrom: 5, scaleTo: 15 })
-            }
-            
-          } else {
-            if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
-              e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
-            } else {
-              e.radius = (e.sum/1000000000000)/2
-                        }
-            
+            e.radius = mapToLogRange({ number: e.sum, min: minNode, max: maxNode, scaleFrom: 5, scaleTo: 15 })
           }
           
         } else {
-          e.radius = options.nodeRadius
+          if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
+            e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
+          } else {
+            e.radius = (e.sum/1000000000000)/2
+                      }
+          
         }
-      });
+        
+      } else {
+        e.radius = options.nodeRadius
+      }
+    });
 
   return {uniqueNodes, links, hexColors};
 }

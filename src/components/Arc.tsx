@@ -56,7 +56,6 @@ function Arc(props: any) {
     var toolTipBounds = toolTipDom.getBoundingClientRect();
     
     var leftOrRight = "left";
-    console.log(offsetX + toolTipBounds.right, mapBounds.right)
     if(offsetX + toolTipBounds.right > mapBounds.right) {
       leftOrRight = "right";
       offsetX = mapBounds.right - pos[0]
@@ -72,7 +71,6 @@ function Arc(props: any) {
     toolTipDom.style[topOrBottom] = `${offsetY}px`
     toolTipDom.style[leftOrRight] = `${offsetX}px`
 
-    console.log("top",toolTipDom.style["top"],"bottom",toolTipDom.style["bottom"])
 
   };
 
@@ -116,10 +114,6 @@ function Arc(props: any) {
 
     // get array of equally spaced values for positioning of graph on x axis
     const values = linSpace(50, width-50, uniqueNodes.length);
-    //console.log(width)
-    //console.log("Equally spaced values are:", values)
-    //console.log("Nodelist:", uniqueNodes)
-
 
     // Update the labels position
     d3.selectAll("text")

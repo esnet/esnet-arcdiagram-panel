@@ -24,6 +24,18 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
     links: []
   };
 
+  // check if source equals dst 
+  var source = options.src ? data.series[0].fields.find((obj: { name: any; }) => obj.name === options.src).name : data.series[0].fields[0].name;
+  var target = options.dest ? data.series[0].fields.find((obj: { name: any; }) => obj.name === options.dest).name : data.series[0].fields[1].name;
+
+  if(source === target) {
+    return (
+      <div>
+        Source equals target
+      </div>
+    )
+  }
+
   try {
     parsedData = parseData(data, graphOptions, theme);
   } catch (error) {
@@ -31,7 +43,6 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
   }
 
   const textColor = theme.colors.text.primary;
-  
 
   return (
     <Arc
@@ -42,6 +53,8 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
       height={height}
     ></Arc>
   );
+ 
+
 };
 
 

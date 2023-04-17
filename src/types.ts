@@ -10,5 +10,6 @@ export interface SimpleOptions {
   linkColor: string;
   radiusFromSource: boolean;
   scale: string;
-
+  src: string;
+  dest: string;
 }
