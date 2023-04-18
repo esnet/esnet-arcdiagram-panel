@@ -43,6 +43,37 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       category: OptionsCategory,
     })
     .addSelect({
+      path: 'linkColorConfig',
+      name: 'Link color',
+      description: 'Select configuration for the link color',
+      defaultValue: "single",
+      category: OptionsCategory,
+      settings: {
+        allowCustomValue: false,
+        options: [
+        { 
+          label: "Single", 
+          value: "single"
+        },
+        { 
+          label: "By source", 
+          value: "source"
+        },
+        { 
+          label: "By field", 
+          value: "field"
+        }
+        ],
+      },
+    })
+    .addColorPicker({
+      path: 'linkColor',
+      name: 'Link Color',
+      defaultValue: 'blue',
+      showIf: config => config.linkColorConfig === "single",
+      category: OptionsCategory,
+    })
+    .addSelect({
       path: 'scale',
       name: 'Scaling',
       defaultValue: "lin",
@@ -67,21 +98,6 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       path: 'nodeColor',
       name: 'Node Color',
       defaultValue: 'blue',
-      showIf: config => !config.groupLinkColor,
-      category: OptionsCategory,
-    })
-    .addColorPicker({
-      path: 'linkColor',
-      name: 'Link Color',
-      defaultValue: 'blue',
-      showIf: config => !config.groupLinkColor,
-      category: OptionsCategory,
-    })
-    
-    .addBooleanSwitch({
-      path: 'groupLinkColor',
-      name: 'Link color by source',
-      defaultValue: false,
       category: OptionsCategory,
     })
     .addSliderInput({
@@ -107,26 +123,6 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       },
       showIf: config => config.groupLinkColor,
       category: OptionsCategory,
-    })
-    .addSelect({
-      path: 'Source',
-      name: 'src',
-      description: 'Source:',
-      settings: {
-        allowCustomValue: false,
-        options: [
-          {
-            label: 'Linear',
-            value: 'lin',
-          },
-          {
-            label: "Logarithmic",
-            value: "log"
-          }
-        ],
-      },
-      category: OptionsCategory,
-      showIf: config => config.radiusFromSource || config.arcFromSource
     })
     .addSelect({
       path: 'src',
@@ -175,6 +171,20 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         },
       },
     })
+    .addTextInput({
+      path: 'toolTipMetric',
+      name: 'Tooltip text',
+      category: OptionsCategory,
+      defaultValue: "",
+      description: 'Text to be displayed infront of metric.',
+    })
+    .addTextInput({
+      path: 'toolTipGroupBy',
+      name: 'Tooltip text',
+      category: OptionsCategory,
+      defaultValue: "",
+      description: 'Text to be displayed infront of group by.',
+    });
 });
 
 

@@ -14,4 +14,7 @@ export interface SimpleOptions {
   dest: string;
   saturation: number;
   lightness: number;
+  toolTipMetric: string;
+  toolTipGroupBy: string;
+  linkColorConfig: string;
 }

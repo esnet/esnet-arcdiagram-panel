@@ -102,6 +102,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     sourceGroups.forEach( (e, i) => {
       e.color = spacedColors[i]
     })
+    console.log(options.linkColorConfig)
 
     links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string}) => {
       // check if arc thickness is set to source
@@ -115,11 +116,14 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       } else {
         e.strokeWidth = options.arcThickness
       }
-      // set links color
-      if(options.groupLinkColor) {
+      // set link color
+      if(options.linkColorConfig === "source") {
         e.color = sourceGroups.find( group => group.source === e.source)!.color
-      } else {
+      } else if (options.linkColorConfig === "single") {
         e.color = hexColors.linkColor
+      } else {
+        // color by field 
+
       }
     });
 
@@ -164,7 +168,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       };
     });
     
-    console.log(uniqueLinks);
+    console.log("Unique links with group by: ", uniqueLinks);
 
   return {uniqueNodes, links, hexColors, uniqueLinks};
 }

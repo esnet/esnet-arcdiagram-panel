@@ -39,7 +39,7 @@ function Arc(props: any) {
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target = idToName(targetId,uniqueNodes)
-      toolTip.sum = "Sum: " + String(sum)
+      toolTip.sum = String(sum)
       toolTip.groupBy = props.parsedData.uniqueLinks.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).groupBy.join(", ")
     }
     
@@ -234,7 +234,7 @@ function Arc(props: any) {
           .style("opacity", 1)
       })
 
-      
+      console.log("Unique nodes: ", uniqueNodes)
 
       /********************************** Link tooltip **********************************/ 
 
@@ -279,9 +279,9 @@ function Arc(props: any) {
           <p style={styles.toolTipStyle.text}>{`->`}</p>
           <p style={styles.toolTipStyle.text} >{toolTip.target}</p>
 
-          <p style={styles.toolTipStyle.text} >{toolTip.sum}</p>
+          <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipMetric} {toolTip.sum}</p>
 
-          <p style={styles.toolTipStyle.text} >{toolTip.groupBy}</p>
+          <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipGroupBy} {toolTip.groupBy}</p>
         </div>
       )}
     </div> 
