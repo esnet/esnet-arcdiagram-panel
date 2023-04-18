@@ -84,6 +84,30 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: false,
       category: OptionsCategory,
     })
+    .addSliderInput({
+      path: 'saturation',
+      name: 'Saturation',
+      defaultValue: 100,
+      settings: {
+        min: 0,
+        max: 100,
+        step: 1,
+      },
+      showIf: config => config.groupLinkColor,
+      category: OptionsCategory,
+    })
+    .addSliderInput({
+      path: 'lightness',
+      name: 'Lightness',
+      defaultValue: 50,
+      settings: {
+        min: 0,
+        max: 100,
+        step: 1,
+      },
+      showIf: config => config.groupLinkColor,
+      category: OptionsCategory,
+    })
     .addSelect({
       path: 'Source',
       name: 'src',
@@ -107,7 +131,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
     .addSelect({
       path: 'src',
       name: 'Source',
-      description: 'Source:',
+      description: 'Select the field to use as source:',
       category: OptionsCategory,
       settings: {
         allowCustomValue: false,
@@ -130,8 +154,9 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
     .addSelect({
       path: 'dest',
       name: 'Destination',
-      description: 'Destination:',
+      description: 'Select the field to use as target:',
       category: OptionsCategory,
+      defaultValue: "",
       settings: {
         allowCustomValue: false,
         options: [],
@@ -151,3 +176,5 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       },
     })
 });
+
+

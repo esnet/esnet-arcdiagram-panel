@@ -8,6 +8,7 @@ let toolTip = {
   source: "",
   target: "",
   sum: "",
+  groupBy: "",
   pos: [0,0]
 }
 
@@ -24,7 +25,7 @@ function Arc(props: any) {
     setShowTooltip(isActive);
   }
 
-  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, sum?:number): void {
+  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, sum?:number, groupBy?:string): void {
     
     // when only sourceId is passed, display node and its targets
     if(targetId == undefined) {
@@ -32,15 +33,14 @@ function Arc(props: any) {
       // get targets for passed nodes as strings
       toolTip.target = getNodeTargets({ id: sourceId, links })
                        .map((id) => idToName(id, uniqueNodes))
+                       .filter((value, index, array) => array.indexOf(value) === index)
                        .join(", ")
-      if(toolTip.target == "") {
-        toolTip.target = ""
-      }
       toolTip.sum = ""
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target = idToName(targetId,uniqueNodes)
       toolTip.sum = "Sum: " + String(sum)
+      toolTip.groupBy = props.parsedData.uniqueLinks.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).groupBy.join(", ")
     }
     
    
@@ -103,7 +103,7 @@ function Arc(props: any) {
       .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-30)"))
       .style("margin-right", "5px")
 
-      // after the labels are rendered, we can find out the amount of margin we need to apply
+    // after the labels are rendered, we can find out the amount of margin we need to apply
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
     // the boundingbox of the largest highlighted label and the most left label
     var offsetBottom = Math.max(...Array.from($("text"), (text) => text.getBoundingClientRect().height));
@@ -240,7 +240,7 @@ function Arc(props: any) {
 
       paths
       .on("mouseover", function (d) {
-        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"));
+        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"),  d.srcElement.getAttribute("groupBy"));
         paths
           .style("opacity", .1)
           .transition()
@@ -281,7 +281,7 @@ function Arc(props: any) {
 
           <p style={styles.toolTipStyle.text} >{toolTip.sum}</p>
 
-
+          <p style={styles.toolTipStyle.text} >{toolTip.groupBy}</p>
         </div>
       )}
     </div> 

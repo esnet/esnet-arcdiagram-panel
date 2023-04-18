@@ -12,4 +12,6 @@ export interface SimpleOptions {
   scale: string;
   src: string;
   dest: string;
+  saturation: number;
+  lightness: number;
 }
