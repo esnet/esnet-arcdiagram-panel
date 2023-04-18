@@ -24,6 +24,17 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       showIf: config => !config.arcFromSource,
       category: OptionsCategory,
     })
+    .addSliderInput({
+      path: 'arcOpacity',
+      name: 'Arc opacity',
+      defaultValue: 1,
+      settings: {
+        min: .1,
+        max: 1,
+        step: .1,
+      },
+      category: OptionsCategory,
+    })
     .addBooleanSwitch({
       path: 'radiusFromSource',
       name: 'Node radius from source',
@@ -73,6 +84,12 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       showIf: config => config.linkColorConfig === "single",
       category: OptionsCategory,
     })
+    .addColorPicker({
+      path: 'nodeColor',
+      name: 'Node Color',
+      defaultValue: 'blue',
+      category: OptionsCategory,
+    })
     .addSelect({
       path: 'scale',
       name: 'Scaling',
@@ -94,12 +111,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       showIf: config => config.radiusFromSource || config.arcFromSource,
       category: OptionsCategory,
     })
-    .addColorPicker({
-      path: 'nodeColor',
-      name: 'Node Color',
-      defaultValue: 'blue',
-      category: OptionsCategory,
-    })
+    
     .addSliderInput({
       path: 'saturation',
       name: 'Saturation',

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
 import { idToName, getNodeTargets, linSpace } from 'utils';
 
@@ -6,7 +6,7 @@ import { styles } from 'styles'
 
 let toolTip = {
   source: "",
-  target: "",
+  target: <p></p> as ReactNode,
   sum: "",
   groupBy: "",
   pos: [0,0]
@@ -34,7 +34,12 @@ function Arc(props: any) {
       toolTip.target = getNodeTargets({ id: sourceId, links })
                        .map((id) => idToName(id, uniqueNodes))
                        .filter((value, index, array) => array.indexOf(value) === index)
-                       .join(", ")
+                       .map((string, index) => (
+                        <p style={styles.toolTipStyle.text} key={index}>
+                          {string}
+                          <br />
+                        </p>
+                       ))      
       toolTip.sum = ""
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
@@ -42,7 +47,6 @@ function Arc(props: any) {
       toolTip.sum = String(sum)
       toolTip.groupBy = props.parsedData.uniqueLinks.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).groupBy.join(", ")
     }
-    
    
     // toggle tooltip
     handleToggleTooltip(isActive)
@@ -159,6 +163,7 @@ function Arc(props: any) {
       .attr("stroke", (l: any) => { return  l?.color })
       .attr("id", "arc")
       .attr("stroke-width", (l: any) => { return  l?.strokeWidth })
+      .style("stroke-opacity", props.graphOptions.arcOpacity)
       .attr("source", (d, i) => links[i].source)
       .attr("target", (d, i) => links[i].target)
       .attr("sum", (d, i) => links[i].sum)
@@ -191,7 +196,7 @@ function Arc(props: any) {
         paths
           .transition()
           .style('stroke-opacity', (l: any) => {
-            return d.srcElement.id == l?.source ? 1 : .5
+            return d.srcElement.id == l?.source ? props.graphOptions.arcOpacity : props.graphOptions.arcOpacity*.5
           })
           .attr('stroke-width', (l: any) => {
             return d.srcElement.id == l?.source ? l?.strokeWidth*2 : l?.strokeWidth
@@ -223,7 +228,7 @@ function Arc(props: any) {
         paths
           .transition()
           .duration(duration)
-          .style('stroke-opacity', 1)
+          .style('stroke-opacity', props.graphOptions.arcOpacity)
           .attr('stroke-width', (l: any) => {
             return l?.strokeWidth
           })
@@ -242,23 +247,23 @@ function Arc(props: any) {
       .on("mouseover", function (d) {
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"),  d.srcElement.getAttribute("groupBy"));
         paths
-          .style("opacity", .1)
+          .style("opacity", props.graphOptions.arcOpacity*0.5)
           .transition()
           .duration(duration)
         d3.select(this)
           .transition()
-          .style('opacity', 1)
+          .style('opacity', props.graphOptions.arcOpacity)
           .duration(duration)
       })
       .on('mouseout', function (d) {
         handleToggleTooltip(false);
         paths
-          .style("opacity", 1)
+          .style("opacity", props.graphOptions.arcOpacity)
           .transition()
           .duration(duration)
         d3.select(this)
           .transition()
-          .style('opacity', 1)
+          .style('opacity', props.graphOptions.arcOpacity)
           .duration(duration)
 
       })
@@ -277,7 +282,7 @@ function Arc(props: any) {
         <div ref={tooltipRef} style={styles.toolTipStyle.box} className='tooltip'>
           <p style={styles.toolTipStyle.text} >{toolTip.source}</p>
           <p style={styles.toolTipStyle.text}>{`->`}</p>
-          <p style={styles.toolTipStyle.text} >{toolTip.target}</p>
+          <div>{toolTip.target}</div>
 
           <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipMetric} {toolTip.sum}</p>
 
