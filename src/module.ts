@@ -64,18 +64,18 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       settings: {
         allowCustomValue: false,
         options: [
-        { 
-          label: "Single", 
-          value: "single"
-        },
-        { 
-          label: "By source", 
-          value: "source"
-        },
-        { 
-          label: "By field", 
-          value: "field"
-        }
+          { 
+            label: "Single", 
+            value: "single"
+          },
+          { 
+            label: "By source", 
+            value: "source"
+          },
+          { 
+            label: "By field", 
+            value: "field"
+          }
         ],
       },
     })
@@ -113,6 +113,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       showIf: config => config.radiusFromSource || config.arcFromSource,
       category: DataCategory,
     })
+    
     .addSelect({
       path: 'src',
       name: 'Source',
@@ -161,19 +162,20 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       },
     })
     .addTextInput({
-      path: 'toolTipMetric',
+      path: "toolTipSource",
       name: 'Tooltip text',
       category: DataCategory,
-      defaultValue: "",
-      description: 'Text to be displayed infront of metric.',
+      defaultValue: "From: ",
+      description: 'Text to be displayed infront of target node.',
     })
     .addTextInput({
-      path: 'toolTipGroupBy',
+      path: "toolTipTarget",
       name: 'Tooltip text',
       category: DataCategory,
-      defaultValue: "",
-      description: 'Text to be displayed infront of group by.',
+      defaultValue: "To: ",
+      description: 'Text to be displayed infront of source node.',
     })
+    
 });
 
 

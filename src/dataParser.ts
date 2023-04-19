@@ -161,6 +161,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       }
     });
 
+    console.log(links)
+
     // additional group by
     const uniqueLinks = Array.from(
       new Set(links.map(({ source, target }: {source: number, target: number}) => `${source}-${target}`))

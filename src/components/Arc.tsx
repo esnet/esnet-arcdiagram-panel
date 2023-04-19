@@ -43,7 +43,7 @@ function Arc(props: any) {
       toolTip.sum = ""
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
-      toolTip.target = <p style={styles.toolTipStyle.text}>{idToName(targetId,uniqueNodes)}</p>
+      toolTip.target =  <p style={styles.toolTipStyle.text}>{idToName(targetId,uniqueNodes)}</p>
       toolTip.sum = String(sum)
       toolTip.field = props.parsedData.uniqueLinks.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).field.join(", ")
     }
@@ -279,9 +279,8 @@ function Arc(props: any) {
 
       {showTooltip && (
         <div ref={tooltipRef} style={styles.toolTipStyle.box} className='tooltip'>
-          <p style={styles.toolTipStyle.text} >{toolTip.source}</p>
-          <p style={styles.toolTipStyle.text}>{`->`}</p>
-          <div>{toolTip.target}</div>
+          <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipSource}{" "}{toolTip.source}</p>
+          <div style={styles.toolTipStyle.text} >{props.graphOptions.toolTipTarget}{toolTip.target}</div>
 
           <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipMetric} {toolTip.sum}</p>
 

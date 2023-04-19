@@ -18,4 +18,6 @@ export interface SimpleOptions {
   toolTipGroupBy: string;
   linkColorConfig: string;
   arcOpacity: number;
+  toolTipTarget: string;
+  toolTipSource: string;
 }
