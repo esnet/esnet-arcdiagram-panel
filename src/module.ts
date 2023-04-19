@@ -2,7 +2,9 @@ import { PanelPlugin, getFieldDisplayName, FieldOverrideContext } from '@grafana
 import { SimpleOptions } from './types';
 import { SimplePanel } from './SimplePanel';
 
-const OptionsCategory = ['Display'];
+const AppearanceCategory = ['Appearance'];
+const DataCategory = ['Data'];
+
 
 export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOptions(builder => {
   return builder
@@ -10,7 +12,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       path: 'arcFromSource',
       name: 'Arc thickness from source',
       defaultValue: false,
-      category: OptionsCategory,
+      category: AppearanceCategory,
     })
     .addSliderInput({
       path: 'arcThickness',
@@ -22,7 +24,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         step: 1,
       },
       showIf: config => !config.arcFromSource,
-      category: OptionsCategory,
+      category: AppearanceCategory,
     })
     .addSliderInput({
       path: 'arcOpacity',
@@ -33,13 +35,13 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         max: 1,
         step: .1,
       },
-      category: OptionsCategory,
+      category: AppearanceCategory,
     })
     .addBooleanSwitch({
       path: 'radiusFromSource',
       name: 'Node radius from source',
       defaultValue: false,
-      category: OptionsCategory,
+      category: AppearanceCategory,
     })
     .addSliderInput({
       path: 'nodeRadius',
@@ -51,14 +53,14 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         step: 1,
       },
       showIf: config => !config.radiusFromSource,
-      category: OptionsCategory,
+      category: AppearanceCategory,
     })
     .addSelect({
       path: 'linkColorConfig',
       name: 'Link color',
       description: 'Select configuration for the link color',
       defaultValue: "single",
-      category: OptionsCategory,
+      category: AppearanceCategory,
       settings: {
         allowCustomValue: false,
         options: [
@@ -82,13 +84,13 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Link Color',
       defaultValue: 'blue',
       showIf: config => config.linkColorConfig === "single",
-      category: OptionsCategory,
+      category: AppearanceCategory,
     })
     .addColorPicker({
       path: 'nodeColor',
       name: 'Node Color',
       defaultValue: 'blue',
-      category: OptionsCategory,
+      category: AppearanceCategory,
     })
     .addSelect({
       path: 'scale',
@@ -109,38 +111,13 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         ],
       },
       showIf: config => config.radiusFromSource || config.arcFromSource,
-      category: OptionsCategory,
-    })
-    
-    .addSliderInput({
-      path: 'saturation',
-      name: 'Saturation',
-      defaultValue: 100,
-      settings: {
-        min: 0,
-        max: 100,
-        step: 1,
-      },
-      showIf: config => config.groupLinkColor,
-      category: OptionsCategory,
-    })
-    .addSliderInput({
-      path: 'lightness',
-      name: 'Lightness',
-      defaultValue: 50,
-      settings: {
-        min: 0,
-        max: 100,
-        step: 1,
-      },
-      showIf: config => config.groupLinkColor,
-      category: OptionsCategory,
+      category: DataCategory,
     })
     .addSelect({
       path: 'src',
       name: 'Source',
       description: 'Select the field to use as source:',
-      category: OptionsCategory,
+      category: DataCategory,
       settings: {
         allowCustomValue: false,
         options: [],
@@ -163,7 +140,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       path: 'dest',
       name: 'Destination',
       description: 'Select the field to use as target:',
-      category: OptionsCategory,
+      category: DataCategory,
       defaultValue: "",
       settings: {
         allowCustomValue: false,
@@ -186,17 +163,17 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
     .addTextInput({
       path: 'toolTipMetric',
       name: 'Tooltip text',
-      category: OptionsCategory,
+      category: DataCategory,
       defaultValue: "",
       description: 'Text to be displayed infront of metric.',
     })
     .addTextInput({
       path: 'toolTipGroupBy',
       name: 'Tooltip text',
-      category: OptionsCategory,
+      category: DataCategory,
       defaultValue: "",
       description: 'Text to be displayed infront of group by.',
-    });
+    })
 });
 
 

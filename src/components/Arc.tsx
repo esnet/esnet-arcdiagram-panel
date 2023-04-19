@@ -8,7 +8,7 @@ let toolTip = {
   source: "",
   target: <p></p> as ReactNode,
   sum: "",
-  groupBy: "",
+  field: "",
   pos: [0,0]
 }
 
@@ -25,7 +25,7 @@ function Arc(props: any) {
     setShowTooltip(isActive);
   }
 
-  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, sum?:number, groupBy?:string): void {
+  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, sum?:number, field?:string): void {
     
     // when only sourceId is passed, display node and its targets
     if(targetId == undefined) {
@@ -43,9 +43,9 @@ function Arc(props: any) {
       toolTip.sum = ""
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
-      toolTip.target = idToName(targetId,uniqueNodes)
+      toolTip.target = <p style={styles.toolTipStyle.text}>{idToName(targetId,uniqueNodes)}</p>
       toolTip.sum = String(sum)
-      toolTip.groupBy = props.parsedData.uniqueLinks.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).groupBy.join(", ")
+      toolTip.field = props.parsedData.uniqueLinks.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).field.join(", ")
     }
    
     // toggle tooltip
@@ -239,13 +239,12 @@ function Arc(props: any) {
           .style("opacity", 1)
       })
 
-      console.log("Unique nodes: ", uniqueNodes)
 
       /********************************** Link tooltip **********************************/ 
 
       paths
       .on("mouseover", function (d) {
-        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"),  d.srcElement.getAttribute("groupBy"));
+        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"),  d.srcElement.getAttribute("field"));
         paths
           .style("opacity", props.graphOptions.arcOpacity*0.5)
           .transition()
@@ -286,7 +285,7 @@ function Arc(props: any) {
 
           <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipMetric} {toolTip.sum}</p>
 
-          <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipGroupBy} {toolTip.groupBy}</p>
+          <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipGroupBy} {toolTip.field}</p>
         </div>
       )}
     </div> 

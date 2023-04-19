@@ -16,6 +16,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
 
   var allData = data.series[0].fields;
 
+  /********************************** Nodes/links **********************************/ 
+
   // if src/dst not defined in options, take first/second group by as default
   var source = options.src ? allData.find((obj: { name: any; }) => obj.name === options.src)?.values : allData[0].values;
   var target = options.dest ? allData.find((obj: { name: any; }) => obj.name === options.dest)?.values : allData[1].values;
@@ -44,7 +46,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     sum: <number>allData.find((obj: { name: any; }) => obj.name === "Sum")?.values.buffer[index],
     strokeWidth: 0,
     color: "",
-    groupBy: allData[3] ? allData[2].values.buffer[index] : ""
+    field: allData[3] ? allData[2].values.buffer[index] : ""
   }));
 
   // Initialize object to store aggregated sums
@@ -78,33 +80,37 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     element.sum = nodes[index].sum
   });
 
-  // color
-  const hexColors = {
-    nodeColor: theme.visualization.getColorByName(options.nodeColor),
-    linkColor: theme.visualization.getColorByName(options.linkColor)
-  }
-
-
   /********************************** Scaling/coloring **********************************/ 
+
+   // color
+    const hexColors = {
+      nodeColor: theme.visualization.getColorByName(options.nodeColor),
+      linkColor: theme.visualization.getColorByName(options.linkColor)
+    }
 
     const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
     maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
     minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
     maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
+
+    // create groups either for "by source" or "by field"
+    if(options.linkColorConfig !== "single") {
+      // create unique groups according to the setting specified in options
+      var groups = [...new Set(links.map( ( item: any ) => item[options.linkColorConfig]))].map( ( group: any ) => ({
+        [options.linkColorConfig]: group,
+        color: ""
+      }))
+
+      console.log(groups)
+
+      const spacedColors = getEvenlySpacedColors(groups.length)
+
+      groups.forEach( (e, i) => {
+        e.color = spacedColors[i]
+      })
+    }
     
-    var sourceGroups = [...new Set(links.map((item: { source: any; }) => item.source))].map( (source,i) => ({
-      source, 
-      color: ""
-    }));
-
-    const spacedColors = getEvenlySpacedColors(sourceGroups.length,options.saturation,options.lightness)
-
-    sourceGroups.forEach( (e, i) => {
-      e.color = spacedColors[i]
-    })
-    console.log(options.linkColorConfig)
-
-    links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string}) => {
+    links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string}) => {
       // check if arc thickness is set to source
       if(options.arcFromSource) {
         // check if we apply logarithmic or linear scaling
@@ -116,14 +122,15 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       } else {
         e.strokeWidth = options.arcThickness
       }
-      // set link color
+      // link color by source
       if(options.linkColorConfig === "source") {
-        e.color = sourceGroups.find( group => group.source === e.source)!.color
-      } else if (options.linkColorConfig === "single") {
-        e.color = hexColors.linkColor
+        e.color = groups.find( group => group[options.linkColorConfig] === e.source)!.color
+      // link color by field
+      } else if (options.linkColorConfig === "field") {
+        e.color = groups.find( group => group[options.linkColorConfig] === e.field)!.color
       } else {
-        // color by field 
-
+ 
+        e.color = hexColors.linkColor
       }
     });
 
@@ -162,13 +169,14 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       return {
         source: parseInt(source),
         target: parseInt(target),
-        groupBy: links
+        field: links
           .filter(({ source, target }: { source: number, target: number}) => `${source}-${target}` === link)
-          .map(({ groupBy }: { groupBy:number }) => groupBy.toString()),
+          .map(({ field }: { field:number }) => field.toString()),
       };
     });
+
+   
     
-    console.log("Unique links with group by: ", uniqueLinks);
 
   return {uniqueNodes, links, hexColors, uniqueLinks};
 }
