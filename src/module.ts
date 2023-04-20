@@ -1,6 +1,7 @@
 import { PanelPlugin, getFieldDisplayName, FieldOverrideContext } from '@grafana/data';
 import { SimpleOptions } from './types';
 import { SimplePanel } from './SimplePanel';
+import { CustomRangeSlider } from './components/CustomRangeSlider'
 
 const AppearanceCategory = ['Appearance'];
 const DataCategory = ['Data'];
@@ -74,7 +75,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           },
           { 
             label: "By field", 
-            value: "field"
+            value: "field",
           }
         ],
       },
@@ -113,7 +114,14 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       showIf: config => config.radiusFromSource || config.arcFromSource,
       category: DataCategory,
     })
-    
+    .addCustomEditor({
+      id: "setRange",
+      path: "arcRange",
+      editor: CustomRangeSlider,
+      name: '',
+      category: DataCategory,
+
+    })
     .addSelect({
       path: 'src',
       name: 'Source',
