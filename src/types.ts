@@ -20,4 +20,5 @@ export interface SimpleOptions {
   arcOpacity: number;
   toolTipTarget: string;
   toolTipSource: string;
+  arcRange: string;
 }

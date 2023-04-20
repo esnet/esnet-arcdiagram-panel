@@ -21,7 +21,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
   // if src/dst not defined in options, take first/second group by as default
   var source = options.src ? allData.find((obj: { name: any; }) => obj.name === options.src)?.values : allData[0].values;
   var target = options.dest ? allData.find((obj: { name: any; }) => obj.name === options.dest)?.values : allData[1].values;
-
+  
   // get source and target arrays and create array of unique nodes from them
   const uniqueNodes = Array.from([...new Set([...source, ...target])]).map((str, index) => ({
     id: index,
@@ -88,6 +88,12 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       linkColor: theme.visualization.getColorByName(options.linkColor)
     }
 
+    // set range for log mapping
+    console.log(options.arcRange?.split(",").map(Number))
+    const linkScaleFrom = options.arcRange?.split(",").map(Number)[0]
+    const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
+
+
     const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
     maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
     minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
@@ -101,8 +107,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         color: ""
       }))
 
-      console.log(groups)
-
       const spacedColors = getEvenlySpacedColors(groups.length)
 
       groups.forEach( (e, i) => {
@@ -115,9 +119,12 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       if(options.arcFromSource) {
         // check if we apply logarithmic or linear scaling
         if(options.scale == "log") {
-          e.strokeWidth = mapToLogRange({ number: e.sum, min: minLink, max: maxLink, scaleFrom: 1, scaleTo: 20 })
+          e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)
+          
+            console.log(e.strokeWidth)    
+          
         } else {
-          e.strokeWidth = e.sum/1000000000000
+          e.strokeWidth = e.sum/10000000000000
         }
       } else {
         e.strokeWidth = options.arcThickness
@@ -134,7 +141,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       }
     });
 
-
     uniqueNodes.forEach((e: { id:any, radius: any; sum: any; }) => {
       // check if arc thickness is set to source
       if(options.radiusFromSource) {
@@ -144,7 +150,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
           if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
             e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
           } else {
-            e.radius = mapToLogRange({ number: e.sum, min: minNode, max: maxNode, scaleFrom: 5, scaleTo: 15 })
+            e.radius = mapToLogRange( e.sum, 5, 15, minNode, maxNode)
           }
           
         } else {
@@ -160,8 +166,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         e.radius = options.nodeRadius
       }
     });
-
-    console.log(links)
 
     // additional group by
     const uniqueLinks = Array.from(

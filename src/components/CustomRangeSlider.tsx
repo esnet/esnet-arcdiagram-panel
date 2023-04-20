@@ -8,19 +8,28 @@ interface Props extends StandardEditorProps<string, StringFieldConfigSettings> {
 }
 
 export const CustomRangeSlider: React.FC<Props> = ({ value, onChange, item, suffix }) => {
+  var rangesliderRef = useRef(null)
+
+  const onValueChange = useCallback(
+    (value: number[] | undefined) => {
+      onChange(String(value))
+    },
+    
+    [value, onChange]
+  );
 
 
   return (
     <div>
       <RangeSlider
-          max={100}
-          min={0}
-          onAfterChange={function Nt(){}}
-          onChange={function Nt(){}}
+          min={1}
+          max={50}
+          onAfterChange={onValueChange}
+          onChange={onValueChange}
           orientation="horizontal"
           value={[
-              10,
-              62
+              1,
+              15
           ]}
       />
     </div>

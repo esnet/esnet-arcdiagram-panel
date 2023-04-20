@@ -14,16 +14,17 @@ export function getNodeTargets({ id, links }: { id: number; links: any[]; }): nu
 }
 
 // map number to log
-export function mapToLogRange({ number, min, max, scaleFrom, scaleTo }: { number: number; min: number; max: number; scaleFrom: number; scaleTo: number; }): number {
-    // Define the minimum and maximum values of the input range
-  
-    // Calculate the logarithmic scale factor
-    const logScaleFactor = Math.log(max) - Math.log(min);
-  
-    // Map the input number to the range given by parameters using logarithmic scaling
-    const scaledValue = (Math.log(number) - Math.log(min)) / logScaleFactor * (scaleTo-scaleFrom) + 1
-    // Round the result to two decimal places
-    return Math.round(scaledValue * 100) / 100;
+export function mapToLogRange(value: number, rangeMin: number, rangeMax: number,  minLinkSum: number, maxLinkSum: number) {
+    
+    const logMinValue = Math.log10(minLinkSum);
+    const logMaxValue = Math.log10(maxLinkSum);
+    const logRange = logMaxValue - logMinValue;
+    const factor = (rangeMax-1) / logRange;
+    console.log()
+
+    const logValue = Math.log10(value);
+    const mappedValue = ((logValue - logMinValue) * factor) + rangeMin;
+    return mappedValue;
 }
 
 // get an array of evenly spaced colors

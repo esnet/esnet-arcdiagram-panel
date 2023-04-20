@@ -12,7 +12,7 @@ let toolTip = {
   pos: [0,0]
 }
 
-function Arc(props: any) {
+function Arc(props: any) { 
   let uniqueNodes = props.parsedData.uniqueNodes;
   let links = props.parsedData.links;
   const containerRef = useRef(null),

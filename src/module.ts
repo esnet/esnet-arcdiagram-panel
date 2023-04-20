@@ -1,3 +1,8 @@
+import {
+  numberOverrideProcessor,
+
+} from '@grafana/data';
+
 import { PanelPlugin, getFieldDisplayName, FieldOverrideContext } from '@grafana/data';
 import { SimpleOptions } from './types';
 import { SimplePanel } from './SimplePanel';
@@ -118,9 +123,11 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       id: "setRange",
       path: "arcRange",
       editor: CustomRangeSlider,
-      name: '',
+      name: 'Range for weighted links',
+      description: 'Range which the arc thickness is being mapped to',
       category: DataCategory,
-
+      defaultValue: "1,15",
+      showIf: config => config.scale === "log",
     })
     .addSelect({
       path: 'src',
