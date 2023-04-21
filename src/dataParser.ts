@@ -19,23 +19,33 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
   /********************************** Nodes/links **********************************/ 
 
   // if src/dst not defined in options, take first/second group by default
-  var source = options.src ? allData.find((obj: { name: any; }) => obj.name === options.src)?.values : allData[0].values;
-  var target = options.dest ? allData.find((obj: { name: any; }) => obj.name === options.dest)?.values : allData[1].values;
+  var sourceString = options.src ? allData.find((obj: { name: any; }) => obj.name === options.src).name : allData[0].name;
+  var targetString = options.dest ? allData.find((obj: { name: any; }) => obj.name === options.dest).name : allData[1].name;
+  var sourceValues = allData.find((obj: { name: any; }) => obj.name === sourceString)?.values
+  var targetValues = allData.find((obj: { name: any; }) => obj.name === targetString)?.values
+
+  // get the field that's neither used as source or dest
+  var additionalField = ""
+  if(allData.length > 3) {
+    const usedFields = [sourceString, targetString, allData[allData.length -1].name]
+    const compareArray = allData.map( (obj: any) => obj.name)
+    additionalField = compareArray.filter( (obj: any ) => !usedFields.includes(obj))[0]
+  }
   
   // get source and target arrays and create array of unique nodes from them
-  const uniqueNodes = Array.from([...new Set([...source, ...target])]).map((str, index) => ({
+  const uniqueNodes = Array.from([...new Set([...sourceValues, ...targetValues])]).map((str, index) => ({
     id: index,
     name: str,
     sum: 0,
     radius: 0
   }));
 
-  let srcById = source.map((name: any) => {
+  let srcById = sourceValues.map((name: any) => {
     const dictionaryItem = uniqueNodes.find(item => item.name === name);
     return dictionaryItem ? dictionaryItem.id : null;
   });
 
-  let dstById = target.map((name: any) => {
+  let dstById = targetValues.map((name: any) => {
     const dictionaryItem = uniqueNodes.find(item => item.name === name);
     return dictionaryItem ? dictionaryItem.id : null;
   });
@@ -43,15 +53,13 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
   const links = srcById.map((element: any, index: string | number) => ({
     source: element,
     target: dstById[index],
-    sum: <number>allData.find((obj: { name: any; }) => obj.name === "Sum")?.values.buffer[index],
+    sum: <number>allData.find((obj: { name: any; }) => obj.name === allData[allData.length -1].name)?.values.buffer[index],
     strokeWidth: 0,
     color: "",
-    field: allData[3] ? allData[2].values.buffer[index] : "",
+    field: allData.find(( obj: any) => obj.name === additionalField).values.buffer[index],
     // for coloring the links by source, add a field with the name of the selected field
     [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values.buffer[index]
   }));
-
-  console.log(links)
 
   // Initialize object to store aggregated sums
   const nodeSums: {[key: number]: number} = {};
