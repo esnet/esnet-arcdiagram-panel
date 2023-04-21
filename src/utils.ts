@@ -20,7 +20,6 @@ export function mapToLogRange(value: number, rangeMin: number, rangeMax: number,
     const logMaxValue = Math.log10(maxLinkSum);
     const logRange = logMaxValue - logMinValue;
     const factor = (rangeMax-1) / logRange;
-    console.log()
 
     const logValue = Math.log10(value);
     const mappedValue = ((logValue - logMinValue) * factor) + rangeMin;
@@ -31,21 +30,28 @@ export function mapToLogRange(value: number, rangeMin: number, rangeMax: number,
 export function getEvenlySpacedColors(amount: number): string[] {
 
     const colors = [];
-    var LightColorPallet = [
-        "#4472CA",
-        "#0B9290",
-        "#610DA7",
-        "#D53675",
-        "#356E46",
-        "#531014",
-        "#C1292E",
-        "#D086F5",
-        "#2CCB7A",
-        "#6D5BDD",
-        "#0A369D",
-        "#F8A824",
-        "#EA1AE0"
-    ];
+    const LightColorPallet = [
+        "#FF4136",
+        "#FF851B",
+        "#FFDC00",
+        "#2ECC40",
+        "#0074D9",
+        "#01FF70",
+        "#FF4136",
+        "#7FDBFF",
+        "#FF4136",
+        "#F012BE",
+        "#FF851B",
+        "#3D9970",
+        "#B10DC9",
+        "#01FF70",
+        "#001f3f",
+        "#FF851B",
+        "#7FDBFF",
+        "#3D9970",
+        "#FF4136",
+        "#111111"
+      ];
 
     for (let i = 0; i < amount; i++) {
         colors.push(LightColorPallet[i]);

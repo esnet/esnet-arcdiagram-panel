@@ -18,7 +18,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
 
   /********************************** Nodes/links **********************************/ 
 
-  // if src/dst not defined in options, take first/second group by as default
+  // if src/dst not defined in options, take first/second group by default
   var source = options.src ? allData.find((obj: { name: any; }) => obj.name === options.src)?.values : allData[0].values;
   var target = options.dest ? allData.find((obj: { name: any; }) => obj.name === options.dest)?.values : allData[1].values;
   
@@ -46,8 +46,12 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     sum: <number>allData.find((obj: { name: any; }) => obj.name === "Sum")?.values.buffer[index],
     strokeWidth: 0,
     color: "",
-    field: allData[3] ? allData[2].values.buffer[index] : ""
+    field: allData[3] ? allData[2].values.buffer[index] : "",
+    // for coloring the links by source, add a field with the name of the selected field
+    [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values.buffer[index]
   }));
+
+  console.log(links)
 
   // Initialize object to store aggregated sums
   const nodeSums: {[key: number]: number} = {};
@@ -89,7 +93,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     }
 
     // set range for log mapping
-    console.log(options.arcRange?.split(",").map(Number))
     const linkScaleFrom = options.arcRange?.split(",").map(Number)[0]
     const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
 
@@ -99,11 +102,11 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
     maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
 
-    // create groups either for "by source" or "by field"
-    if(options.linkColorConfig !== "single") {
+    // create groups for the field specified
+    if(options.linkColorConfig !== "single" && options.colorConfigField) {
       // create unique groups according to the setting specified in options
-      var groups = [...new Set(links.map( ( item: any ) => item[options.linkColorConfig]))].map( ( group: any ) => ({
-        [options.linkColorConfig]: group,
+      var groups = [...new Set(links.map( ( item: any ) => item[options.colorConfigField]))].map( ( group: any ) => ({
+        [options.colorConfigField]: group,
         color: ""
       }))
 
@@ -112,29 +115,25 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       groups.forEach( (e, i) => {
         e.color = spacedColors[i]
       })
+
+      console.log(groups)
     }
     
-    links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string}) => {
+    links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
       // check if arc thickness is set to source
       if(options.arcFromSource) {
         // check if we apply logarithmic or linear scaling
         if(options.scale == "log") {
-          e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)
-          
-            console.log(e.strokeWidth)    
-          
+          e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
         } else {
           e.strokeWidth = e.sum/10000000000000
         }
       } else {
         e.strokeWidth = options.arcThickness
       }
-      // link color by source
-      if(options.linkColorConfig === "source") {
-        e.color = groups.find( group => group[options.linkColorConfig] === e.source)!.color
       // link color by field
-      } else if (options.linkColorConfig === "field") {
-        e.color = groups.find( group => group[options.linkColorConfig] === e.field)!.color
+      if (options.linkColorConfig === "field" && groups) {
+        e.color = groups.find( group => group[options.colorConfigField] === e[options.colorConfigField])!.color
       } else {
  
         e.color = hexColors.linkColor

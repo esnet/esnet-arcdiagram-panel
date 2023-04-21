@@ -75,14 +75,33 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
             value: "single"
           },
           { 
-            label: "By source", 
-            value: "source"
-          },
-          { 
             label: "By field", 
             value: "field",
           }
         ],
+      },
+    })
+    .addSelect({
+      path: 'colorConfigField',
+      name: 'Field',
+      description: 'Select a field to base the link color on:',
+      category: AppearanceCategory,
+      settings: {
+        allowCustomValue: false,
+        options: [],
+        getOptions: async (context: FieldOverrideContext) => {
+          const options = [];
+          if (context && context.data) {
+            for (const frame of context.data) {
+              for (const field of frame.fields) {
+                const name = getFieldDisplayName(field, frame, context.data);
+                const value = name;
+                options.push({ value, label: name });
+              }
+            }
+          }
+          return Promise.resolve(options);
+        },
       },
     })
     .addColorPicker({
