@@ -14,6 +14,7 @@ let toolTip = {
 
 function Arc(props: any) { 
   let uniqueNodes = props.parsedData.uniqueNodes;
+
   let links = props.parsedData.links;
   const containerRef = useRef(null),
   gRef = useRef(null),
@@ -284,7 +285,7 @@ function Arc(props: any) {
 
           <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipMetric} {toolTip.sum}</p>
 
-          <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipGroupBy} {toolTip.field}</p>
+          <p style={styles.toolTipStyle.text} >{props.parsedData.additionalField} {toolTip.field}</p>
         </div>
       )}
     </div> 

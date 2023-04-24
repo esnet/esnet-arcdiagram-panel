@@ -1,8 +1,3 @@
-import {
-  numberOverrideProcessor,
-
-} from '@grafana/data';
-
 import { PanelPlugin, getFieldDisplayName, FieldOverrideContext } from '@grafana/data';
 import { SimpleOptions } from './types';
 import { SimplePanel } from './SimplePanel';
@@ -148,6 +143,16 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: "1,15",
       showIf: config => config.scale === "log",
     })
+    .addCustomEditor({
+      id: "setRange",
+      path: "NodeRange",
+      editor: CustomRangeSlider,
+      name: 'Range for weighted nodes',
+      description: 'Range which the node radius is being mapped to',
+      category: DataCategory,
+      defaultValue: "1,15",
+      showIf: config => config.scale === "log" && config.radiusFromSource,
+    })
     .addSelect({
       path: 'src',
       name: 'Source',
@@ -209,7 +214,13 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: "To: ",
       description: 'Text to be displayed infront of source node.',
     })
-    
+    .addTextInput({
+      path: "toolTipMetric",
+      name: 'Tooltip text',
+      category: DataCategory,
+      defaultValue: "Sum: ",
+      description: 'Text to be displayed infront of metric.',
+    })
 });
 
 

@@ -29,6 +29,9 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
   if(allData.length > 3) {
     const usedFields = [sourceString, targetString, allData[allData.length -1].name]
     const compareArray = allData.map( (obj: any) => obj.name)
+    // this should be an array "additionalFields" to account for more than one additional field 
+    var additionalFields = compareArray.filter( (obj: any ) => !usedFields.includes(obj))
+    console.log(additionalFields)
     additionalField = compareArray.filter( (obj: any ) => !usedFields.includes(obj))[0]
   }
   
@@ -56,11 +59,10 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     sum: <number>allData.find((obj: { name: any; }) => obj.name === allData[allData.length -1].name)?.values.buffer[index],
     strokeWidth: 0,
     color: "",
-    field: allData.find(( obj: any) => obj.name === additionalField).values.buffer[index],
+    field: (additionalField === "") ? additionalField : allData.find(( obj: any) => obj.name === additionalField).values.buffer[index],
     // for coloring the links by source, add a field with the name of the selected field
     [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values.buffer[index]
   }));
-
   // Initialize object to store aggregated sums
   const nodeSums: {[key: number]: number} = {};
 
@@ -103,6 +105,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     // set range for log mapping
     const linkScaleFrom = options.arcRange?.split(",").map(Number)[0]
     const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
+    const nodeScaleFrom = options.NodeRange?.split(",").map(Number)[0]
+    const nodeScaleTo = options.NodeRange?.split(",").map(Number)[1]
 
 
     const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
@@ -123,8 +127,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       groups.forEach( (e, i) => {
         e.color = spacedColors[i]
       })
-
-      console.log(groups)
     }
     
     links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
@@ -157,14 +159,14 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
           if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
             e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
           } else {
-            e.radius = mapToLogRange( e.sum, 5, 15, minNode, maxNode)
+            e.radius = mapToLogRange( e.sum, nodeScaleFrom, nodeScaleTo, minNode, maxNode)
           }
           
         } else {
           if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
             e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
           } else {
-            e.radius = (e.sum/1000000000000)/2
+            e.radius = (e.sum/100000000000000)
           }
           
         }
@@ -191,5 +193,5 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
    
     
 
-  return {uniqueNodes, links, hexColors, uniqueLinks};
+  return {uniqueNodes, links, hexColors, uniqueLinks, additionalField};
 }
