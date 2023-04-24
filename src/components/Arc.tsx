@@ -8,7 +8,7 @@ let toolTip = {
   source: "",
   target: <p></p> as ReactNode,
   sum: "",
-  field: "",
+  field: <p></p> as ReactNode,
   pos: [0,0]
 }
 
@@ -40,13 +40,22 @@ function Arc(props: any) {
                           {string}
                           <br />
                         </p>
-                       ))      
+                       ))     
+      // reset metric and field  
       toolTip.sum = ""
+      toolTip.field = <p></p>
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target =  <p style={styles.toolTipStyle.text}>{idToName(targetId,uniqueNodes)}</p>
       toolTip.sum = String(sum)
-      toolTip.field = props.parsedData.uniqueLinks.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).field.join(", ")
+      toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{props.parsedData.uniqueLinks.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).field
+                      .map((string: any, index: number) => (
+                        <p style={styles.toolTipStyle.text} key={index}>
+                          {string}
+                          <br />
+                        </p>
+                      ))}
+                      </p>
     }
    
     // toggle tooltip
@@ -54,11 +63,11 @@ function Arc(props: any) {
 
     // update position
     var mapBounds = document.querySelectorAll(".panel-container")[0].getBoundingClientRect();
-    var offsetY = pos[1] - mapBounds.top
-    var offsetX = pos[0] - mapBounds.left
+    var offsetY = pos[1] - mapBounds.top,
+    offsetX = pos[0] - mapBounds.left
     
-    var toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement;
-    var toolTipBounds = toolTipDom.getBoundingClientRect();
+    var toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement,
+    toolTipBounds = toolTipDom.getBoundingClientRect();
     
     var leftOrRight = "left";
     if(offsetX + toolTipBounds.right > mapBounds.right) {
@@ -68,7 +77,7 @@ function Arc(props: any) {
 
     var topOrBottom = "top"
 
-    if((offsetY + toolTipBounds.bottom - 250 > mapBounds.bottom)) {
+    if((offsetY + toolTipBounds.bottom-350 > mapBounds.bottom)) {
       topOrBottom = "bottom";
       offsetY = mapBounds.bottom - pos[1]
     }
@@ -280,12 +289,12 @@ function Arc(props: any) {
 
       {showTooltip && (
         <div ref={tooltipRef} style={styles.toolTipStyle.box} className='tooltip'>
-          <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipSource}{" "}{toolTip.source}</p>
-          <div style={styles.toolTipStyle.text} >{props.graphOptions.toolTipTarget}{toolTip.target}</div>
+          <p style={styles.toolTipStyle.text} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipSource}</b> {" "}{toolTip.source}</p>
+          <div style={styles.toolTipStyle.text} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>
 
-          <p style={styles.toolTipStyle.text} >{props.graphOptions.toolTipMetric} {toolTip.sum}</p>
+          <p style={styles.toolTipStyle.text} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
 
-          <p style={styles.toolTipStyle.text} >{props.parsedData.additionalField} {toolTip.field}</p>
+          <p style={styles.toolTipStyle.text} > {toolTip.field}</p>
         </div>
       )}
     </div> 

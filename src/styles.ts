@@ -32,7 +32,10 @@ export const styles = {
         color: "black",
         "font-size": "10px",
         margin: "0",
-  
+        "font-weight": "100"
+      } as React.CSSProperties,
+      preface: {
+        "font-weight": "900"
       } as React.CSSProperties,
     } 
 }
