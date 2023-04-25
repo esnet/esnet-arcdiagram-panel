@@ -1,4 +1,4 @@
-import { mapToLogRange } from 'utils';
+import { calcStrokeWidth, mapToLogRange } from 'utils';
 import { getEvenlySpacedColors } from 'utils';
 
 /**
@@ -94,7 +94,32 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     element.sum = nodes[index].sum
   });
 
-  /********************************** Scaling/coloring **********************************/ 
+  /********************************** Scaling/coloring **********************************/
+  
+    // remove duplicates if more than 2 group bys
+    if(allData.length > 3) {
+      links = links.reduce((acc: any, cur: any) => {
+        const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
+        if (existing) {
+          existing.sum += cur.sum;
+          if (!existing.field.includes(cur.field)) {
+            existing.field.push(cur.field);
+          }
+        } else {
+          acc.push({
+            source: cur.source,
+            target: cur.target,
+            sum: cur.sum,
+            strokeWidth: 0,
+            color: cur.color,
+            field: [cur.field],
+            [options.colorConfigField]: cur[options.colorConfigField]
+            // you can copy any other fields from the current object as needed
+          });
+        }
+        return acc;
+      }, []);
+    }
 
    // color
     const hexColors = {
@@ -107,7 +132,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
     const nodeScaleFrom = options.NodeRange?.split(",").map(Number)[0]
     const nodeScaleTo = options.NodeRange?.split(",").map(Number)[1]
-
 
     const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
     maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
@@ -130,17 +154,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     }
     
     links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
-      // check if arc thickness is set to source
-      if(options.arcFromSource) {
-        // check if we apply logarithmic or linear scaling
-        if(options.scale == "log") {
-          e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
-        } else {
-          e.strokeWidth = e.sum/10000000000000
-        }
-      } else {
-        e.strokeWidth = options.arcThickness
-      }
+      calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
       // link color by field
       if (options.linkColorConfig === "field" && groups) {
         e.color = groups.find( group => group[options.colorConfigField] === e[options.colorConfigField])!.color
@@ -176,52 +190,9 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       }
     });
 
-    const uniqueLinks = links.reduce((acc: any, cur: any) => {
-      const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
-      if (existing) {
-        existing.sum += cur.sum;
-        if (!existing.field.includes(cur.field)) {
-          existing.field.push(cur.field);
-        }
-      } else {
-        acc.push({
-          source: cur.source,
-          target: cur.target,
-          sum: cur.sum,
-          strokeWidth: 0,
-          color: cur.color,
-          field: [cur.field],
-          [options.colorConfigField]: cur[options.colorConfigField]
-          // you can copy any other fields from the current object as needed
-        });
-      }
-      return acc;
-    }, []);
+    /*uniqueLinks.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
+      calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
+    })*/
 
-    uniqueLinks.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
-      // check if arc thickness is set to source
-      if(options.arcFromSource) {
-        // check if we apply logarithmic or linear scaling
-        if(options.scale == "log") {
-          e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
-        } else {
-          e.strokeWidth = e.sum/10000000000000
-        }
-      } else {
-        e.strokeWidth = options.arcThickness
-      }
-    })
-
-    // remove duplicates if selected
-    /*if(options.dups) {
-      uni
-    }*/ 
-  
-    if(allData.length > 3) {
-
-      links = uniqueLinks;
-    }
-    
-
-  return {uniqueNodes, links, hexColors, uniqueLinks, additionalField};
+  return {uniqueNodes, links, hexColors, additionalField};
 }

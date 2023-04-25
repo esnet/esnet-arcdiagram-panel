@@ -65,4 +65,17 @@ export function getEvenlySpacedColors(amount: number): string[] {
 export function linSpace(start: number, stop: number, n: number): number[] {
     const step = (stop - start) / (n - 1);
     return Array.from({ length: n }, (_, i) => start + i * step);
-  }
+}
+
+export function calcStrokeWidth(arcFromSource: boolean, scale: string, arcThickness: number, e: any, linkScaleFrom: number, linkScaleTo: number, minLink: number, maxLink: number) {
+    if(arcFromSource) {
+        // check if we apply logarithmic or linear scaling
+        if(scale == "log") {
+          e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
+        } else {
+          e.strokeWidth = e.sum/10000000000000
+        }
+    } else {
+        e.strokeWidth = arcThickness
+    }
+}

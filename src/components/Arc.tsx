@@ -48,7 +48,7 @@ function Arc(props: any) {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target =  <p style={styles.toolTipStyle.text}>{idToName(targetId,uniqueNodes)}</p>
       toolTip.sum = String(sum)
-      toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{props.parsedData.uniqueLinks.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).field
+      toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{props.parsedData.links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).field
                       .map((string: any, index: number) => (
                         <p style={styles.toolTipStyle.text} key={index}>
                           {string}
