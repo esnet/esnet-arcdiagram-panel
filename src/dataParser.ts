@@ -31,7 +31,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     const compareArray = allData.map( (obj: any) => obj.name)
     // this should be an array "additionalFields" to account for more than one additional field 
     var additionalFields = compareArray.filter( (obj: any ) => !usedFields.includes(obj))
-    console.log(additionalFields)
+    //console.log(additionalFields)
     additionalField = compareArray.filter( (obj: any ) => !usedFields.includes(obj))[0]
   }
   
@@ -53,7 +53,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     return dictionaryItem ? dictionaryItem.id : null;
   });
 
-  const links = srcById.map((element: any, index: string | number) => ({
+  let links = srcById.map((element: any, index: string | number) => ({
     source: element,
     target: dstById[index],
     sum: <number>allData.find((obj: { name: any; }) => obj.name === allData[allData.length -1].name)?.values.buffer[index],
@@ -176,21 +176,51 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       }
     });
 
-    // additional group by
-    const uniqueLinks = Array.from(
-      new Set(links.map(({ source, target }: {source: number, target: number}) => `${source}-${target}`))
-    ).map((link: any) => {
-      const [source, target] = link.split('-');
-      return {
-        source: parseInt(source),
-        target: parseInt(target),
-        field: links
-          .filter(({ source, target }: { source: number, target: number}) => `${source}-${target}` === link)
-          .map(({ field }: { field:number }) => field.toString()),
-      };
-    });
+    const uniqueLinks = links.reduce((acc: any, cur: any) => {
+      const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
+      if (existing) {
+        existing.sum += cur.sum;
+        if (!existing.field.includes(cur.field)) {
+          existing.field.push(cur.field);
+        }
+      } else {
+        acc.push({
+          source: cur.source,
+          target: cur.target,
+          sum: cur.sum,
+          strokeWidth: 0,
+          color: cur.color,
+          field: [cur.field],
+          [options.colorConfigField]: cur[options.colorConfigField]
+          // you can copy any other fields from the current object as needed
+        });
+      }
+      return acc;
+    }, []);
 
-   
+    uniqueLinks.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
+      // check if arc thickness is set to source
+      if(options.arcFromSource) {
+        // check if we apply logarithmic or linear scaling
+        if(options.scale == "log") {
+          e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
+        } else {
+          e.strokeWidth = e.sum/10000000000000
+        }
+      } else {
+        e.strokeWidth = options.arcThickness
+      }
+    })
+
+    // remove duplicates if selected
+    /*if(options.dups) {
+      uni
+    }*/ 
+  
+    if(allData.length > 3) {
+
+      links = uniqueLinks;
+    }
     
 
   return {uniqueNodes, links, hexColors, uniqueLinks, additionalField};

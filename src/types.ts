@@ -21,4 +21,5 @@ export interface SimpleOptions {
   toolTipTarget: string;
   toolTipSource: string;
   arcRange: string;
+  dups: boolean;
 }
