@@ -2,6 +2,11 @@ import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
 import { idToName, getNodeTargets, linSpace } from 'utils';
 
+// left margin
+// alert 4th group by
+// add standard options grafana unit selector
+
+
 import { styles } from 'styles'
 
 let toolTip = {
@@ -15,6 +20,7 @@ let toolTip = {
 function Arc(props: any) { 
   let uniqueNodes = props.parsedData.uniqueNodes;
 
+
   let links = props.parsedData.links;
   const containerRef = useRef(null),
   gRef = useRef(null),
@@ -22,11 +28,12 @@ function Arc(props: any) {
   tooltipRef = useRef(null);
   const [showTooltip, setShowTooltip] = useState(false);
 
+
   const handleToggleTooltip = (isActive: boolean) => {
     setShowTooltip(isActive);
   }
 
-  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, sum?:number, field?:string): void {
+  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, sum?:number, field?:string, displayValue?:string): void {
     
     // when only sourceId is passed, display node and its targets
     if(targetId == undefined) {
@@ -47,8 +54,8 @@ function Arc(props: any) {
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target =  <p style={styles.toolTipStyle.text}>{idToName(targetId,uniqueNodes)}</p>
-      toolTip.sum = String(sum)
-      toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{props.parsedData.links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).field
+      toolTip.sum = displayValue!
+      toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).field
                       .map((string: any, index: number) => (
                         <p style={styles.toolTipStyle.text} key={index}>
                           {string}
@@ -121,10 +128,8 @@ function Arc(props: any) {
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
     // the boundingbox of the largest highlighted label and the most left label
     var offsetBottom = Math.max(...Array.from($("text"), (text) => text.getBoundingClientRect().height));
-    var offsetLeft = document.getElementsByTagName("text")[0].getBoundingClientRect().width
     // Map to highlighted labels (size increases by 60%)
     offsetBottom*=1.6
-    offsetLeft*=1.6
 
     // get array of equally spaced values for positioning of graph on x axis
     const values = linSpace(50, width-50, uniqueNodes.length);
@@ -132,6 +137,10 @@ function Arc(props: any) {
     // Update the labels position
     d3.selectAll("text")
     .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-30)"))
+
+    // check if the first couple of labels are out of bounds
+    var labelAsHtml = document.getElementsByTagName("text")
+    labelAsHtml[0].innerHTML = "..."
     
 
     // render nodes
@@ -177,6 +186,7 @@ function Arc(props: any) {
       .attr("source", (d, i) => links[i].source)
       .attr("target", (d, i) => links[i].target)
       .attr("sum", (d, i) => links[i].sum)
+      .attr("displayValue", (d, i) => links[i].displayValue)
     
     /********************************** Highlighting **********************************/ 
     var nodes = d3.selectAll("circle")
@@ -254,7 +264,7 @@ function Arc(props: any) {
 
       paths
       .on("mouseover", function (d) {
-        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"),  d.srcElement.getAttribute("field"));
+        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"),  d.srcElement.getAttribute("field"),  d.srcElement.getAttribute("displayValue"));
         paths
           .style("opacity", props.graphOptions.arcOpacity*0.5)
           .transition()

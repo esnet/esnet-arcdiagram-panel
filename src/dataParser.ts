@@ -59,10 +59,12 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     sum: <number>allData.find((obj: { name: any; }) => obj.name === allData[allData.length -1].name)?.values.buffer[index],
     strokeWidth: 0,
     color: "",
-    field: (additionalField === "") ? additionalField : allData.find(( obj: any) => obj.name === additionalField).values.buffer[index],
+    field: (additionalField === "") ? [additionalField] : allData.find(( obj: any) => obj.name === additionalField).values.buffer[index],
     // for coloring the links by source, add a field with the name of the selected field
-    [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values.buffer[index]
+    [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values.buffer[index],
+    displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix : ""}`
   }));
+
   // Initialize object to store aggregated sums
   const nodeSums: {[key: number]: number} = {};
 
@@ -94,32 +96,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     element.sum = nodes[index].sum
   });
 
-  /********************************** Scaling/coloring **********************************/
-  
-    // remove duplicates if more than 2 group bys
-    if(allData.length > 3) {
-      links = links.reduce((acc: any, cur: any) => {
-        const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
-        if (existing) {
-          existing.sum += cur.sum;
-          if (!existing.field.includes(cur.field)) {
-            existing.field.push(cur.field);
-          }
-        } else {
-          acc.push({
-            source: cur.source,
-            target: cur.target,
-            sum: cur.sum,
-            strokeWidth: 0,
-            color: cur.color,
-            field: [cur.field],
-            [options.colorConfigField]: cur[options.colorConfigField]
-            // you can copy any other fields from the current object as needed
-          });
-        }
-        return acc;
-      }, []);
-    }
+  /********************************** Scaling/coloring **********************************/ 
 
    // color
     const hexColors = {
@@ -132,6 +109,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
     const nodeScaleFrom = options.NodeRange?.split(",").map(Number)[0]
     const nodeScaleTo = options.NodeRange?.split(",").map(Number)[1]
+
 
     const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
     maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
@@ -190,9 +168,37 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       }
     });
 
-    /*uniqueLinks.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
+    const uniqueLinks = links.reduce((acc: any, cur: any) => {
+      const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
+      if (existing) {
+        existing.sum += cur.sum;
+        if (!existing.field.includes(cur.field)) {
+          existing.field.push(cur.field);
+        }
+      } else {
+        acc.push({
+          source: cur.source,
+          target: cur.target,
+          sum: cur.sum,
+          displayValue: cur.displayValue,
+          strokeWidth: 0,
+          color: cur.color,
+          field: [cur.field],
+          [options.colorConfigField]: cur[options.colorConfigField]
+          // you can copy any other fields from the current object as needed
+        });
+      }
+      return acc;
+    }, []);
+
+    uniqueLinks.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
       calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
-    })*/
+    })
+  
+    if(allData.length > 3) {
+      links = uniqueLinks;
+    }
+    
 
   return {uniqueNodes, links, hexColors, additionalField};
 }

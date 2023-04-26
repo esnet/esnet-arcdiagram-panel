@@ -1,4 +1,4 @@
-import { PanelPlugin, getFieldDisplayName, FieldOverrideContext } from '@grafana/data';
+import { PanelPlugin, getFieldDisplayName, FieldOverrideContext, FieldConfigProperty } from '@grafana/data';
 import { SimpleOptions } from './types';
 import { SimplePanel } from './SimplePanel';
 import { CustomRangeSlider } from './components/CustomRangeSlider'
@@ -98,6 +98,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
+      showIf: config => config.linkColorConfig !== "single",
     })
     .addColorPicker({
       path: 'linkColor',
@@ -227,6 +228,18 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: false,
       category: DataCategory,
     })
+})
+.useFieldConfig({
+  disableStandardOptions: [FieldConfigProperty.NoValue, FieldConfigProperty.Max, FieldConfigProperty.Min],
+  standardOptions: {
+    [FieldConfigProperty.Color]: {
+      settings: {
+        byValueSupport: true,
+        bySeriesSupport: true,
+        preferThresholdsMode: true,
+      },
+    },
+  },
 });
 
 
