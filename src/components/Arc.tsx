@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
-import { idToName, getNodeTargets, linSpace } from 'utils';
+import { idToName, getNodeTargets, linSpace, resetLabel } from 'utils';
 import './animation.css'
 import { styles } from 'styles'
 import { replaceEllipsis } from 'utils';
@@ -119,6 +119,7 @@ function Arc(props: any) {
       .attr('font-size', 10)
       .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-45)"))
       .style("margin-right", "5px")
+      .attr('name', (d, i) => { return uniqueNodes[i].name})
 
     // after the labels are rendered, we can find out the amount of margin we need to apply
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
@@ -134,13 +135,11 @@ function Arc(props: any) {
     d3.selectAll("text")
     .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-45)"))
 
-    // out of bounds problem
+    // check if label is out of bounds
     var labelsAsHtml = document.getElementsByTagName("text")
-    replaceEllipsis(labelsAsHtml)
-
-
-
-
+    Array.from(labelsAsHtml).forEach(element => {
+      replaceEllipsis(element, false)
+    });
 
     // render nodes
     var svg = d3.select(container)
@@ -196,7 +195,8 @@ function Arc(props: any) {
       .on("mouseover", function (d) {
         // Tooltip
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.id));
-
+        labelsAsHtml[d.srcElement.id].setAttribute("name", labelsAsHtml[d.srcElement.id].innerHTML)
+        replaceEllipsis(labelsAsHtml[d.srcElement.id],true)
         const nodeTargets = getNodeTargets({ id: Number(d.srcElement.id), links })
         nodes
           .style("opacity", ( n: any) => {
@@ -232,6 +232,7 @@ function Arc(props: any) {
           })
       })
       .on('mouseout', function (d) {
+        resetLabel(labelsAsHtml[d.srcElement.id])
         handleToggleTooltip(false);
         nodes
           .transition()

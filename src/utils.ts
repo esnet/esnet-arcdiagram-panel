@@ -85,24 +85,22 @@ export function calcStrokeWidth(arcFromSource: boolean, scale: string, arcThickn
     }
 }
 
-export function replaceEllipsis(labels: HTMLCollectionOf<SVGTextElement>){
-    Array.from(labels).forEach(label => {
-        const labelOffsetX = Number(label.getAttribute("transform")?.split(",")[0].substring(10))
-        console.log(labelOffsetX)
+export function replaceEllipsis(label: SVGTextElement, isHighlighted: Boolean){
 
-        // check if label is out of bounds
-        if(label.getBoundingClientRect().width > labelOffsetX) {
-            console.log("label out of bounds")
-            console.log("out of bounds by",label.getBoundingClientRect().width - labelOffsetX)
+    const labelBoundingBox = label.getBoundingClientRect().width * (isHighlighted ? 1.6 : 1);
 
-            const overlap = label.getBoundingClientRect().width - labelOffsetX
+    const labelOffsetX = Number(label.getAttribute("transform")?.split(",")[0].substring(10))
 
-            label.innerHTML = "..." + label.innerHTML.substring(overlap*0.3, label.innerHTML.length)
-        }
-    })
+    // check if label is out of bounds
+    if(labelBoundingBox > labelOffsetX) {
 
+        const overlap = labelBoundingBox - labelOffsetX
 
-    // multiplying 0.6 maps the threshold to character-space
-    
-    
+        label.innerHTML = "..." + label.innerHTML.substring(overlap*0.3, label.innerHTML.length)
+    }
+
+}
+
+export function resetLabel(label: SVGTextElement) {
+    label.innerHTML = label.getAttribute("name")!;    
 }
