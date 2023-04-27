@@ -1,6 +1,6 @@
 {
   "extends": "./node_modules/@grafana/toolkit/src/config/tsconfig.plugin.json",
-  "include": ["src", "types"],
+  "include": ["src", "types", "src/globals.d.ts"],
   "compilerOptions": {
     "ignoreDeprecations": "5.0",
     "rootDir": "./src",

@@ -1,17 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
   "type": "panel",
-  "name": "test",
-  "id": "esnet-test",
+  "name": "Arc Diagram",
+  "id": "esnet-arcdiagram-panel",
   "info": {
-    "description": "test",
+    "description": "An arc diagram panel plugin for Grafana.",
     "author": {
-      "name": "test",
-      "url": "test"
+      "name": "esnet",
+      "url": "https://github.com/esnet"
     },
     "keywords": [
-      "test",
-      "test"
+      "arc",
+      "diagram"
     ],
     "logos": {
       "small": "img/logo.svg",

@@ -222,12 +222,6 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: "Sum: ",
       description: 'Text to be displayed infront of metric.',
     })
-    .addBooleanSwitch({
-      path: 'dups',
-      name: 'Only show unique links',
-      defaultValue: false,
-      category: DataCategory,
-    })
 })
 .useFieldConfig({
   disableStandardOptions: [FieldConfigProperty.NoValue, FieldConfigProperty.Max, FieldConfigProperty.Min],

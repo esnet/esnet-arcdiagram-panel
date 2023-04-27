@@ -1,7 +1,7 @@
 {
-  "name": "esnet-test",
+  "name": "esnet-arcdiagram-panel",
   "version": "1.0.0",
-  "description": "test",
+  "description": "An arc diagram panel plugin for Grafana",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
@@ -10,7 +10,7 @@
     "sign": "grafana-toolkit plugin:sign",
     "start": "yarn watch"
   },
-  "author": "test",
+  "author": "esnet",
   "license": "Apache-2.0",
   "devDependencies": {
     "@grafana/toolkit": "latest",

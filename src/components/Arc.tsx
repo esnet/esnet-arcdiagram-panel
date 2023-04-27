@@ -1,13 +1,9 @@
 import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
 import { idToName, getNodeTargets, linSpace } from 'utils';
-
-// left margin
-// alert 4th group by
-// add standard options grafana unit selector
-
-
+import './animation.css'
 import { styles } from 'styles'
+import { replaceEllipsis } from 'utils';
 
 let toolTip = {
   source: "",
@@ -121,7 +117,7 @@ function Arc(props: any) {
       .style("text-anchor", "end")
       .attr('fill', 'white')
       .attr('font-size', 10)
-      .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-30)"))
+      .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-45)"))
       .style("margin-right", "5px")
 
     // after the labels are rendered, we can find out the amount of margin we need to apply
@@ -136,12 +132,15 @@ function Arc(props: any) {
 
     // Update the labels position
     d3.selectAll("text")
-    .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-30)"))
+    .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-45)"))
 
-    // check if the first couple of labels are out of bounds
-    var labelAsHtml = document.getElementsByTagName("text")
-    labelAsHtml[0].innerHTML = "..."
-    
+    // out of bounds problem
+    var labelsAsHtml = document.getElementsByTagName("text")
+    replaceEllipsis(labelsAsHtml)
+
+
+
+
 
     // render nodes
     var svg = d3.select(container)

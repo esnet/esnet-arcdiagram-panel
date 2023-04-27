@@ -1,3 +1,8 @@
+/*
+A collection of utility functions
+*/
+
+import { lab } from "d3";
 
 // find string by id
 export function idToName(id: number, dic: any[]): string {
@@ -78,4 +83,26 @@ export function calcStrokeWidth(arcFromSource: boolean, scale: string, arcThickn
     } else {
         e.strokeWidth = arcThickness
     }
+}
+
+export function replaceEllipsis(labels: HTMLCollectionOf<SVGTextElement>){
+    Array.from(labels).forEach(label => {
+        const labelOffsetX = Number(label.getAttribute("transform")?.split(",")[0].substring(10))
+        console.log(labelOffsetX)
+
+        // check if label is out of bounds
+        if(label.getBoundingClientRect().width > labelOffsetX) {
+            console.log("label out of bounds")
+            console.log("out of bounds by",label.getBoundingClientRect().width - labelOffsetX)
+
+            const overlap = label.getBoundingClientRect().width - labelOffsetX
+
+            label.innerHTML = "..." + label.innerHTML.substring(overlap*0.3, label.innerHTML.length)
+        }
+    })
+
+
+    // multiplying 0.6 maps the threshold to character-space
+    
+    
 }

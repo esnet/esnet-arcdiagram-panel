@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useEffect, useRef } from 'react';
+import React, { ReactNode, useCallback } from 'react';
 import { RangeSlider } from '@grafana/ui';
 import { StandardEditorProps, StringFieldConfigSettings } from '@grafana/data';
 
@@ -8,7 +8,6 @@ interface Props extends StandardEditorProps<string, StringFieldConfigSettings> {
 }
 
 export const CustomRangeSlider: React.FC<Props> = ({ value, onChange, item, suffix }) => {
-  var rangesliderRef = useRef(null)
 
   const onValueChange = useCallback(
     (value: number[] | undefined) => {
@@ -17,7 +16,6 @@ export const CustomRangeSlider: React.FC<Props> = ({ value, onChange, item, suff
     
     [value, onChange]
   );
-
 
   return (
     <div>
