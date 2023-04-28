@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
-import { idToName, getNodeTargets, linSpace, resetLabel } from 'utils';
+import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis } from 'utils';
 import './animation.css'
 import { styles } from 'styles'
-import { replaceEllipsis } from 'utils';
 
 let toolTip = {
   source: "",
@@ -29,7 +28,7 @@ function Arc(props: any) {
     setShowTooltip(isActive);
   }
 
-  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, displayValue?:string): void {
+  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, displayValue?: string): void {
     
     // when only sourceId is passed, display node and its targets
     if(targetId === undefined) {
@@ -215,11 +214,11 @@ function Arc(props: any) {
         paths
           .transition()
           .style('stroke-opacity', (l: any) => {
-            // eslint-disable eqeqeq
+            /* eslint-disable eqeqeq */
             return d.srcElement.id == l?.source ? props.graphOptions.arcOpacity : props.graphOptions.arcOpacity*.5
           })
           .attr('stroke-width', (l: any) => {
-            // eslint-disable eqeqeq
+            /* eslint-disable eqeqeq */
             return d.srcElement.id == l?.source ? l?.strokeWidth*2 : l?.strokeWidth
           })
           .duration(duration)
@@ -288,7 +287,7 @@ function Arc(props: any) {
           .duration(duration)
 
       })
-  // eslint-disable react-hooks/exhaustive-deps
+  /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.parsedData.hexColors.nodeColor, props.width, uniqueNodes]);
 
   return ( 
