@@ -87,7 +87,6 @@ function Arc(props: any) {
     toolTipDom.style[topOrBottom] = `${offsetY}px`
     toolTipDom.style[leftOrRight] = `${offsetX}px`
 
-
   };
 
   useEffect(() => {
