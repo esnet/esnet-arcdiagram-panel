@@ -10,7 +10,7 @@
     "sign": "grafana-toolkit plugin:sign",
     "start": "yarn watch"
   },
-  "author": "esnet",
+  "author": "ESnet",
   "license": "Apache-2.0",
   "devDependencies": {
     "@grafana/toolkit": "latest",

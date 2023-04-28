@@ -88,6 +88,7 @@ export function calcStrokeWidth(arcFromSource: boolean, scale: string, arcThickn
 export function replaceEllipsis(label: SVGTextElement, isHighlighted: Boolean){
 
     const labelBoundingBox = label.getBoundingClientRect().width * (isHighlighted ? 1.6 : 1);
+    const mapRatio = (isHighlighted ? 0.2 : 0.3);
 
     const labelOffsetX = Number(label.getAttribute("transform")?.split(",")[0].substring(10))
 
@@ -96,7 +97,7 @@ export function replaceEllipsis(label: SVGTextElement, isHighlighted: Boolean){
 
         const overlap = labelBoundingBox - labelOffsetX
 
-        label.innerHTML = "..." + label.innerHTML.substring(overlap*0.3, label.innerHTML.length)
+        label.innerHTML = "..." + label.innerHTML.substring(overlap*mapRatio, label.innerHTML.length)
     }
 
 }

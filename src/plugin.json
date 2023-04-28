@@ -6,7 +6,7 @@
   "info": {
     "description": "An arc diagram panel plugin for Grafana.",
     "author": {
-      "name": "esnet",
+      "name": "ESnet",
       "url": "https://github.com/esnet"
     },
     "keywords": [

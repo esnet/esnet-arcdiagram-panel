@@ -22,4 +22,6 @@ export interface SimpleOptions {
   toolTipSource: string;
   arcRange: string;
   dups: boolean;
+  // to be implemented
+  linScalingFactor: number
 }

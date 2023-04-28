@@ -158,6 +158,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
           if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
             e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
           } else {
+            // scaling factor change via options to be implemented
             e.radius = (e.sum/100000000000000)
           }
           
@@ -185,7 +186,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
           color: cur.color,
           field: [cur.field],
           [options.colorConfigField]: cur[options.colorConfigField]
-          // you can copy any other fields from the current object as needed
         });
       }
       return acc;
@@ -199,6 +199,5 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       links = uniqueLinks;
     }
     
-
   return {uniqueNodes, links, hexColors, additionalField};
 }
