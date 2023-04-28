@@ -29,10 +29,10 @@ function Arc(props: any) {
     setShowTooltip(isActive);
   }
 
-  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, sum?:number, field?:string, displayValue?:string): void {
+  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, displayValue?:string): void {
     
     // when only sourceId is passed, display node and its targets
-    if(targetId == undefined) {
+    if(targetId === undefined) {
       toolTip.source = idToName(sourceId,uniqueNodes)
       // get targets for passed nodes as strings
       toolTip.target = getNodeTargets({ id: sourceId, links })
@@ -65,20 +65,20 @@ function Arc(props: any) {
     handleToggleTooltip(isActive)
 
     // update position
-    var mapBounds = document.querySelectorAll(".panel-container")[0].getBoundingClientRect();
-    var offsetY = pos[1] - mapBounds.top,
+    const mapBounds = document.querySelectorAll(".panel-container")[0].getBoundingClientRect();
+    let offsetY = pos[1] - mapBounds.top,
     offsetX = pos[0] - mapBounds.left
     
-    var toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement,
+    const toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement,
     toolTipBounds = toolTipDom.getBoundingClientRect();
     
-    var leftOrRight = "left";
+    let leftOrRight = "left";
     if(offsetX + toolTipBounds.right > mapBounds.right) {
       leftOrRight = "right";
       offsetX = mapBounds.right - pos[0]
     }
 
-    var topOrBottom = "top"
+    let topOrBottom = "top"
 
     if((offsetY + toolTipBounds.bottom-350 > mapBounds.bottom)) {
       topOrBottom = "bottom";
@@ -103,7 +103,7 @@ function Arc(props: any) {
     labelBox = labelRef.current;
 
     // render labels
-    var text = d3.select(labelBox)
+    const text = d3.select(labelBox)
       .selectAll('text')
       .data(uniqueNodes)
 
@@ -124,7 +124,7 @@ function Arc(props: any) {
     // after the labels are rendered, we can find out the amount of margin we need to apply
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
     // the boundingbox of the largest highlighted label and the most left label
-    var offsetBottom = Math.max(...Array.from($("text"), (text) => text.getBoundingClientRect().height));
+    let offsetBottom = Math.max(...Array.from($("text"), (text) => text.getBoundingClientRect().height));
     // Map to highlighted labels (size increases by 60%)
     offsetBottom*=1.6
 
@@ -136,13 +136,13 @@ function Arc(props: any) {
     .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-45)"))
 
     // check if label is out of bounds
-    var labelsAsHtml = document.getElementsByTagName("text")
+    const labelsAsHtml = document.getElementsByTagName("text")
     Array.from(labelsAsHtml).forEach(element => {
       replaceEllipsis(element, false)
     });
 
     // render nodes
-    var svg = d3.select(container)
+    const svg = d3.select(container)
     .selectAll('circle')
     .data(uniqueNodes)
 
@@ -158,7 +158,7 @@ function Arc(props: any) {
       .attr("radius", (d, i) => uniqueNodes[i].radius);
 
     // render links
-    var g = d3.select(graph)
+    const g = d3.select(graph)
       .selectAll('path')
       .data(links)
 
@@ -187,10 +187,10 @@ function Arc(props: any) {
       .attr("displayValue", (d, i) => links[i].displayValue)
     
     /********************************** Highlighting **********************************/ 
-    var nodes = d3.selectAll("circle")
-    var paths = d3.selectAll("path")
-    var labels = d3.selectAll("text")
-    var duration = 200;
+    const nodes = d3.selectAll("circle")
+    const paths = d3.selectAll("path")
+    const labels = d3.selectAll("text")
+    const duration = 200;
     nodes
       .on("mouseover", function (d) {
         // Tooltip
@@ -215,9 +215,11 @@ function Arc(props: any) {
         paths
           .transition()
           .style('stroke-opacity', (l: any) => {
+            // eslint-disable eqeqeq
             return d.srcElement.id == l?.source ? props.graphOptions.arcOpacity : props.graphOptions.arcOpacity*.5
           })
           .attr('stroke-width', (l: any) => {
+            // eslint-disable eqeqeq
             return d.srcElement.id == l?.source ? l?.strokeWidth*2 : l?.strokeWidth
           })
           .duration(duration)
@@ -264,7 +266,7 @@ function Arc(props: any) {
 
       paths
       .on("mouseover", function (d) {
-        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"),  d.srcElement.getAttribute("field"),  d.srcElement.getAttribute("displayValue"));
+        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"));
         paths
           .style("opacity", props.graphOptions.arcOpacity*0.5)
           .transition()
@@ -286,8 +288,8 @@ function Arc(props: any) {
           .duration(duration)
 
       })
-
-  }, [props.graphOptions]);
+  // eslint-disable react-hooks/exhaustive-deps
+  }, [props.graphOptions, links, props.height, props.parsedData.hexColors.nodeColor, props.width, uniqueNodes]);
 
   return ( 
     <div  style={styles.containerStyle} > 
@@ -310,5 +312,6 @@ function Arc(props: any) {
     </div> 
   );
 }
+
 
 export default Arc;

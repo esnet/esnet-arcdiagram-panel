@@ -1,5 +1,4 @@
-import { calcStrokeWidth, mapToLogRange } from 'utils';
-import { getEvenlySpacedColors } from 'utils';
+import { calcStrokeWidth, mapToLogRange, getEvenlySpacedColors } from 'utils';
 
 /**
  * Takes data from Grafana query and returns it in the format needed for this panel
@@ -14,24 +13,21 @@ import { getEvenlySpacedColors } from 'utils';
 
 export function parseData(data: { series: any[] }, options: any, theme: any) { // <- should that have proper typing?
 
-  var allData = data.series[0].fields;
+  const allData = data.series[0].fields;
 
   /********************************** Nodes/links **********************************/ 
 
   // if src/dst not defined in options, take first/second group by default
-  var sourceString = options.src ? allData.find((obj: { name: any; }) => obj.name === options.src).name : allData[0].name;
-  var targetString = options.dest ? allData.find((obj: { name: any; }) => obj.name === options.dest).name : allData[1].name;
-  var sourceValues = allData.find((obj: { name: any; }) => obj.name === sourceString)?.values
-  var targetValues = allData.find((obj: { name: any; }) => obj.name === targetString)?.values
+  const sourceString = options.src ? allData.find((obj: { name: any; }) => obj.name === options.src).name : allData[0].name;
+  const targetString = options.dest ? allData.find((obj: { name: any; }) => obj.name === options.dest).name : allData[1].name;
+  const sourceValues = allData.find((obj: { name: any; }) => obj.name === sourceString)?.values
+  const targetValues = allData.find((obj: { name: any; }) => obj.name === targetString)?.values
 
   // get the field that's neither used as source or dest
-  var additionalField = ""
+  let additionalField = ""
   if(allData.length > 3) {
     const usedFields = [sourceString, targetString, allData[allData.length -1].name]
     const compareArray = allData.map( (obj: any) => obj.name)
-    // this should be an array "additionalFields" to account for more than one additional field 
-    var additionalFields = compareArray.filter( (obj: any ) => !usedFields.includes(obj))
-    //console.log(additionalFields)
     additionalField = compareArray.filter( (obj: any ) => !usedFields.includes(obj))[0]
   }
   
@@ -56,7 +52,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
   let links = srcById.map((element: any, index: string | number) => ({
     source: element,
     target: dstById[index],
-    sum: <number>allData.find((obj: { name: any; }) => obj.name === allData[allData.length -1].name)?.values.buffer[index],
+    sum: allData.find((obj: { name: any; }) => obj.name === allData[allData.length -1].name)?.values.buffer[index] as number,
     strokeWidth: 0,
     color: "",
     field: (additionalField === "") ? [additionalField] : allData.find(( obj: any) => obj.name === additionalField).values.buffer[index],
@@ -80,8 +76,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
 
   // Create array of unique nodes with aggregated sums
   const nodes  = Object.keys(nodeSums).map(nodeId => ({
-    id: parseInt(nodeId),
-    sum: nodeSums[parseInt(nodeId)],
+    id: nodeId as unknown as number,
+    sum: nodeSums[nodeId as unknown as number],
   }));
 
   links.forEach(function(link: { target: any; }) {
@@ -117,9 +113,10 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
 
     // create groups for the field specified
+    let groups: any[] = []
     if(options.linkColorConfig !== "single" && options.colorConfigField) {
       // create unique groups according to the setting specified in options
-      var groups = [...new Set(links.map( ( item: any ) => item[options.colorConfigField]))].map( ( group: any ) => ({
+      groups = [...new Set(links.map( ( item: any ) => item[options.colorConfigField]))].map( ( group: any ) => ({
         [options.colorConfigField]: group,
         color: ""
       }))
@@ -142,7 +139,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       }
     });
 
-    uniqueNodes.forEach((e: { id:any, radius: any; sum: any; }) => {
+    uniqueNodes.forEach((e: { id: any, radius: any; sum: any; }) => {
       // check if arc thickness is set to source
       if(options.radiusFromSource) {
         // check if we apply logarithmic or linear scaling

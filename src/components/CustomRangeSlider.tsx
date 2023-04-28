@@ -14,7 +14,7 @@ export const CustomRangeSlider: React.FC<Props> = ({ value, onChange, item, suff
       onChange(String(value))
     },
     
-    [value, onChange]
+    [onChange]
   );
 
   return (

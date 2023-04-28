@@ -2,8 +2,6 @@
 A collection of utility functions
 */
 
-import { lab } from "d3";
-
 // find string by id
 export function idToName(id: number, dic: any[]): string {
     return dic.find( (obj: any) => obj.id === id).name
@@ -75,7 +73,7 @@ export function linSpace(start: number, stop: number, n: number): number[] {
 export function calcStrokeWidth(arcFromSource: boolean, scale: string, arcThickness: number, e: any, linkScaleFrom: number, linkScaleTo: number, minLink: number, maxLink: number) {
     if(arcFromSource) {
         // check if we apply logarithmic or linear scaling
-        if(scale == "log") {
+        if(scale === "log") {
           e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
         } else {
           e.strokeWidth = e.sum/10000000000000
