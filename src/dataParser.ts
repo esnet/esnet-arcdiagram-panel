@@ -132,7 +132,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
       // link color by field
       if (options.linkColorConfig === "field" && groups) {
-        e.color = groups.find( group => group[options.colorConfigField] === e[options.colorConfigField])!.color
+        e.color = groups.find( group => group[options.colorConfigField] === e[options.colorConfigField as keyof typeof e])!.color
       } else {
  
         e.color = hexColors.linkColor

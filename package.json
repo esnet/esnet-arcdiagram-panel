@@ -24,7 +24,8 @@
     "nvm": "^0.0.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "reload": "^3.2.1"
+    "reload": "^3.2.1",
+    "typescript": "^5.0.4"
   },
   "engines": {
     "node": ">=14"

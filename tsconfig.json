@@ -7,9 +7,5 @@
     "typeRoots": ["./node_modules/@types"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "strictNullChecks": false,
-    "strictPropertyInitialization": false,
-    "ignoreDeprecations": "5.0"
   }
 }

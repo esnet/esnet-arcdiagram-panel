@@ -83,9 +83,18 @@ function Arc(props: any) {
       topOrBottom = "bottom";
       offsetY = mapBounds.bottom - pos[1]
     }
-
-    toolTipDom.style[topOrBottom] = `${offsetY}px`
-    toolTipDom.style[leftOrRight] = `${offsetX}px`
+    
+    if (topOrBottom === "top") {
+      toolTipDom.style.top = `${offsetY}px`;
+    } else {
+      toolTipDom.style.bottom = `${offsetY}px`;
+    }
+    
+    if (leftOrRight === "left") {
+      toolTipDom.style.left = `${offsetX}px`;
+    } else {
+      toolTipDom.style.right = `${offsetX}px`;
+    }
 
   };
 
