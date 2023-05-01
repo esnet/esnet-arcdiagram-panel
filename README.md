@@ -3,7 +3,8 @@
 This plugin creates an arc diagram showing the relationship between 2 selected fields (source and destination).
 A third group by will be displayed in the tooltip.
 
-![](https://github.com/esnet/esnet-arcdiagram-panel/tree/main/src/img/arcdiagram-plugin.png?raw=true)
+![](https://github.com/esnet/esnet-arcdiagram-panel/blob/main/src/img/arcdiagram-plugin.png)
+
 
 ## Options
 ### Appearance
