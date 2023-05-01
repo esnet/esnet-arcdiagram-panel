@@ -27,7 +27,12 @@
         "url": "https://github.com/grafana/grafana-starter-panel/blob/master/LICENSE"
       }
     ],
-    "screenshots": [],
+    "screenshots": [
+      {
+        "name": "arcdiagram-plugin",
+        "path": "img/arcdiagram-plugin.png"
+      }
+    ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
