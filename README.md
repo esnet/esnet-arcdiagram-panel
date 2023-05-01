@@ -1,4 +1,4 @@
-# Matrix Panel Plugin
+# Arcdiagram Panel Plugin
 
 This plugin creates an arc diagram showing the relationship between 2 selected fields (source and destination).
 A third group by will be displayed in the tooltip.
