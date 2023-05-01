@@ -9,6 +9,10 @@ A third group by will be displayed in the tooltip.
 ## Options
 ### Appearance
 **Arc thickness / node radius from source:** Adjusts the arc thickness / node radius based on the metric<br>
+**Arc thickness:** Slider from 1 to 15 to adjust thickness of the links (if arc thickness not from source)<br>
+**Arc opacity:** Slider from 0.1 to 1 to adjust opacity of the links <br>
+**Node radius:** Slider from 5 to 15 to adjust radius of the nodes (if node radius not from source)<br>
+
 **Link color:** Dropdown to pick the preferred coloring. "Single" allows to use the color picker for the preferred color. "By field" opens another dropdown that gives the option to pick a group by which the color should be based on
 
 ### Data
