@@ -203,8 +203,12 @@ function Arc(props: any) {
         // Tooltip
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.id));
         labelsAsHtml[d.srcElement.id].setAttribute("name", labelsAsHtml[d.srcElement.id].innerHTML)
-        replaceEllipsis(labelsAsHtml[d.srcElement.id],true)
         const nodeTargets = getNodeTargets({ id: Number(d.srcElement.id), links })
+        // add ellipsis for node being hovered over & target nodes
+        replaceEllipsis(labelsAsHtml[d.srcElement.id],true)
+        nodeTargets.forEach(e => {
+          replaceEllipsis(labelsAsHtml[e],true)
+        })
         nodes
           .style("opacity", ( n: any) => {
             return nodeTargets.includes(n.id) ? 1 : 0.5
@@ -241,7 +245,11 @@ function Arc(props: any) {
           })
       })
       .on('mouseout', function (d) {
+        const nodeTargets = getNodeTargets({ id: Number(d.srcElement.id), links })
         resetLabel(labelsAsHtml[d.srcElement.id])
+        nodeTargets.forEach(e => {
+          resetLabel(labelsAsHtml[e])
+        })
         handleToggleTooltip(false);
         nodes
           .transition()
