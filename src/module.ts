@@ -60,14 +60,14 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       path: 'linkColorConfig',
       name: 'Link color',
       description: 'Select configuration for the link color',
-      defaultValue: "single",
+      defaultValue: "default",
       category: AppearanceCategory,
       settings: {
         allowCustomValue: false,
         options: [
           { 
-            label: "Single", 
-            value: "single"
+            label: "Default", 
+            value: "default"
           },
           { 
             label: "By field", 
@@ -98,19 +98,25 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
-      showIf: config => config.linkColorConfig !== "single",
+      showIf: config => config.linkColorConfig !== "default",
     })
     .addColorPicker({
       path: 'linkColor',
       name: 'Link Color',
       defaultValue: 'blue',
-      showIf: config => config.linkColorConfig === "single",
+      showIf: config => config.linkColorConfig === "default",
       category: AppearanceCategory,
     })
     .addColorPicker({
       path: 'nodeColor',
       name: 'Node Color',
       defaultValue: 'blue',
+      category: AppearanceCategory,
+    })
+    .addBooleanSwitch({
+      path: 'isDarkMode',
+      name: 'Colors for dark mode',
+      defaultValue: false,
       category: AppearanceCategory,
     })
     .addSelect({

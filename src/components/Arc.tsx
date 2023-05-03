@@ -122,7 +122,7 @@ function Arc(props: any) {
       .attr("y", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 5 ? (uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*2) : 10 })
       .text((d, i) => uniqueNodes[i].name)
       .style("text-anchor", "end")
-      .attr('fill', 'white')
+      .attr('fill', () => {return props.graphOptions.isDarkMode ? "white" : "black"})
       .attr('font-size', 10)
       .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-45)"))
       .style("margin-right", "5px")
@@ -281,7 +281,7 @@ function Arc(props: any) {
 
       paths
       .on("mouseover", function (d) {
-        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("sum"));
+        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("displayValue"));
         paths
           .style("opacity", props.graphOptions.arcOpacity*0.5)
           .transition()
@@ -301,7 +301,6 @@ function Arc(props: any) {
           .transition()
           .style('opacity', props.graphOptions.arcOpacity)
           .duration(duration)
-
       })
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.parsedData.hexColors.nodeColor, props.width, uniqueNodes]);

@@ -29,36 +29,54 @@ export function mapToLogRange(value: number, rangeMin: number, rangeMax: number,
     return mappedValue;
 }
 
+export function mapToLinRange(value: number) {console.log(value)}
+
 // get an array of evenly spaced colors
-export function getEvenlySpacedColors(amount: number): string[] {
+export function getEvenlySpacedColors(amount: number, darkMode: boolean): string[] {
+
+    // add darkmode colors
 
     const colors = [];
-    const LightColorPallet = [
-        "#FF4136",
-        "#FF851B",
-        "#FFDC00",
-        "#2ECC40",
-        "#0074D9",
-        "#01FF70",
-        "#FF4136",
-        "#7FDBFF",
-        "#FF4136",
-        "#F012BE",
-        "#FF851B",
-        "#3D9970",
-        "#B10DC9",
-        "#01FF70",
-        "#001f3f",
-        "#FF851B",
-        "#7FDBFF",
-        "#3D9970",
-        "#FF4136",
-        "#111111"
+    const lightColors = [
+        "#FFCDD2",
+        "#F8BBD0",
+        "#E1BEE7",
+        "#D1C4E9",
+        "#C5CAE9",
+        "#BBDEFB",
+        "#B3E5FC",
+        "#B2EBF2",
+        "#B2DFDB",
+        "#C8E6C9",
+        "#DCEDC8",
+        "#F0F4C3",
+        "#FFF9C4",
+        "#FFE0B2",
+        "#FFCCBC"
       ];
 
-    for (let i = 0; i < amount; i++) {
-        colors.push(LightColorPallet[i]);
-    }
+      const darkColors = [
+        "#EF9A9A",
+        "#F48FB1",
+        "#CE93D8",
+        "#B39DDB",
+        "#9FA8DA",
+        "#90CAF9",
+        "#81D4FA",
+        "#80DEEA",
+        "#80CBC4",
+        "#A5D6A7",
+        "#C5E1A5",
+        "#E6EE9C",
+        "#FFF59D",
+        "#FFCC80",
+        "#FFAB91"
+      ];      
+      
+      for (let i = 0; i < amount; i++) {
+        const colorIndex = i % darkColors.length;
+        colors.push(darkMode ? darkColors[colorIndex] : lightColors[colorIndex]);
+      }
 
     return colors;
 
@@ -76,6 +94,7 @@ export function calcStrokeWidth(arcFromSource: boolean, scale: string, arcThickn
         if(scale === "log") {
           e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
         } else {
+            // call function to map to lin range instead
           e.strokeWidth = e.sum/10000000000000
         }
     } else {

@@ -61,6 +61,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix : ""}`
   }));
 
+
   // Initialize object to store aggregated sums
   const nodeSums: {[key: number]: number} = {};
 
@@ -106,7 +107,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     const nodeScaleFrom = options.NodeRange?.split(",").map(Number)[0]
     const nodeScaleTo = options.NodeRange?.split(",").map(Number)[1]
 
-
     const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
     maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
     minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
@@ -114,19 +114,21 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
 
     // create groups for the field specified
     let groups: any[] = []
-    if(options.linkColorConfig !== "single" && options.colorConfigField) {
+    if(options.linkColorConfig !== "default" && options.colorConfigField) {
       // create unique groups according to the setting specified in options
       groups = [...new Set(links.map( ( item: any ) => item[options.colorConfigField]))].map( ( group: any ) => ({
         [options.colorConfigField]: group,
         color: ""
       }))
 
-      const spacedColors = getEvenlySpacedColors(groups.length)
+      const spacedColors = getEvenlySpacedColors(groups.length, options.isDarkMode)
 
       groups.forEach( (e, i) => {
         e.color = spacedColors[i]
       })
     }
+
+    console.log(groups)
     
     links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
       calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
@@ -196,5 +198,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       links = uniqueLinks;
     }
     
+
   return {uniqueNodes, links, hexColors, additionalField};
 }

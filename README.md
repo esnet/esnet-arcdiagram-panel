@@ -13,7 +13,7 @@ A third group by will be displayed in the tooltip.
 **Arc opacity:** Slider from 0.1 to 1 to adjust opacity of the links <br>
 **Node radius:** Slider from 5 to 15 to adjust radius of the nodes (if node radius not from source)<br>
 
-**Link color:** Dropdown to pick the preferred coloring. "Single" allows to use the color picker for the preferred color. "By field" opens another dropdown that gives the option to pick a group by which the color should be based on
+**Link color:** Dropdown to pick the preferred coloring. "Default" allows to use the color picker for the preferred color. "By field" opens another dropdown that gives the option to pick a group by which the color should be based on
 
 ### Data
 **Scaling:** Appears when arc thickness / node radius is set to "from source". Gives the option to select linear or logarithmic scaling<br>
