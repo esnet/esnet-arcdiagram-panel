@@ -114,8 +114,8 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       category: AppearanceCategory,
     })
     .addBooleanSwitch({
-      path: 'isDarkMode',
-      name: 'Colors for dark mode',
+      path: 'search',
+      name: 'Activate search bar',
       defaultValue: false,
       category: AppearanceCategory,
     })

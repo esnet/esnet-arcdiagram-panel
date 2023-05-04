@@ -59,10 +59,11 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
         height={height}
         query={query}
       ></Arc>
-      <SearchField
+      {options.search && <SearchField
         onQuery={setQuery}
         nodeList={parsedData.uniqueNodes}
-      ></SearchField>
+      ></SearchField>}
+      
     </div>
   );
 };

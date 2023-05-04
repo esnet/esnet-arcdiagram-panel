@@ -131,10 +131,8 @@ export function evaluateQuery(query: string, nodeList: any[], labels: HTMLCollec
             let numericalMatches = matches.map( (e: any) => e.id)
             
             if(numericalMatches.includes(Number(labels[i].id))) {
-                labels[i].style["font-size"] = 16
                 labels[i].style.opacity = "1"
             } else {
-                labels[i].style["font-size"] = 10
                 labels[i].style.opacity = "0.2"
             }
             

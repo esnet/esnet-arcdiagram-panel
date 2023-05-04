@@ -22,7 +22,7 @@ export interface SimpleOptions {
   toolTipSource: string;
   arcRange: string;
   dups: boolean;
-  isDarkMode: boolean;
+  search: boolean;
   // to be implemented
   linScalingFactor: number
 }

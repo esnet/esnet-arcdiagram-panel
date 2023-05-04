@@ -46,13 +46,15 @@ export const styles = {
       position: "absolute",
       top: 0,
       right: 0,
-      background: "hsla(0, 0%, 0%, 0.5)",
       color: "white",
+      padding: "1em"
     } as React.CSSProperties,
     inputStyle: {
       width: "200px",
       height: "25px",
-      background: "hsla(0, 0%, 0%, 0.5)"
+      background: "hsla(0, 0%, 0%, 0.5)",
+      color: "white",
+      "border-radius": "5px"
     } as React.CSSProperties,
    
 }

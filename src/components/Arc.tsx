@@ -146,7 +146,7 @@ function Arc(props: any) {
       replaceEllipsis(element, false)
     });
 
-    evaluateQuery(props.query,uniqueNodes, labelsAsHtml)
+    if(props.graphOptions.search) {evaluateQuery(props.query,uniqueNodes, labelsAsHtml)}
 
     // render nodes
     const svg = d3.select(container)
