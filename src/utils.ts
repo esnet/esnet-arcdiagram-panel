@@ -37,41 +37,8 @@ export function getEvenlySpacedColors(amount: number, darkMode: boolean): string
     // add darkmode colors
 
     const colors = [];
-    const lightColors = [
-        "#FFCDD2",
-        "#F8BBD0",
-        "#E1BEE7",
-        "#D1C4E9",
-        "#C5CAE9",
-        "#BBDEFB",
-        "#B3E5FC",
-        "#B2EBF2",
-        "#B2DFDB",
-        "#C8E6C9",
-        "#DCEDC8",
-        "#F0F4C3",
-        "#FFF9C4",
-        "#FFE0B2",
-        "#FFCCBC"
-      ];
-
-      const darkColors = [
-        "#EF9A9A",
-        "#F48FB1",
-        "#CE93D8",
-        "#B39DDB",
-        "#9FA8DA",
-        "#90CAF9",
-        "#81D4FA",
-        "#80DEEA",
-        "#80CBC4",
-        "#A5D6A7",
-        "#C5E1A5",
-        "#E6EE9C",
-        "#FFF59D",
-        "#FFCC80",
-        "#FFAB91"
-      ];      
+    const lightColors = ['#FFD700', '#00BFFF', '#FF8C00', '#FF1493', '#7FFF00', '#9400D3', '#00FFFF', '#FF69B4', '#32CD32', '#FFDAB9']
+    const darkColors =  ['#7CFC00', '#1E90FF', '#FFA500', '#FFC0CB', '#8B008B', '#32CD32', '#FF00FF', '#FF6347', '#FFFF00', '#FF1493']     
       
       for (let i = 0; i < amount; i++) {
         const colorIndex = i % darkColors.length;

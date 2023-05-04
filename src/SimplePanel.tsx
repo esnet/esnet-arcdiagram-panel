@@ -20,7 +20,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
   let graphOptions = {
     ...options,
   };
-
+  
   const theme = useTheme2();
 
   if (data.series[0].fields.length > 3) {

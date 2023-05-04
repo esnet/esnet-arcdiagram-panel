@@ -1,6 +1,6 @@
 {
   "name": "esnet-arcdiagram-panel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An arc diagram panel plugin for Grafana",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
