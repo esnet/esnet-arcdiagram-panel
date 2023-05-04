@@ -37,5 +37,22 @@ export const styles = {
       preface: {
         "font-weight": "900"
       } as React.CSSProperties,
-    } 
+    }, 
+    panelContainerStyle: {
+      height: "100%",
+      width: "100%"
+    } as React.CSSProperties,
+    searchFieldStyle: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      background: "hsla(0, 0%, 0%, 0.5)",
+      color: "white",
+    } as React.CSSProperties,
+    inputStyle: {
+      width: "200px",
+      height: "25px",
+      background: "hsla(0, 0%, 0%, 0.5)"
+    } as React.CSSProperties,
+   
 }

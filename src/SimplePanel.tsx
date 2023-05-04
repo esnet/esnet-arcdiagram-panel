@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PanelProps } from '@grafana/data';
 import { SimpleOptions } from 'types';
 import { useTheme2 } from '@grafana/ui';
 import Arc from './components/Arc';
+import SearchField from './components/SearchField';
 import { parseData } from 'dataParser';
+import { styles } from 'styles';
 
 interface Props extends PanelProps<SimpleOptions> {}
 /**
@@ -13,6 +15,8 @@ interface Props extends PanelProps<SimpleOptions> {}
  * @return { Arc } Arc diagram
  */
 export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: any) => {
+  const [query, setQuery] = useState("");
+
   let graphOptions = {
     ...options,
   };
@@ -46,16 +50,21 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
   const textColor = theme.colors.text.primary;
 
   return (
-    <Arc
-      textColor={textColor}
-      parsedData={parsedData}
-      graphOptions={graphOptions}
-      width={width}
-      height={height}
-    ></Arc>
+    <div style={styles.panelContainerStyle}>
+      <Arc
+        textColor={textColor}
+        parsedData={parsedData}
+        graphOptions={graphOptions}
+        width={width}
+        height={height}
+        query={query}
+      ></Arc>
+      <SearchField
+        onQuery={setQuery}
+        nodeList={parsedData.uniqueNodes}
+      ></SearchField>
+    </div>
   );
- 
-
 };
 
 

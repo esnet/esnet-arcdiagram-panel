@@ -127,8 +127,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         e.color = spacedColors[i]
       })
     }
-
-    console.log(groups)
     
     links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
       calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
@@ -136,7 +134,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       if (options.linkColorConfig === "field" && groups) {
         e.color = groups.find( group => group[options.colorConfigField] === e[options.colorConfigField as keyof typeof e])!.color
       } else {
- 
         e.color = hexColors.linkColor
       }
     });

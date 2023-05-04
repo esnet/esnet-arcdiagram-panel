@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
-import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis } from 'utils';
+import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery } from 'utils';
 import './animation.css'
 import { styles } from 'styles'
 
@@ -14,15 +14,12 @@ let toolTip = {
 
 function Arc(props: any) { 
   let uniqueNodes = props.parsedData.uniqueNodes;
-
-
   let links = props.parsedData.links;
   const containerRef = useRef(null),
   gRef = useRef(null),
   labelRef = useRef(null),
   tooltipRef = useRef(null);
   const [showTooltip, setShowTooltip] = useState(false);
-
 
   const handleToggleTooltip = (isActive: boolean) => {
     setShowTooltip(isActive);
@@ -127,6 +124,7 @@ function Arc(props: any) {
       .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-45)"))
       .style("margin-right", "5px")
       .attr('name', (d, i) => { return uniqueNodes[i].name})
+      .attr('id', (d, i) => { return i})
 
     // after the labels are rendered, we can find out the amount of margin we need to apply
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
@@ -147,6 +145,8 @@ function Arc(props: any) {
     Array.from(labelsAsHtml).forEach(element => {
       replaceEllipsis(element, false)
     });
+
+    evaluateQuery(props.query,uniqueNodes, labelsAsHtml)
 
     // render nodes
     const svg = d3.select(container)
@@ -308,10 +308,9 @@ function Arc(props: any) {
   return ( 
     <div  style={styles.containerStyle} > 
       <svg style={styles.containerStyle} ref = {containerRef}>
-      <g style={styles.containerStyle} ref = {gRef}></g>
-      <svg style={styles.labelStyle} ref = {labelRef}></svg>
+        <g style={styles.containerStyle} ref = {gRef}></g>
+        <svg style={styles.labelStyle} ref = {labelRef}></svg>
       </svg>
-
 
       {showTooltip && (
         <div ref={tooltipRef} style={styles.toolTipStyle.box} className='tooltip'>

@@ -122,3 +122,24 @@ export function replaceEllipsis(label: SVGTextElement, isHighlighted: Boolean){
 export function resetLabel(label: SVGTextElement) {
     label.innerHTML = label.getAttribute("name")!;    
 }
+
+export function evaluateQuery(query: string, nodeList: any[], labels: HTMLCollectionOf<SVGTextElement>) {
+    for(let i = 0; i < labels.length; i++) {
+        if(query) {
+            let matches = nodeList.map( ({ name, id }) => ({ name, id }));
+            matches = matches.filter((e: any) => e.name.toLowerCase().includes(query.toLowerCase()))
+            let numericalMatches = matches.map( (e: any) => e.id)
+            
+            if(numericalMatches.includes(Number(labels[i].id))) {
+                labels[i].style["font-size"] = 16
+                labels[i].style.opacity = "1"
+            } else {
+                labels[i].style["font-size"] = 10
+                labels[i].style.opacity = "0.2"
+            }
+            
+        } else {
+            labels[i].style.opacity = "1"
+        }
+    }
+}
