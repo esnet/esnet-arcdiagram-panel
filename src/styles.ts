@@ -46,15 +46,15 @@ export const styles = {
       position: "absolute",
       top: 0,
       right: 0,
-      color: "white",
       padding: "1em"
     } as React.CSSProperties,
-    inputStyle: {
-      width: "200px",
-      height: "25px",
-      background: "hsla(0, 0%, 0%, 0.5)",
-      color: "white",
-      "border-radius": "5px"
-    } as React.CSSProperties,
-   
+    inputStyle(isDarkMode: boolean) {
+      return {
+        width: "200px",
+        height: "25px",
+        background: (isDarkMode) ? "rgb(244 245 245 / 83%)" : "hsla(0, 0%, 0%, 0.5)",
+        color: (isDarkMode) ? "black" : "white",
+        "border-radius": "5px"
+      }
+    }
 }

@@ -119,7 +119,7 @@ function Arc(props: any) {
       .attr("y", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 5 ? (uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*2) : 10 })
       .text((d, i) => uniqueNodes[i].name)
       .style("text-anchor", "end")
-      .attr('fill', () => {return props.graphOptions.isDarkMode ? "white" : "black"})
+      .attr('fill', () => {return props.isDarkMode ? "white" : "black"})
       .attr('font-size', 10)
       .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-45)"))
       .style("margin-right", "5px")

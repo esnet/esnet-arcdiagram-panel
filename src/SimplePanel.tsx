@@ -58,10 +58,12 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
         width={width}
         height={height}
         query={query}
+        isDarkMode={theme.isDark}
       ></Arc>
       {options.search && <SearchField
         onQuery={setQuery}
         nodeList={parsedData.uniqueNodes}
+        isDarkMode={theme.isDark}
       ></SearchField>}
       
     </div>

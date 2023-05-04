@@ -7,9 +7,11 @@ export default function SearchField(props: any) {
         props.onQuery(e.target.value)
     }
 
+    console.log(styles.inputStyle(props.isDarkMode))
+
     return (
       <div style={styles.searchFieldStyle}>
-        <input style={styles.inputStyle} type="text" name="name" onChange={handleChange}/>
+        <input style={styles.inputStyle(props.isDarkMode)} type="text" name="name" onChange={handleChange}/>
       </div>
     )
 }
