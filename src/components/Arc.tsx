@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
-import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery } from 'utils';
-import './animation.css'
+import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery, handleZoom } from 'utils';
+import '../styles.css'
 import { styles } from 'styles'
 
 let toolTip = {
@@ -120,7 +120,7 @@ function Arc(props: any) {
       .text((d, i) => uniqueNodes[i].name)
       .style("text-anchor", "end")
       .attr('fill', () => {return props.isDarkMode ? "white" : "black"})
-      .attr('font-size', 10)
+      .attr('font-size', props.graphOptions.fontSize)
       .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-45)"))
       .style("margin-right", "5px")
       .attr('name', (d, i) => { return uniqueNodes[i].name})
@@ -238,7 +238,7 @@ function Arc(props: any) {
           .transition()
           .duration(duration)
           .attr("font-size", (label_d: any) => {
-            return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 16 : 10
+            return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? props.graphOptions.fontSize*1.6 : props.graphOptions.fontSize
           })
           .style("opacity", (label_d: any) => {
             return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 1 : .1
@@ -272,7 +272,7 @@ function Arc(props: any) {
         labels
           .transition()
           .duration(duration)
-          .attr("font-size", 10)
+          .attr("font-size", props.graphOptions.fontSize)
           .style("opacity", 1)
       })
 
@@ -305,8 +305,12 @@ function Arc(props: any) {
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.parsedData.hexColors.nodeColor, props.width, uniqueNodes]);
 
+  if(document.getElementsByClassName("canvas")[0] !== undefined) {
+    handleZoom(props.zoom, document.getElementsByClassName("canvas")[0] as HTMLElement)
+  }
+  
   return ( 
-    <div  style={styles.containerStyle} > 
+    <div className={"canvas"} style={styles.containerStyle} > 
       <svg style={styles.containerStyle} ref = {containerRef}>
         <g style={styles.containerStyle} ref = {gRef}></g>
         <svg style={styles.labelStyle} ref = {labelRef}></svg>

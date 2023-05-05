@@ -1,0 +1,65 @@
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+  color: grey;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+ color: grey;
+ opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+ color: grey;
+ opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+ color: grey;
+}
+::-ms-input-placeholder { /* Microsoft Edge */
+ color: grey;
+}
+
+input::placeholder { /* Most modern browsers support this now. */
+ color: #808080;
+}
+
+.zoom-button {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 250ms;
+}
+
+.zoom-button:hover {
+  transform: translateY(-10px);
+  background-color: grey !important;
+}
+
+.search-field {
+  transition: all 250ms;
+}
+
+.search-field input {
+  transition: all 250ms;
+}
+
+.search-field:hover {
+  transform: translateY(-10px);
+}
+
+.search-field input:hover {
+  background-color: rgb(195, 188, 188) !important;
+}
+
+
+.hidden{
+  display: none;
+}
+
+
+@keyframes inAnimation {
+  0% {
+    opacity: 0.2;
+    visibility: hidden;
+  }
+  100% {
+    opacity: 1;
+    visibility: visible;
+  }
+}

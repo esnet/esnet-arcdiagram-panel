@@ -23,6 +23,8 @@ export interface SimpleOptions {
   arcRange: string;
   dups: boolean;
   search: boolean;
+  fontSize: number;
+  zoom: boolean;
   // to be implemented
   linScalingFactor: number
 }

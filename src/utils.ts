@@ -108,3 +108,13 @@ export function evaluateQuery(query: string, nodeList: any[], labels: HTMLCollec
         }
     }
 }
+
+export function handleZoom(isActive: boolean, canvas: HTMLElement) {
+    if(isActive) {
+        canvas.style.transformOrigin = "left"
+        canvas.style.transform = "scale(1.5)"
+    } else {
+        canvas.style.transformOrigin = "unset"
+        canvas.style.transform = "unset"
+    }
+}

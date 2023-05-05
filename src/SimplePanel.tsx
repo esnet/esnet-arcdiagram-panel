@@ -16,11 +16,16 @@ interface Props extends PanelProps<SimpleOptions> {}
  */
 export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: any) => {
   const [query, setQuery] = useState("");
+  const [zoom, toggleZoom] = useState(false)
+
+  const onClick = () => {
+    toggleZoom(!zoom)
+  }
 
   let graphOptions = {
     ...options,
   };
-  
+
   const theme = useTheme2();
 
   if (data.series[0].fields.length > 3) {
@@ -49,6 +54,8 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
 
   const textColor = theme.colors.text.primary;
 
+  
+
   return (
     <div style={styles.panelContainerStyle}>
       <Arc
@@ -59,12 +66,23 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
         height={height}
         query={query}
         isDarkMode={theme.isDark}
+        zoom={zoom}
       ></Arc>
-      {options.search && <SearchField
-        onQuery={setQuery}
-        nodeList={parsedData.uniqueNodes}
-        isDarkMode={theme.isDark}
-      ></SearchField>}
+      <div style={styles.toolBarStyle}>
+        {options.search && <SearchField
+          onQuery={setQuery}
+          nodeList={parsedData.uniqueNodes}
+          isDarkMode={theme.isDark}
+        ></SearchField>}
+        {options.zoom && 
+          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={onClick}>
+            <img className={!zoom ? "show" : "hidden"} style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/plus_icon.svg" alt=""/>
+            <img className={zoom ? "show" : "hidden"} style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/minus_icon.svg" alt=""/>
+          </button>
+        }
+        
+      </div>
+      
       
     </div>
   );

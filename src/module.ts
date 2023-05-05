@@ -119,6 +119,23 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: false,
       category: AppearanceCategory,
     })
+    .addSliderInput({
+      path: 'fontSize',
+      name: 'Font size',
+      defaultValue: 10,
+      settings: {
+        min: 5,
+        max: 20,
+        step: 1,
+      },
+      category: AppearanceCategory,
+    })
+    .addBooleanSwitch({
+      path: 'zoom',
+      name: 'Activate zoom button',
+      defaultValue: false,
+      category: AppearanceCategory,
+    })
     .addSelect({
       path: 'scale',
       name: 'Scaling',
