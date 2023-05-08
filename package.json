@@ -7,7 +7,7 @@
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev",
     "watch": "FAST_REFRESH=TRUE grafana-toolkit plugin:dev --watch",
-    "sign": "grafana-toolkit plugin:sign",
+    "sign": "npx --yes @grafana/sign-plugin@latest",
     "start": "yarn watch"
   },
   "author": "ESnet",
