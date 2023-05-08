@@ -136,6 +136,18 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: false,
       category: AppearanceCategory,
     })
+    .addSliderInput({
+      path: 'zoomFactor',
+      name: 'Set zoom',
+      defaultValue: 2,
+      settings: {
+        min: 1,
+        max: 5,
+        step: 1,
+      },
+      category: AppearanceCategory,
+      showIf: config => config.zoom
+    })
     .addSelect({
       path: 'scale',
       name: 'Scaling',

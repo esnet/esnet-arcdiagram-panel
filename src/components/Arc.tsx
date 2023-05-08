@@ -35,7 +35,7 @@ function Arc(props: any) {
                        .map((id) => idToName(id, uniqueNodes))
                        .filter((value, index, array) => array.indexOf(value) === index)
                        .map((string, index) => (
-                        <p style={styles.toolTipStyle.text} key={index}>
+                        <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
                           {string}
                           <br />
                         </p>
@@ -45,11 +45,11 @@ function Arc(props: any) {
       toolTip.field = <p></p>
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
-      toolTip.target =  <p style={styles.toolTipStyle.text}>{idToName(targetId,uniqueNodes)}</p>
+      toolTip.target =  <p style={styles.toolTipStyle.text(props.zoom)}>{idToName(targetId,uniqueNodes)}</p>
       toolTip.sum = displayValue!
       toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).field
                       .map((string: any, index: number) => (
-                        <p style={styles.toolTipStyle.text} key={index}>
+                        <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
                           {string}
                           <br />
                         </p>
@@ -225,7 +225,7 @@ function Arc(props: any) {
           .attr("r", uniqueNodes[d.srcElement.id].radius*2)
         paths
           .transition()
-          .style('stroke-opacity', (l: any) => {
+          .style('opacity', (l: any) => {
             /* eslint-disable eqeqeq */
             return d.srcElement.id == l?.source ? props.graphOptions.arcOpacity : props.graphOptions.arcOpacity*.5
           })
@@ -256,7 +256,7 @@ function Arc(props: any) {
           .duration(duration)
           .attr("r", (n: any) => {
             return uniqueNodes[n.id].radius
-          } )
+          })
           .style('opacity', 1)
         d3.select(this)
           .transition()
@@ -265,7 +265,7 @@ function Arc(props: any) {
         paths
           .transition()
           .duration(duration)
-          .style('stroke-opacity', props.graphOptions.arcOpacity)
+          .style('opacity', props.graphOptions.arcOpacity)
           .attr('stroke-width', (l: any) => {
             return l?.strokeWidth
           })
@@ -294,19 +294,25 @@ function Arc(props: any) {
       .on('mouseout', function (d) {
         handleToggleTooltip(false);
         paths
-          .style("opacity", props.graphOptions.arcOpacity)
           .transition()
           .duration(duration)
+          .style('opacity', props.graphOptions.arcOpacity)
+          .attr('stroke-width', (l: any) => {
+            return l?.strokeWidth
+          })
         d3.select(this)
           .transition()
           .style('opacity', props.graphOptions.arcOpacity)
           .duration(duration)
+          .attr('stroke-width', (l: any) => {
+            return l?.strokeWidth
+          })
       })
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.parsedData.hexColors.nodeColor, props.width, uniqueNodes]);
 
   if(document.getElementsByClassName("canvas")[0] !== undefined) {
-    handleZoom(props.zoom, document.getElementsByClassName("canvas")[0] as HTMLElement)
+    handleZoom(props.zoom, document.getElementsByClassName("canvas")[0] as HTMLElement, props.graphOptions.zoomFactor)
   }
   
   return ( 
@@ -318,12 +324,12 @@ function Arc(props: any) {
 
       {showTooltip && (
         <div ref={tooltipRef} style={styles.toolTipStyle.box} className='tooltip'>
-          <p style={styles.toolTipStyle.text} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipSource}</b> {" "}{toolTip.source}</p>
-          <div style={styles.toolTipStyle.text} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>
+          <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipSource}</b> {" "}{toolTip.source}</p>
+          <div style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>
 
-          <p style={styles.toolTipStyle.text} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
+          <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
 
-          <p style={styles.toolTipStyle.text} > {toolTip.field}</p>
+          <p style={styles.toolTipStyle.text(props.zoom)} > {toolTip.field}</p>
         </div>
       )}
     </div> 

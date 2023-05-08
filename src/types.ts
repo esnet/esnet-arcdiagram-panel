@@ -12,8 +12,6 @@ export interface SimpleOptions {
   scale: string;
   src: string;
   dest: string;
-  saturation: number;
-  lightness: number;
   toolTipMetric: string;
   toolTipGroupBy: string;
   linkColorConfig: string;
@@ -25,6 +23,5 @@ export interface SimpleOptions {
   search: boolean;
   fontSize: number;
   zoom: boolean;
-  // to be implemented
-  linScalingFactor: number
+  zoomFactor: number;
 }

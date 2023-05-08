@@ -28,12 +28,14 @@ export const styles = {
         "border-radius": "5px",
         opacity: 0.9
       } as React.CSSProperties,
-      text: {
-        color: "black",
-        "font-size": "10px",
+      text(zoom: boolean) {
+        return {
+          color: "black",
+        "font-size": (zoom) ? "5px" : "10px",
         margin: "0",
         "font-weight": "100"
-      } as React.CSSProperties,
+        }
+      },
       preface: {
         "font-weight": "900"
       } as React.CSSProperties,

@@ -116,10 +116,11 @@ export function evaluateQuery(query: string, nodeList: any[], labels: HTMLCollec
     }
 }
 
-export function handleZoom(isActive: boolean, canvas: HTMLElement) {
+export function handleZoom(isActive: boolean, canvas: HTMLElement, zoomFactor: number) {
     if(isActive) {
         canvas.style.transformOrigin = "left"
-        canvas.style.transform = "scale(1.5)"
+        console.log(zoomFactor)
+        canvas.style.transform = `scale(${zoomFactor})`
     } else {
         canvas.style.transformOrigin = "unset"
         canvas.style.transform = "unset"

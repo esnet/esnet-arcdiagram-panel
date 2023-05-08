@@ -52,9 +52,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
     console.error('parsing error: ', error);
   }
 
-  const textColor = theme.colors.text.primary;
-
-  
+  const textColor = theme.colors.text.primary;  
 
   return (
     <div style={styles.panelContainerStyle}>
