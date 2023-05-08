@@ -165,7 +165,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       description: 'Range which the arc thickness is being mapped to',
       category: DataCategory,
       defaultValue: "1,15",
-      showIf: config => config.scale === "log" && config.arcFromSource,
+      showIf: config => config.arcFromSource,
     })
     .addCustomEditor({
       id: "setRange",

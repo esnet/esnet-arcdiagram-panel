@@ -15,6 +15,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
 
   const allData = data.series[0].fields;
 
+
   /********************************** Nodes/links **********************************/ 
 
   // if src/dst not defined in options, take first/second group by default
@@ -54,7 +55,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     target: dstById[index],
     sum: allData.find((obj: { name: any; }) => obj.name === allData[allData.length -1].name)?.values.buffer[index] as number,
     strokeWidth: 0,
-    color: "",
+    color: allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).color,
     field: (additionalField === "") ? [additionalField] : allData.find(( obj: any) => obj.name === additionalField).values.buffer[index],
     // for coloring the links by source, add a field with the name of the selected field
     [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values.buffer[index],
@@ -134,7 +135,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       if (options.linkColorConfig === "field" && groups) {
         e.color = groups.find( group => group[options.colorConfigField] === e[options.colorConfigField as keyof typeof e])!.color
       } else {
-        e.color = hexColors.linkColor
+        e.color = e.color
       }
     });
 
@@ -195,6 +196,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       links = uniqueLinks;
     }
     
+    //console.log(allData[allData.length -1].display(allData[allData.length -1].values.buffer[0]).color)
+    //console.log(links[0].color)
 
   return {uniqueNodes, links, hexColors, additionalField};
 }

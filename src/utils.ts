@@ -29,7 +29,14 @@ export function mapToLogRange(value: number, rangeMin: number, rangeMax: number,
     return mappedValue;
 }
 
-export function mapToLinRange(value: number) {console.log(value)}
+export function mapToLinRange(value: number, rangeMin: number, rangeMax: number,  minLinkSum: number, maxLinkSum: number) {
+    const inputRange = maxLinkSum - minLinkSum;
+    const outputRange = rangeMax - rangeMin;
+
+    const scaledValue = (value - minLinkSum) / inputRange;
+    const mappedValue = scaledValue * outputRange + rangeMin;
+    return mappedValue;
+}
 
 // get an array of evenly spaced colors
 export function getEvenlySpacedColors(amount: number, darkMode: boolean): string[] {
@@ -62,7 +69,7 @@ export function calcStrokeWidth(arcFromSource: boolean, scale: string, arcThickn
           e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
         } else {
             // call function to map to lin range instead
-          e.strokeWidth = e.sum/10000000000000
+          e.strokeWidth = mapToLinRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)
         }
     } else {
         e.strokeWidth = arcThickness
