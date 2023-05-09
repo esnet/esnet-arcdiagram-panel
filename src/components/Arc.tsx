@@ -185,7 +185,7 @@ function Arc(props: any) {
       .attr("stroke", (l: any) => { return  l?.color })
       .attr("id", "arc")
       .attr("stroke-width", (l: any) => { return  l?.strokeWidth })
-      .style("stroke-opacity", props.graphOptions.arcOpacity)
+      .style("opacity", props.graphOptions.arcOpacity)
       .attr("source", (d, i) => links[i].source)
       .attr("target", (d, i) => links[i].target)
       .attr("sum", (d, i) => links[i].sum)
