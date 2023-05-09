@@ -146,8 +146,6 @@ function Arc(props: any) {
       replaceEllipsis(element, false)
     });
 
-    if(props.graphOptions.search) {evaluateQuery(props.query,uniqueNodes, labelsAsHtml)}
-
     // render nodes
     const svg = d3.select(container)
     .selectAll('circle')
@@ -227,7 +225,7 @@ function Arc(props: any) {
           .transition()
           .style('opacity', (l: any) => {
             /* eslint-disable eqeqeq */
-            return d.srcElement.id == l?.source ? props.graphOptions.arcOpacity : props.graphOptions.arcOpacity*.5
+            return d.srcElement.id == l?.source ? props.graphOptions.arcOpacity : .1
           })
           .attr('stroke-width', (l: any) => {
             /* eslint-disable eqeqeq */
@@ -283,7 +281,7 @@ function Arc(props: any) {
       .on("mouseover", function (d) {
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("displayValue"));
         paths
-          .style("opacity", props.graphOptions.arcOpacity*0.5)
+          .style("opacity", .1)
           .transition()
           .duration(duration)
         d3.select(this)
@@ -308,6 +306,11 @@ function Arc(props: any) {
             return l?.strokeWidth
           })
       })
+
+    const linksAsHtml = document.getElementsByTagName("path")
+
+    if(props.graphOptions.search) {evaluateQuery(props.query,uniqueNodes, labelsAsHtml, linksAsHtml)}
+
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.parsedData.hexColors.nodeColor, props.width, uniqueNodes]);
 

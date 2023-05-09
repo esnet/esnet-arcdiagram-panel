@@ -99,9 +99,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
    // color
     const hexColors = {
       nodeColor: theme.visualization.getColorByName(options.nodeColor),
-      linkColor: theme.visualization.getColorByName(options.linkColor)
     }
-
+      
     // set range for log mapping
     const linkScaleFrom = options.arcRange?.split(",").map(Number)[0]
     const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
@@ -195,9 +194,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     if(allData.length > 3) {
       links = uniqueLinks;
     }
-    
-    //console.log(allData[allData.length -1].display(allData[allData.length -1].values.buffer[0]).color)
-    //console.log(links[0].color)
 
   return {uniqueNodes, links, hexColors, additionalField};
 }

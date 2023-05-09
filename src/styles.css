@@ -27,7 +27,7 @@ input::placeholder { /* Most modern browsers support this now. */
 }
 
 .zoom-button:hover {
-  transform: translateY(-10px);
+  transform: translateY(-8px);
   background-color: grey !important;
 }
 
@@ -40,7 +40,7 @@ input::placeholder { /* Most modern browsers support this now. */
 }
 
 .search-field:hover {
-  transform: translateY(-10px);
+  transform: translateY(-8px);
 }
 
 .search-field input:hover {

@@ -32,7 +32,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Arc opacity',
       defaultValue: 1,
       settings: {
-        min: .1,
+        min: .6,
         max: 1,
         step: .1,
       },
@@ -99,13 +99,6 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         },
       },
       showIf: config => config.linkColorConfig !== "default",
-    })
-    .addColorPicker({
-      path: 'linkColor',
-      name: 'Link Color',
-      defaultValue: 'blue',
-      showIf: config => config.linkColorConfig === "default",
-      category: AppearanceCategory,
     })
     .addColorPicker({
       path: 'nodeColor',

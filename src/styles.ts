@@ -53,7 +53,7 @@ export const styles = {
       return {
         width: "200px",
         height: "40px",
-        background: (isDarkMode) ? "rgb(244 245 245 / 83%)" : "hsla(0, 0%, 0%, 0.5)",
+        background: (isDarkMode) ? "rgb(244 245 245 / 83%)" : "hsla(0, 0%, 0%, 1)",
         color: (isDarkMode) ? "black" : "white",
         "border-radius": "50px",
         padding: "1em"

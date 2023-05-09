@@ -90,30 +90,34 @@ export function replaceEllipsis(label: SVGTextElement, isHighlighted: Boolean){
 
         label.innerHTML = "..." + label.innerHTML.substring(overlap*mapRatio, label.innerHTML.length)
     }
-
 }
 
 export function resetLabel(label: SVGTextElement) {
     label.innerHTML = label.getAttribute("name")!;    
 }
 
-export function evaluateQuery(query: string, nodeList: any[], labels: HTMLCollectionOf<SVGTextElement>) {
-    for(let i = 0; i < labels.length; i++) {
-        if(query) {
-            let matches = nodeList.map( ({ name, id }) => ({ name, id }));
-            matches = matches.filter((e: any) => e.name.toLowerCase().includes(query.toLowerCase()))
-            let numericalMatches = matches.map( (e: any) => e.id)
-            
-            if(numericalMatches.includes(Number(labels[i].id))) {
-                labels[i].style.opacity = "1"
-            } else {
-                labels[i].style.opacity = "0.2"
-            }
-            
-        } else {
-            labels[i].style.opacity = "1"
+export function evaluateQuery(query: string, nodeList: any[], labels: HTMLCollectionOf<SVGTextElement>, links: HTMLCollectionOf<SVGPathElement>) {
+    let matches = nodeList.map(({ name, id }) => ({ name, id }));
+    matches = matches.filter((e: any) => e.name.toLowerCase().includes(query.toLowerCase()))
+    const numericalMatches = new Set(matches.map((e: any) => e.id));
+
+    const labelsLength = labels.length;
+    const linksLength = links.length;
+
+    console.log(numericalMatches)
+    
+    if (query) {
+        // highlight labels
+        for (let i = 0; i < labelsLength; i++) {
+            const labelId = Number(labels[i].id);
+            labels[i].style.opacity = numericalMatches.has(labelId) ? "1" : "0.2";
+        } 
+        // highlight links
+        for (let j = 0; j < linksLength; j++) {
+            const linkSource = Number(links[j].getAttribute("source"));
+            links[j].style.opacity = numericalMatches.has(linkSource) ? "1" : "0.2";
         }
-    }
+    } 
 }
 
 export function handleZoom(isActive: boolean, canvas: HTMLElement, zoomFactor: number) {
