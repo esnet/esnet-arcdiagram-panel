@@ -96,27 +96,22 @@ export function resetLabel(label: SVGTextElement) {
     label.innerHTML = label.getAttribute("name")!;    
 }
 
-export function evaluateQuery(query: string, nodeList: any[], labels: HTMLCollectionOf<SVGTextElement>, links: HTMLCollectionOf<SVGPathElement>) {
+export function evaluateQuery(query: string, nodeList: any[], labels: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, links: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, arcOpacity: number) {
     let matches = nodeList.map(({ name, id }) => ({ name, id }));
     matches = matches.filter((e: any) => e.name.toLowerCase().includes(query.toLowerCase()))
     const numericalMatches = new Set(matches.map((e: any) => e.id));
-
-    const labelsLength = labels.length;
-    const linksLength = links.length;
-
-    console.log(numericalMatches)
     
     if (query) {
         // highlight labels
-        for (let i = 0; i < labelsLength; i++) {
-            const labelId = Number(labels[i].id);
-            labels[i].style.opacity = numericalMatches.has(labelId) ? "1" : "0.2";
-        } 
+        labels
+            .style("opacity", (label: any) => {
+                return numericalMatches.has(label.id) ?  arcOpacity : .1
+            })
         // highlight links
-        for (let j = 0; j < linksLength; j++) {
-            const linkSource = Number(links[j].getAttribute("source"));
-            links[j].style.opacity = numericalMatches.has(linkSource) ? "1" : "0.2";
-        }
+        links
+            .style("opacity", (link: any) => {
+                return numericalMatches.has(link.source) /*|| numericalMatches.has(link.target)*/ ?  arcOpacity : .1
+            })
     } 
 }
 
