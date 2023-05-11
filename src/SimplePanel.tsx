@@ -18,13 +18,15 @@ interface Props extends PanelProps<SimpleOptions> {}
 export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: any) => {
   const [query, setQuery] = useState("");
   const [zoomState, setZoomState] = useState(10);
-  const isIncrement = true
-
-  const onClick = (isIncrement: boolean) => {
+  
+  const onClick = (isIncrement: boolean, isReset?: boolean) => {
     if(!isIncrement && zoomState == 10) {
       return
     } else {
       setZoomState((isIncrement) ? zoomState+1 : zoomState-1)
+    }
+    if(isReset) {
+      setZoomState(10)
     }
   }
 
@@ -80,11 +82,14 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
         ></SearchField>}
         {options.zoom && 
         <div style={styles.zoomButtonWrapper}>
-          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={() => onClick(!isIncrement)}>
-            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/minus_icon.svg" alt=""/>
+          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={() => onClick(false)}>
+            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/area_zoom_out.svg" alt=""/>
           </button>
-          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={() => onClick(isIncrement)}>
-            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/plus_icon.svg" alt=""/>
+          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={() => onClick(true)}>
+            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/area_zoom_in.svg" alt=""/>
+          </button>
+          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={() => onClick(true, true)}>
+            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/reset_icon.svg" alt=""/>
           </button>
         </div>
         }

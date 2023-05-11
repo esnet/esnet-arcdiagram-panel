@@ -93,10 +93,10 @@ export function replaceEllipsis(label: SVGTextElement, isHighlighted: Boolean){
 }
 
 export function resetLabel(label: SVGTextElement) {
-    label.innerHTML = label.getAttribute("name")!;    
+    label.innerHTML = label.getAttribute("name")!;
 }
 
-export function evaluateQuery(query: string, nodeList: any[], labels: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, links: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, arcOpacity: number) {
+export function evaluateQuery(query: string, nodeList: any[], labels: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, links: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, nodes: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, arcOpacity: number) {
     let matches = nodeList.map(({ name, id }) => ({ name, id }));
     matches = matches.filter((e: any) => e.name.toLowerCase().includes(query.toLowerCase()))
     const numericalMatches = new Set(matches.map((e: any) => e.id));
@@ -105,18 +105,28 @@ export function evaluateQuery(query: string, nodeList: any[], labels: d3.Selecti
         // highlight labels
         labels
             .style("opacity", (label: any) => {
-                return numericalMatches.has(label.id) ?  arcOpacity : .1
+                return numericalMatches.has(label.id) ?  1 : .1
             })
         // highlight links
         links
             .style("opacity", (link: any) => {
-                console.log(numericalMatches)
                 return (numericalMatches.has(link.source) || numericalMatches.has(link.target)) ?  arcOpacity : .1
+            })
+        // highlight nodes
+        nodes
+            .style("opacity", (node: any) => {
+                return numericalMatches.has(node.id) ?  1 : .1
             })
     } 
 }
 
+export function getQueryMatches(query: string, nodeList: any[]) {
+    let matches = nodeList.map(({ name, id }) => ({ name, id }));
+    matches = matches.filter((e: any) => e.name.toLowerCase().includes(query.toLowerCase()))
+    const numericalMatches = new Set(matches.map((e: any) => e.id));
+    return numericalMatches;
+}
+
 export function handleZoom(canvas: HTMLElement, zoomState: number) {
-    console.log(zoomState)
     canvas.style.transform = `scale(${zoomState/10})`
 }

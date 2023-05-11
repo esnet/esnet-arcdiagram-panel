@@ -15,6 +15,9 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
 
   const allData = data.series[0].fields;
 
+  /********************************** Check if hop mode **********************************/ 
+
+  
 
   /********************************** Nodes/links **********************************/ 
 

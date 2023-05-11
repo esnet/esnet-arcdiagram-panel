@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
-import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery, handleZoom } from 'utils';
+import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery, handleZoom, getQueryMatches } from 'utils';
 import '../styles.css'
 import { styles } from 'styles'
 
@@ -192,11 +192,14 @@ function Arc(props: any) {
       .attr("displayValue", (d, i) => links[i].displayValue)
     
     /********************************** Highlighting **********************************/ 
+    
     const nodes = d3.selectAll("circle")
     const paths = d3.selectAll("path")
     const labels = d3.selectAll("text")
     const duration = 200;
-    nodes
+    const queryMatches = getQueryMatches(props.query, uniqueNodes)
+
+      nodes
       .on("mouseover", function (d) {
         // Tooltip
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.id));
@@ -209,12 +212,21 @@ function Arc(props: any) {
         })
         nodes
           .style("opacity", ( n: any) => {
-            return nodeTargets.includes(n.id) ? 1 : 0.5
+            if(props.query.length !==0) {
+              return queryMatches.has(n.id) ? 1 : 0.1
+            } else {
+              return nodeTargets.includes(n.id) ? 1 : 0.1
+            }
+            
           })
           .transition()
           .attr("r", (n: any) => {
-            return nodeTargets.includes(n.id) ? uniqueNodes[n.id].radius*2 : uniqueNodes[n.id].radius
-          } )
+            if(props.query.length !==0) {
+              return uniqueNodes[n.id].radius
+            } else {
+              return nodeTargets.includes(n.id) ? uniqueNodes[n.id].radius*2 : uniqueNodes[n.id].radius
+            }  
+          })
           .duration(duration)
         d3.select(this)
           .style("opacity", 1)
@@ -224,8 +236,12 @@ function Arc(props: any) {
         paths
           .transition()
           .style('opacity', (l: any) => {
-            /* eslint-disable eqeqeq */
-            return d.srcElement.id == l?.source ? props.graphOptions.arcOpacity : .1
+            if(props.query.length !==0) {
+              return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
+            } else {
+              /* eslint-disable eqeqeq */
+              return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? props.graphOptions.arcOpacity : .1
+            }  
           })
           .attr('stroke-width', (l: any) => {
             /* eslint-disable eqeqeq */
@@ -236,10 +252,18 @@ function Arc(props: any) {
           .transition()
           .duration(duration)
           .attr("font-size", (label_d: any) => {
-            return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? props.graphOptions.fontSize*1.6 : props.graphOptions.fontSize
+            if(props.query.length !==0) {
+              return label_d.name === d.srcElement.getAttribute("name") ? props.graphOptions.fontSize*1.6 : props.graphOptions.fontSize
+            } else {
+              return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? props.graphOptions.fontSize*1.6 : props.graphOptions.fontSize
+            }
           })
           .style("opacity", (label_d: any) => {
-            return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 1 : .1
+            if(props.query.length !==0) {
+              return label_d.name === d.srcElement.getAttribute("name") ? 1 : .1
+            } else {
+              return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 1 : .1
+            }
           })
       })
       .on('mouseout', function (d) {
@@ -255,7 +279,14 @@ function Arc(props: any) {
           .attr("r", (n: any) => {
             return uniqueNodes[n.id].radius
           })
-          .style('opacity', 1)
+          .style("opacity",(n: any) => {
+            if(props.query.length !==0) {
+              console.log("id: ", n.id, queryMatches.has(n.id))
+              return queryMatches.has(n.id) ? 1 : .1
+            } else {
+              return 1
+            }
+          })
         d3.select(this)
           .transition()
           .duration(duration)
@@ -263,7 +294,13 @@ function Arc(props: any) {
         paths
           .transition()
           .duration(duration)
-          .style('opacity', props.graphOptions.arcOpacity)
+          .style("opacity",(l: any) => {
+            if(props.query.length !==0) {
+              return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
+            } else {
+              return props.graphOptions.arcOpacity
+            }
+          })
           .attr('stroke-width', (l: any) => {
             return l?.strokeWidth
           })
@@ -271,9 +308,14 @@ function Arc(props: any) {
           .transition()
           .duration(duration)
           .attr("font-size", props.graphOptions.fontSize)
-          .style("opacity", 1)
+          .style("opacity",(l: any) => {
+            if(props.query.length !==0) {
+              return queryMatches.has(l.id) ? 1 : .1
+            } else {
+              return 1
+            }
+          })
       })
-
 
       /********************************** Link tooltip **********************************/ 
 
@@ -281,7 +323,13 @@ function Arc(props: any) {
       .on("mouseover", function (d) {
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("displayValue"));
         paths
-          .style("opacity", .1)
+          .style("opacity",(l: any) => {
+            if(props.query.length !==0) {
+              return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
+            } else {
+              return .1
+            }
+          })
           .transition()
           .duration(duration)
         d3.select(this)
@@ -294,20 +342,35 @@ function Arc(props: any) {
         paths
           .transition()
           .duration(duration)
-          .style('opacity', props.graphOptions.arcOpacity)
+          .style("opacity",(l: any) => {
+            if(props.query.length !==0) {
+              return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
+            } else {
+              return props.graphOptions.arcOpacity
+            }
+          })
           .attr('stroke-width', (l: any) => {
             return l?.strokeWidth
           })
         d3.select(this)
           .transition()
-          .style('opacity', props.graphOptions.arcOpacity)
+          .style("opacity",(l: any) => {
+            if(props.query.length !==0) {
+              return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
+            } else {
+              return props.graphOptions.arcOpacity
+            }
+          })
           .duration(duration)
           .attr('stroke-width', (l: any) => {
             return l?.strokeWidth
           })
       })
+    
+      // queryMatches.has(l.source) || queryMatches.has(l.target)
+    
 
-    if(props.graphOptions.search) {evaluateQuery(props.query,uniqueNodes, labels, paths, props.graphOptions.arcOpacity)}
+    if(props.graphOptions.search) {evaluateQuery(props.query,uniqueNodes, labels, paths, nodes, props.graphOptions.arcOpacity)}
 
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.parsedData.hexColors.nodeColor, props.width, uniqueNodes]);
