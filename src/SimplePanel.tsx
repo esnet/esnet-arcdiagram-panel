@@ -14,12 +14,18 @@ interface Props extends PanelProps<SimpleOptions> {}
  * @param {*} { options, data, width, height, id }
  * @return { Arc } Arc diagram
  */
+
 export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: any) => {
   const [query, setQuery] = useState("");
-  const [zoom, toggleZoom] = useState(false)
+  const [zoomState, setZoomState] = useState(10);
+  const isIncrement = true
 
-  const onClick = () => {
-    toggleZoom(!zoom)
+  const onClick = (isIncrement: boolean) => {
+    if(!isIncrement && zoomState == 10) {
+      return
+    } else {
+      setZoomState((isIncrement) ? zoomState+1 : zoomState-1)
+    }
   }
 
   let graphOptions = {
@@ -64,7 +70,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
         height={height}
         query={query}
         isDarkMode={theme.isDark}
-        zoom={zoom}
+        zoomState={zoomState}
       ></Arc>
       <div style={styles.toolBarStyle}>
         {options.search && <SearchField
@@ -73,10 +79,14 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
           isDarkMode={theme.isDark}
         ></SearchField>}
         {options.zoom && 
-          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={onClick}>
-            <img className={!zoom ? "show" : "hidden"} style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/plus_icon.svg" alt=""/>
-            <img className={zoom ? "show" : "hidden"} style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/minus_icon.svg" alt=""/>
+        <div style={styles.zoomButtonWrapper}>
+          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={() => onClick(!isIncrement)}>
+            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/minus_icon.svg" alt=""/>
           </button>
+          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={() => onClick(isIncrement)}>
+            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/plus_icon.svg" alt=""/>
+          </button>
+        </div>
         }
         
       </div>

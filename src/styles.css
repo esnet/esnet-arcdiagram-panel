@@ -46,20 +46,3 @@ input::placeholder { /* Most modern browsers support this now. */
 .search-field input:hover {
   background-color: rgb(195, 188, 188) !important;
 }
-
-
-.hidden{
-  display: none;
-}
-
-
-@keyframes inAnimation {
-  0% {
-    opacity: 0.2;
-    visibility: hidden;
-  }
-  100% {
-    opacity: 1;
-    visibility: visible;
-  }
-}

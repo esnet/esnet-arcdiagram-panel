@@ -55,7 +55,6 @@ export const styles = {
         height: "40px",
         background: (isDarkMode) ? "rgb(244 245 245 / 83%)" : "hsla(0, 0%, 0%, 1)",
         color: (isDarkMode) ? "black" : "white",
-        "border-radius": "50px",
         padding: "1em"
       }
     },
@@ -64,12 +63,14 @@ export const styles = {
       right: 0,
       position: "absolute"
     } as React.CSSProperties,
+    zoomButtonWrapper: {
+      margin: "0em 1em",
+      "vertical-align": "middle",
+      display: "inline-block",
+    } as React.CSSProperties,
     zoomButtonStyle(isDarkMode: boolean) {
       return {
         display: "inline-block",
-        margin: "0em 1em",
-        "vertical-align": "middle",
-        "border-radius": "50px",
         "background-color": isDarkMode ? "rgba(244, 245, 245, 0.83)" : "black"
       }
     },

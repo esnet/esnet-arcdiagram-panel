@@ -307,13 +307,13 @@ function Arc(props: any) {
           })
       })
 
-    if(props.graphOptions.search) {evaluateQuery(props.query,uniqueNodes, labels, paths, props.graphOptions.arcOpacitY)}
+    if(props.graphOptions.search) {evaluateQuery(props.query,uniqueNodes, labels, paths, props.graphOptions.arcOpacity)}
 
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.parsedData.hexColors.nodeColor, props.width, uniqueNodes]);
 
-  if(document.getElementsByClassName("canvas")[0] !== undefined && props.zoom) {
-    handleZoom(props.zoom, document.getElementsByClassName("canvas")[0] as HTMLElement, props.graphOptions.zoomFactor)
+  if(document.getElementsByClassName("canvas")[0] !== undefined) {
+    handleZoom(document.getElementsByClassName("canvas")[0] as HTMLElement, props.zoomState)
   }
   
   return ( 

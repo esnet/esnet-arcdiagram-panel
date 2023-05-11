@@ -110,18 +110,13 @@ export function evaluateQuery(query: string, nodeList: any[], labels: d3.Selecti
         // highlight links
         links
             .style("opacity", (link: any) => {
-                return numericalMatches.has(link.source) /*|| numericalMatches.has(link.target)*/ ?  arcOpacity : .1
+                console.log(numericalMatches)
+                return (numericalMatches.has(link.source) || numericalMatches.has(link.target)) ?  arcOpacity : .1
             })
     } 
 }
 
-export function handleZoom(isActive: boolean, canvas: HTMLElement, zoomFactor: number) {
-    if(isActive) {
-        canvas.style.transformOrigin = "left"
-        console.log(zoomFactor)
-        canvas.style.transform = `scale(${zoomFactor})`
-    } else {
-        canvas.style.transformOrigin = "unset"
-        canvas.style.transform = "unset"
-    }
+export function handleZoom(canvas: HTMLElement, zoomState: number) {
+    console.log(zoomState)
+    canvas.style.transform = `scale(${zoomState/10})`
 }
