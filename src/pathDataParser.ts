@@ -18,55 +18,58 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
   const allData = data.series[0].fields;
   const paths = allData[0].values.buffer;
 
-  let uniqueNodes = Array.from([...new Set(allData[0].values.buffer.join(" ").split(" "))]).map((str, index) => ({
-    id: index,
-    name: str,
-    sum: 1,
-    radius: 5
-  }));
+  /********************************** Nodes **********************************/
 
+    let uniqueNodes = Array.from([...new Set(allData[0].values.buffer.join(" ").split(" "))]).map((str, index) => ({
+      id: index,
+      name: str,
+      sum: 1,
+      radius: 5
+    }));
 
-  const pathColors = getEvenlySpacedColors(paths.length, theme.isDark)
+  /********************************** Links **********************************/
 
-  let links: { source: number | undefined; target: number | undefined; path: number; sum: number; strokeWidth: number; field: string; color: string; displayValue: string; }[] = [];
+    const pathColors = getEvenlySpacedColors(paths.length, theme.isDark)
 
-  paths.forEach((path: string, pathIndex: number) => {
-    const pathNodes = path.split(' ');
+    let links: { source: number | undefined; target: number | undefined; path: number; sum: number; strokeWidth: number; field: string; color: string; displayValue: string; }[] = [];
 
-    for (let i = 0; i < pathNodes.length - 1; i++) {
-      const source = uniqueNodes.find( (node: any) => node.name === pathNodes[i])?.id;
-      const target = uniqueNodes.find( (node: any) => node.name === pathNodes[i+1])?.id;
-      links.push({ 
-        source, 
-        target, 
-        path: pathIndex,
-        sum: allData[allData.length -1].values.buffer[pathIndex],
-        field: "",
-        strokeWidth: 1,
-        color: pathColors[pathIndex],
-        displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix : ""}`
-      });
+    paths.forEach((path: string, pathIndex: number) => {
+      const pathNodes = path.split(' ');
+
+      for (let i = 0; i < pathNodes.length - 1; i++) {
+        const source = uniqueNodes.find( (node: any) => node.name === pathNodes[i])?.id;
+        const target = uniqueNodes.find( (node: any) => node.name === pathNodes[i+1])?.id;
+        links.push({ 
+          source, 
+          target, 
+          path: pathIndex,
+          sum: allData[allData.length -1].values.buffer[pathIndex],
+          field: "",
+          strokeWidth: 1,
+          color: pathColors[pathIndex],
+          displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix : ""}`
+        });
+      }
+    });
+
+  /********************************** Stroke width/ node radius **********************************/
+
+    // set range for mapping
+    const linkScaleFrom = options.arcRange?.split(",").map(Number)[0]
+    const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
+
+    const minLink = Number(Math.min(...links.map(( e: any ) => e.sum)))
+    const maxLink = Number(Math.max(...links.map(( e: any ) => e.sum)))
+
+    for (let i = 0; i < links.length; i++) {
+      calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, links[i], linkScaleFrom, linkScaleTo, minLink, maxLink)
     }
-  });
 
-  // set range for mapping
-  const linkScaleFrom = options.arcRange?.split(",").map(Number)[0]
-  const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
-  //const nodeScaleFrom = options.NodeRange?.split(",").map(Number)[0]
-  //const nodeScaleTo = options.NodeRange?.split(",").map(Number)[1]
+    calcNodeRadius(uniqueNodes, links, options)
 
-  const minLink = Number(Math.min(...links.map(( e: any ) => e.sum)))
-  const maxLink = Number(Math.max(...links.map(( e: any ) => e.sum)))
-  //minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
-  //maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
+    console.log(uniqueNodes)
 
-  for (let i = 0; i < links.length; i++) {
-    calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, links[i], linkScaleFrom, linkScaleTo, minLink, maxLink)
-  }
-
-  calcNodeRadius(uniqueNodes, links, options)
-
-  console.log(uniqueNodes)
+  /**********************************************************************************/
 
   return {uniqueNodes, links};
 }

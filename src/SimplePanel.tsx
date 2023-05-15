@@ -38,7 +38,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
 
   const theme = useTheme2();
 
-  if (data.series[0].fields.length > 3) {
+  if (data.series[0].fields.length > 4) {
     return <div>4th group by not supported</div>;
   }
 

@@ -15,8 +15,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
 
   const allData = data.series[0].fields;
   
-  /********************************** Nodes/links **********************************/ 
-
   // if src/dst not defined in options, take first/second group by default
   const sourceString = options.src ? allData.find((obj: { name: any; }) => obj.name === options.src).name : allData[0].name;
   const targetString = options.dest ? allData.find((obj: { name: any; }) => obj.name === options.dest).name : allData[1].name;
@@ -30,52 +28,46 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     const compareArray = allData.map( (obj: any) => obj.name)
     additionalField = compareArray.filter( (obj: any ) => !usedFields.includes(obj))[0]
   }
+
+  const hexColors = {
+    nodeColor: theme.visualization.getColorByName(options.nodeColor),
+  }
+
+  /********************************** Nodes **********************************/
   
-  // get source and target arrays and create array of unique nodes from them
-  const uniqueNodes = Array.from([...new Set([...sourceValues, ...targetValues])]).map((str, index) => ({
-    id: index,
-    name: str,
-    sum: 0,
-    radius: 0
-  }));
+    // get source and target arrays and create array of unique nodes from them
+    const uniqueNodes = Array.from([...new Set([...sourceValues, ...targetValues])]).map((str, index) => ({
+      id: index,
+      name: str,
+      sum: 0,
+      radius: 0
+    }));
 
-  let srcById = sourceValues.map((name: any) => {
-    const dictionaryItem = uniqueNodes.find(item => item.name === name);
-    return dictionaryItem ? dictionaryItem.id : null;
-  });
+  /********************************** Links **********************************/
 
-  let dstById = targetValues.map((name: any) => {
-    const dictionaryItem = uniqueNodes.find(item => item.name === name);
-    return dictionaryItem ? dictionaryItem.id : null;
-  });
+    let srcById = sourceValues.map((name: any) => {
+      const dictionaryItem = uniqueNodes.find(item => item.name === name);
+      return dictionaryItem ? dictionaryItem.id : null;
+    });
 
-  let links = srcById.map((element: any, index: string | number) => ({
-    source: element,
-    target: dstById[index],
-    sum: allData.find((obj: { name: any; }) => obj.name === allData[allData.length -1].name)?.values.buffer[index] as number,
-    strokeWidth: 0,
-    color: allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).color,
-    field: (additionalField === "") ? [additionalField] : allData.find(( obj: any) => obj.name === additionalField).values.buffer[index],
-    // for coloring the links by source, add a field with the name of the selected field
-    [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values.buffer[index],
-    displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix : ""}`
-  }));
+    let dstById = targetValues.map((name: any) => {
+      const dictionaryItem = uniqueNodes.find(item => item.name === name);
+      return dictionaryItem ? dictionaryItem.id : null;
+    });
 
-  addNodeSum(links, uniqueNodes)
+    let links = srcById.map((element: any, index: string | number) => ({
+      source: element,
+      target: dstById[index],
+      sum: allData.find((obj: { name: any; }) => obj.name === allData[allData.length -1].name)?.values.buffer[index] as number,
+      strokeWidth: 0,
+      color: allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).color,
+      field: (additionalField === "") ? [additionalField] : allData.find(( obj: any) => obj.name === additionalField).values.buffer[index],
+      // for coloring the links by source, add a field with the name of the selected field
+      [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values.buffer[index],
+      displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix : ""}`
+    }));
 
-  /********************************** Scaling/coloring **********************************/ 
-
-   // color
-    const hexColors = {
-      nodeColor: theme.visualization.getColorByName(options.nodeColor),
-    }
-      
-    // set range for mapping
-    const linkScaleFrom = options.arcRange?.split(",").map(Number)[0],
-    linkScaleTo = options.arcRange?.split(",").map(Number)[1]
-
-    const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
-    maxLink = Number(Math.max(...links.map(( e: any ) => e.sum)))
+  /********************************** Colors **********************************/ 
 
     // create groups for the field specified
     let groups: any[] = []
@@ -92,6 +84,15 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         e.color = spacedColors[i]
       })
     }
+
+  /********************************** Stroke width/ node radius **********************************/
+
+    // set range for mapping
+    const linkScaleFrom = options.arcRange?.split(",").map(Number)[0],
+    linkScaleTo = options.arcRange?.split(",").map(Number)[1]
+
+    const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
+    maxLink = Number(Math.max(...links.map(( e: any ) => e.sum)))
     
     links.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
       calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
@@ -103,39 +104,43 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       }
     });
 
+    // Add accumulated sums to nodes to calculate radius from
+    addNodeSum(links, uniqueNodes)
     calcNodeRadius(uniqueNodes, links, options)
 
-    const uniqueLinks = links.reduce((acc: any, cur: any) => {
-      const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
-      if (existing) {
-        existing.sum += cur.sum;
-        if (!existing.field.includes(cur.field)) {
-          existing.field.push(cur.field);
-        }
-      } else {
-        acc.push({
-          source: cur.source,
-          target: cur.target,
-          sum: cur.sum,
-          displayValue: cur.displayValue,
-          strokeWidth: 0,
-          color: cur.color,
-          field: [cur.field],
-          [options.colorConfigField]: cur[options.colorConfigField]
-        });
-      }
-      return acc;
-    }, []);
+  /********************************** Bundle overlapping links **********************************/ 
 
-    uniqueLinks.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
-      calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
-    })
-  
     if(allData.length > 3) {
+
+      const uniqueLinks = links.reduce((acc: any, cur: any) => {
+        const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
+        if (existing) {
+          existing.sum += cur.sum;
+          if (!existing.field.includes(cur.field)) {
+            existing.field.push(cur.field);
+          }
+        } else {
+          acc.push({
+            source: cur.source,
+            target: cur.target,
+            sum: cur.sum,
+            displayValue: cur.displayValue,
+            strokeWidth: 0,
+            color: cur.color,
+            field: [cur.field],
+            [options.colorConfigField]: cur[options.colorConfigField]
+          });
+        }
+        return acc;
+      }, []);
+
+      uniqueLinks.forEach((e: {source: number, strokeWidth: number; sum: number; color: string; field: string;}) => {
+        calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
+      })
       links = uniqueLinks;
     }
-
-    console.log(links)
+  
+  /**********************************************************************************/
 
   return {uniqueNodes, links, hexColors, additionalField};
 }
