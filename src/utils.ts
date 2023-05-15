@@ -66,10 +66,10 @@ export function calcStrokeWidth(arcFromSource: boolean, scale: string, arcThickn
     if(arcFromSource) {
         // check if we apply logarithmic or linear scaling
         if(scale === "log") {
-          e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
+            e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
         } else {
             // call function to map to lin range instead
-          e.strokeWidth = mapToLinRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)
+            e.strokeWidth = mapToLinRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)
         }
     } else {
         e.strokeWidth = arcThickness
@@ -129,4 +129,71 @@ export function getQueryMatches(query: string, nodeList: any[]) {
 
 export function handleZoom(canvas: HTMLElement, zoomState: number) {
     canvas.style.transform = `scale(${zoomState/10})`
+}
+
+export function addNodeSum(links: any[], uniqueNodes: any[]) {
+    // Initialize object to store aggregated sums
+    const nodeSums: {[key: number]: number} = {};
+
+    // Loop through links array and populate nodeSums object
+    links.forEach((link: { source: any; sum: any; }) => {
+        const {source, sum} = link;
+        if (nodeSums[source]) {
+        nodeSums[source] += sum;
+        } else {
+        nodeSums[source] = sum;
+        }
+    });
+
+    // Create array of unique nodes with aggregated sums
+    const nodes  = Object.keys(nodeSums).map(nodeId => ({
+        id: nodeId as unknown as number,
+        sum: nodeSums[nodeId as unknown as number],
+    }));
+
+    links.forEach(function(link: { target: any; }) {
+        const target = link.target;
+        if (!nodeSums[target]) {
+        nodes.push({id: target, sum: 1});
+        nodeSums[target] = 1;
+        }
+    });
+
+    uniqueNodes.map(function(element, index) {
+        element.sum = nodes[index]?.sum
+    });
+}
+
+export function calcNodeRadius(uniqueNodes: any[], links: any[], options: any) {
+
+    const nodeScaleFrom = options.NodeRange?.split(",").map(Number)[0]
+    const nodeScaleTo = options.NodeRange?.split(",").map(Number)[1]
+
+    const minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum)))
+    const maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
+
+    uniqueNodes.forEach((e: { id: any, radius: any; sum: any; }) => {
+        // check if arc thickness is set to source
+        if(options.radiusFromSource) {
+          // check if we apply logarithmic or linear scaling
+          if(options.scale === "log") {
+            // check if node only receiving. if yes, give it the size of the largest incoming link
+            if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
+              e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
+            } else {
+              e.radius = mapToLogRange( e.sum, nodeScaleFrom, nodeScaleTo, minNode, maxNode)
+            }
+            
+          } else {
+            if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
+              e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
+            } else {
+              // scaling factor change via options to be implemented
+              e.radius = (e.sum/100000000000000)
+            }
+          }
+        } else {
+          e.radius = options.nodeRadius
+        }
+      });
 }

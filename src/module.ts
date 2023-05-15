@@ -5,10 +5,17 @@ import { CustomRangeSlider } from './components/CustomRangeSlider'
 
 const AppearanceCategory = ['Appearance'];
 const DataCategory = ['Data'];
+const ModeCategory = ['Mode'];
 
 
 export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOptions(builder => {
   return builder
+    .addBooleanSwitch({
+      path: 'hopMode',
+      name: 'Visualize traceroute',
+      defaultValue: false,
+      category: ModeCategory
+    })
     .addBooleanSwitch({
       path: 'arcFromSource',
       name: 'Arc thickness from source',
@@ -43,6 +50,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Node radius from source',
       defaultValue: false,
       category: AppearanceCategory,
+      showIf: config => !config.hopMode
     })
     .addSliderInput({
       path: 'nodeRadius',
@@ -129,18 +137,6 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: false,
       category: AppearanceCategory,
     })
-    .addSliderInput({
-      path: 'zoomFactor',
-      name: 'Set zoom',
-      defaultValue: 2,
-      settings: {
-        min: 1,
-        max: 5,
-        step: 1,
-      },
-      category: AppearanceCategory,
-      showIf: config => config.zoom
-    })
     .addSelect({
       path: 'scale',
       name: 'Scaling',
@@ -204,6 +200,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
+      showIf: config => !config.hopMode
     })
     .addSelect({
       path: 'dest',
@@ -228,6 +225,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
+      showIf: config => !config.hopMode
     })
     .addTextInput({
       path: "toolTipSource",

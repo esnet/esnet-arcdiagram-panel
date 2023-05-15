@@ -1,4 +1,4 @@
-import { calcStrokeWidth, mapToLogRange, getEvenlySpacedColors } from 'utils';
+import { calcStrokeWidth, getEvenlySpacedColors, addNodeSum, calcNodeRadius } from 'utils';
 
 /**
  * Takes data from Grafana query and returns it in the format needed for this panel
@@ -14,11 +14,7 @@ import { calcStrokeWidth, mapToLogRange, getEvenlySpacedColors } from 'utils';
 export function parseData(data: { series: any[] }, options: any, theme: any) { // <- should that have proper typing?
 
   const allData = data.series[0].fields;
-
-  /********************************** Check if hop mode **********************************/ 
-
   
-
   /********************************** Nodes/links **********************************/ 
 
   // if src/dst not defined in options, take first/second group by default
@@ -65,37 +61,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix : ""}`
   }));
 
-
-  // Initialize object to store aggregated sums
-  const nodeSums: {[key: number]: number} = {};
-
-  // Loop through links array and populate nodeSums object
-  links.forEach((link: { source: any; sum: any; }) => {
-    const {source, sum} = link;
-    if (nodeSums[source]) {
-      nodeSums[source] += sum;
-    } else {
-      nodeSums[source] = sum;
-    }
-  });
-
-  // Create array of unique nodes with aggregated sums
-  const nodes  = Object.keys(nodeSums).map(nodeId => ({
-    id: nodeId as unknown as number,
-    sum: nodeSums[nodeId as unknown as number],
-  }));
-
-  links.forEach(function(link: { target: any; }) {
-    const target = link.target;
-    if (!nodeSums[target]) {
-      nodes.push({id: target, sum: 1});
-      nodeSums[target] = 1;
-    }
-  });
-
-  uniqueNodes.map(function(element, index) {
-    element.sum = nodes[index].sum
-  });
+  addNodeSum(links, uniqueNodes)
 
   /********************************** Scaling/coloring **********************************/ 
 
@@ -104,16 +70,12 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       nodeColor: theme.visualization.getColorByName(options.nodeColor),
     }
       
-    // set range for log mapping
-    const linkScaleFrom = options.arcRange?.split(",").map(Number)[0]
-    const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
-    const nodeScaleFrom = options.NodeRange?.split(",").map(Number)[0]
-    const nodeScaleTo = options.NodeRange?.split(",").map(Number)[1]
+    // set range for mapping
+    const linkScaleFrom = options.arcRange?.split(",").map(Number)[0],
+    linkScaleTo = options.arcRange?.split(",").map(Number)[1]
 
     const minLink = Number(Math.min(...links.map(( e: any ) => e.sum))),
-    maxLink = Number(Math.max(...links.map(( e: any ) => e.sum))),
-    minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum))),
-    maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
+    maxLink = Number(Math.max(...links.map(( e: any ) => e.sum)))
 
     // create groups for the field specified
     let groups: any[] = []
@@ -141,32 +103,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       }
     });
 
-    uniqueNodes.forEach((e: { id: any, radius: any; sum: any; }) => {
-      // check if arc thickness is set to source
-      if(options.radiusFromSource) {
-        // check if we apply logarithmic or linear scaling
-        if(options.scale === "log") {
-          // check if node only receiving. if yes, give it the size of the largest incoming link
-          if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
-            e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
-          } else {
-            e.radius = mapToLogRange( e.sum, nodeScaleFrom, nodeScaleTo, minNode, maxNode)
-          }
-          
-        } else {
-          if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
-            e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
-          } else {
-            // scaling factor change via options to be implemented
-            e.radius = (e.sum/100000000000000)
-          }
-          
-        }
-        
-      } else {
-        e.radius = options.nodeRadius
-      }
-    });
+    calcNodeRadius(uniqueNodes, links, options)
 
     const uniqueLinks = links.reduce((acc: any, cur: any) => {
       const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
@@ -197,6 +134,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     if(allData.length > 3) {
       links = uniqueLinks;
     }
+
+    console.log(links)
 
   return {uniqueNodes, links, hexColors, additionalField};
 }

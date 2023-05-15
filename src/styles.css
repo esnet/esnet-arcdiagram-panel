@@ -46,3 +46,7 @@ input::placeholder { /* Most modern browsers support this now. */
 .search-field input:hover {
   background-color: rgb(195, 188, 188) !important;
 }
+
+.panel-content div:first-child {
+  overflow: scroll;
+}

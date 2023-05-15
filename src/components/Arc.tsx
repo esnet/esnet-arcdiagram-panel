@@ -47,7 +47,8 @@ function Arc(props: any) {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target =  <p style={styles.toolTipStyle.text(props.zoom)}>{idToName(targetId,uniqueNodes)}</p>
       toolTip.sum = displayValue!
-      toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId).field
+      if(props.parsedData.additionalField !== undefined) {
+        toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)?.field
                       .map((string: any, index: number) => (
                         <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
                           {string}
@@ -55,6 +56,8 @@ function Arc(props: any) {
                         </p>
                       ))}
                       </p>
+      }
+      
     }
    
     // toggle tooltip
@@ -157,7 +160,7 @@ function Arc(props: any) {
       .attr("cx", (d, i) => values[i])
       .attr("cy", height-offsetBottom)
       .attr("r", (n: any) => { return  n?.radius })
-      .style("fill", props.parsedData.hexColors.nodeColor)
+      .style("fill", props.graphOptions.nodeColor)
       .attr("id", (d, i) => uniqueNodes[i].id)
       .attr("name", (d, i) => uniqueNodes[i].name)
       .attr("radius", (d, i) => uniqueNodes[i].radius);
@@ -373,7 +376,7 @@ function Arc(props: any) {
     if(props.graphOptions.search) {evaluateQuery(props.query,uniqueNodes, labels, paths, nodes, props.graphOptions.arcOpacity)}
 
   /* eslint-disable react-hooks/exhaustive-deps */
-  }, [props.graphOptions, links, props.height, props.parsedData.hexColors.nodeColor, props.width, uniqueNodes]);
+  }, [props.graphOptions, links, props.height, props.width, uniqueNodes]);
 
   if(document.getElementsByClassName("canvas")[0] !== undefined) {
     handleZoom(document.getElementsByClassName("canvas")[0] as HTMLElement, props.zoomState)

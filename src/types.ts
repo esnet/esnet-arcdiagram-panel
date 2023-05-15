@@ -24,4 +24,5 @@ export interface SimpleOptions {
   fontSize: number;
   zoom: boolean;
   zoomFactor: number;
+  hopMode: boolean;
 }

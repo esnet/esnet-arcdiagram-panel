@@ -5,6 +5,8 @@ import { useTheme2 } from '@grafana/ui';
 import Arc from './components/Arc';
 import SearchField from './components/SearchField';
 import { parseData } from 'dataParser';
+import { parsePathData } from 'pathDataParser';
+
 import { styles } from 'styles';
 
 interface Props extends PanelProps<SimpleOptions> {}
@@ -40,14 +42,17 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
     return <div>4th group by not supported</div>;
   }
 
-  // check if source equals dst 
-  const source = options.src ? data.series[0].fields.find((obj: { name: any; }) => obj.name === options.src).name : data.series[0].fields[0].name;
-  const target = options.dest ? data.series[0].fields.find((obj: { name: any; }) => obj.name === options.dest).name : data.series[0].fields[1].name;
-
-  // catch errors
-  if (source === target) {
-    return <div>Source equals target</div>;
+  // check if source equals dst
+  if(!options.hopMode) {
+    const source = options.src ? data.series[0].fields.find((obj: { name: any; }) => obj.name === options.src).name : data.series[0].fields[0].name;
+    const target = options.dest ? data.series[0].fields.find((obj: { name: any; }) => obj.name === options.dest).name : data.series[0].fields[1].name;
+    // catch errors
+    if (source === target) {
+      return <div>Source equals target</div>;
+    }
   }
+  
+  
 
   let parsedData: { uniqueNodes: any[]; links: any[] } = {
     uniqueNodes: [],
@@ -55,7 +60,11 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
   };
 
   try {
-    parsedData = parseData(data, graphOptions, theme);
+    if(!options.hopMode) {
+      parsedData = parseData(data, graphOptions, theme);
+    } else {
+      parsedData = parsePathData(data, graphOptions, theme)
+    }
   } catch (error) {
     console.error('parsing error: ', error);
   }
@@ -92,11 +101,8 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
             <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/reset_icon.svg" alt=""/>
           </button>
         </div>
-        }
-        
+        } 
       </div>
-      
-      
     </div>
   );
 };
