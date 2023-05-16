@@ -49,4 +49,5 @@ input::placeholder { /* Most modern browsers support this now. */
 
 .panel-content div:first-child {
   overflow: scroll;
+  transform-origin: left;
 }

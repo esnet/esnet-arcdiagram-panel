@@ -18,6 +18,16 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
   const allData = data.series[0].fields;
   const paths = allData[0].values.buffer;
 
+  const pathString = options.pathString ? allData.find((obj: { name: any; }) => obj.name === options.pathString).name : allData[0].name;
+  // get the field that's neither used as source or dest
+  let additionalField = ""
+  if(allData.length > 2) {
+    //const usedFields = [sourceString, targetString, allData[allData.length -1].name]
+    //const compareArray = allData.map( (obj: any) => obj.name)
+    //additionalField = compareArray.filter( (obj: any ) => !usedFields.includes(obj))[0]
+    console.log(pathString)
+  }
+
   /********************************** Nodes **********************************/
 
     let uniqueNodes = Array.from([...new Set(allData[0].values.buffer.join(" ").split(" "))]).map((str, index) => ({
@@ -67,7 +77,6 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
     calcNodeRadius(uniqueNodes, links, options)
 
-    console.log(uniqueNodes)
 
   /**********************************************************************************/
 

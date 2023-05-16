@@ -129,6 +129,8 @@ export function getQueryMatches(query: string, nodeList: any[]) {
 
 export function handleZoom(canvas: HTMLElement, zoomState: number) {
     canvas.style.transform = `scale(${zoomState/10})`
+    //canvas.style.transform = "left"
+    
 }
 
 export function addNodeSum(links: any[], uniqueNodes: any[]) {

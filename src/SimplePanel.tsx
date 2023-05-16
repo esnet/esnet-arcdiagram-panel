@@ -52,8 +52,6 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
     }
   }
   
-  
-
   let parsedData: { uniqueNodes: any[]; links: any[] } = {
     uniqueNodes: [],
     links: []

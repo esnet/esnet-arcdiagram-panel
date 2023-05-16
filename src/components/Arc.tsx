@@ -324,6 +324,8 @@ function Arc(props: any) {
 
       paths
       .on("mouseover", function (d) {
+        // page x. page y
+        console.log(d.clientX,d.clientY)
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("displayValue"));
         paths
           .style("opacity",(l: any) => {

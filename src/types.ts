@@ -25,4 +25,6 @@ export interface SimpleOptions {
   zoom: boolean;
   zoomFactor: number;
   hopMode: boolean;
+  delimiter: string;
+  pathField: string;
 }

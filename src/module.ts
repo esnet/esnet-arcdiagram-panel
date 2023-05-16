@@ -16,6 +16,14 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: false,
       category: ModeCategory
     })
+    .addTextInput({
+      path: "delimiter",
+      name: 'String delimiter',
+      category: ModeCategory,
+      defaultValue: "",
+      description: 'Character to seperate nodes by',
+      showIf: config => config.hopMode,
+    })
     .addBooleanSwitch({
       path: 'arcFromSource',
       name: 'Arc thickness from source',
@@ -177,6 +185,31 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       category: DataCategory,
       defaultValue: "1,15",
       showIf: config => config.scale === "log" && config.radiusFromSource,
+    })
+    .addSelect({
+      path: 'pathField',
+      name: 'Path',
+      description: 'Select the field to use as traceroute:',
+      category: DataCategory,
+      defaultValue: "",
+      settings: {
+        allowCustomValue: false,
+        options: [],
+        getOptions: async (context: FieldOverrideContext) => {
+          const options = [];
+          if (context && context.data) {
+            for (const frame of context.data) {
+              for (const field of frame.fields) {
+                const name = getFieldDisplayName(field, frame, context.data);
+                const value = name;
+                options.push({ value, label: name });
+              }
+            }
+          }
+          return Promise.resolve(options);
+        },
+      },
+      showIf: config => config.hopMode
     })
     .addSelect({
       path: 'src',
