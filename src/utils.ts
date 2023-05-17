@@ -73,7 +73,7 @@ export function replaceEllipsis(label: SVGTextElement, isHighlighted: Boolean){
 
     const labelBoundingBox = label.getBoundingClientRect().width * (isHighlighted ? 1.6 : 1);
     const mapRatio = (isHighlighted ? 0.2 : 0.3);
-
+    
     const labelOffsetX = Number(label.getAttribute("transform")?.split(",")[0].substring(10))
 
     // check if label is out of bounds
@@ -102,9 +102,41 @@ export function evaluateQuery(query: string, nodeList: any[], labels: HTMLCollec
             } else {
                 labels[i].style.opacity = "0.2"
             }
-            
         } else {
             labels[i].style.opacity = "1"
         }
     }
 }
+
+export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number) {
+    let maxNodesCrossed = 0;
+    let maxArc = null;
+
+    for (const link of links) {
+        const nodesCrossed = Math.abs(link.target - link.source) - 1;
+        if (nodesCrossed > maxNodesCrossed) {
+            maxNodesCrossed = nodesCrossed;
+            maxArc = link;
+        }
+    }
+
+    const maxArcDistance = maxArc.target - maxArc.source
+    const step = (panelWidth-50 - 50) / (nodes.length - 1);
+    const maxArcHeight = (maxArcDistance * step) / 2
+
+    const longestName = nodes.reduce((acc, curr) => {
+        if (curr.name.length > acc.name.length) {
+          return curr;
+        } else {
+          return acc;
+        }
+      }).name;
+    
+    // * 3.77 maps string to pixels, * 1.6 maps to highlighted tag
+    const longestNameSize = longestName.length * 3.77 * 1.6
+
+    const graphHeight =  maxArcHeight + longestNameSize
+
+    return graphHeight
+}
+

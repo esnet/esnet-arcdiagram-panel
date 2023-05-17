@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
 import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery } from 'utils';
-import './animation.css'
 import { styles } from 'styles'
 
 let toolTip = {
@@ -19,7 +18,7 @@ function Arc(props: any) {
   gRef = useRef(null),
   labelRef = useRef(null),
   tooltipRef = useRef(null);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false)
 
   const handleToggleTooltip = (isActive: boolean) => {
     setShowTooltip(isActive);
@@ -61,46 +60,52 @@ function Arc(props: any) {
     handleToggleTooltip(isActive)
 
     // update position
-    const mapBounds = document.querySelectorAll(".panel-container")[0].getBoundingClientRect();
-    let offsetY = pos[1] - mapBounds.top,
-    offsetX = pos[0] - mapBounds.left
-    
-    const toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement,
-    toolTipBounds = toolTipDom.getBoundingClientRect();
-    
-    let leftOrRight = "left";
-    if(offsetX + toolTipBounds.right > mapBounds.right) {
-      leftOrRight = "right";
-      offsetX = mapBounds.right - pos[0]
-    }
+    const panelContainer = document.querySelectorAll(`[data-panelid="${props.panelId}"] .panel-container`)[0]
+    if(panelContainer !== undefined) {
+      const mapBounds = panelContainer.getBoundingClientRect();
+      let offsetY = pos[1] - mapBounds.top,
+      offsetX = pos[0] - mapBounds.left
+      
+      const toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement,
+      toolTipBounds = toolTipDom.getBoundingClientRect();
+      
+      let leftOrRight = "left";
+      if(offsetX + toolTipBounds.right > mapBounds.right) {
+        leftOrRight = "right";
+        offsetX = mapBounds.right - pos[0]
+      }
 
-    let topOrBottom = "top"
+      let topOrBottom = "top"
 
-    if((offsetY + toolTipBounds.bottom-350 > mapBounds.bottom)) {
-      topOrBottom = "bottom";
-      offsetY = mapBounds.bottom - pos[1]
+      if((offsetY + toolTipBounds.bottom-350 > mapBounds.bottom)) {
+        topOrBottom = "bottom";
+        offsetY = mapBounds.bottom - pos[1]
+      }
+      
+      if (topOrBottom === "top") {
+        toolTipDom.style.top = `${offsetY}px`;
+      } else {
+        toolTipDom.style.bottom = `${offsetY}px`;
+      }
+      
+      if (leftOrRight === "left") {
+        toolTipDom.style.left = `${offsetX}px`;
+      } else {
+        toolTipDom.style.right = `${offsetX}px`;
+      }
     }
     
-    if (topOrBottom === "top") {
-      toolTipDom.style.top = `${offsetY}px`;
-    } else {
-      toolTipDom.style.bottom = `${offsetY}px`;
-    }
-    
-    if (leftOrRight === "left") {
-      toolTipDom.style.left = `${offsetX}px`;
-    } else {
-      toolTipDom.style.right = `${offsetX}px`;
-    }
 
   };
 
   useEffect(() => {
     // removes the graph if it exists in the dom so it gets rendered with updated dimensions
-    d3.selectAll("circle, path, text").remove();
+    d3.selectAll(`[data-panelid="${props.panelId}"] circle, [data-panelid="${props.panelId}"] path, [data-panelid="${props.panelId}"] text`).remove();
 
     const width = props.width,
     height = props.height
+
+    
 
     const container = containerRef.current,
     graph = gRef.current,
@@ -108,7 +113,7 @@ function Arc(props: any) {
 
     // render labels
     const text = d3.select(labelBox)
-      .selectAll('text')
+      .selectAll(`[data-panelid="${props.panelId}"] text`)
       .data(uniqueNodes)
 
     text
@@ -123,8 +128,8 @@ function Arc(props: any) {
       .attr('font-size', 10)
       .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-45)"))
       .style("margin-right", "5px")
-      .attr('name', (d, i) => { return uniqueNodes[i].name})
-      .attr('id', (d, i) => { return i})
+      .attr('name', (d, i) => { return uniqueNodes[i].name })
+      .attr('id', (d, i) => { return i })
 
     // after the labels are rendered, we can find out the amount of margin we need to apply
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
@@ -137,7 +142,7 @@ function Arc(props: any) {
     const values = linSpace(50, width-50, uniqueNodes.length);
 
     // Update the labels position
-    d3.selectAll("text")
+    d3.selectAll(`[data-panelid="${props.panelId}"] text`)
     .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-45)"))
 
     // check if label is out of bounds
@@ -150,7 +155,7 @@ function Arc(props: any) {
 
     // render nodes
     const svg = d3.select(container)
-    .selectAll('circle')
+    .selectAll(`[data-panelid="${props.panelId}"] circle`)
     .data(uniqueNodes)
 
     svg
@@ -166,7 +171,7 @@ function Arc(props: any) {
 
     // render links
     const g = d3.select(graph)
-      .selectAll('path')
+      .selectAll(`[data-panelid="${props.panelId}"] path`)
       .data(links)
 
     g
@@ -194,9 +199,9 @@ function Arc(props: any) {
       .attr("displayValue", (d, i) => links[i].displayValue)
     
     /********************************** Highlighting **********************************/ 
-    const nodes = d3.selectAll("circle")
-    const paths = d3.selectAll("path")
-    const labels = d3.selectAll("text")
+    const nodes = d3.selectAll(`[data-panelid="${props.panelId}"] circle`)
+    const paths = d3.selectAll(`[data-panelid="${props.panelId}"] path`)
+    const labels = d3.selectAll(`[data-panelid="${props.panelId}"] text`)
     const duration = 200;
     nodes
       .on("mouseover", function (d) {
@@ -276,7 +281,6 @@ function Arc(props: any) {
           .style("opacity", 1)
       })
 
-
       /********************************** Link tooltip **********************************/ 
 
       paths
@@ -302,14 +306,16 @@ function Arc(props: any) {
           .style('opacity', props.graphOptions.arcOpacity)
           .duration(duration)
       })
+
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.parsedData.hexColors.nodeColor, props.width, uniqueNodes]);
 
+  
   return ( 
     <div  style={styles.containerStyle} > 
       <svg style={styles.containerStyle} ref = {containerRef}>
         <g style={styles.containerStyle} ref = {gRef}></g>
-        <svg style={styles.labelStyle} ref = {labelRef}></svg>
+        <svg className="text-container" style={styles.labelStyle} ref = {labelRef}></svg>
       </svg>
 
       {showTooltip && (
@@ -328,3 +334,5 @@ function Arc(props: any) {
 
 
 export default Arc;
+
+

@@ -6,6 +6,7 @@ import Arc from './components/Arc';
 import SearchField from './components/SearchField';
 import { parseData } from 'dataParser';
 import { styles } from 'styles';
+import { calcDiagramHeight } from 'utils';
 
 interface Props extends PanelProps<SimpleOptions> {}
 /**
@@ -14,7 +15,7 @@ interface Props extends PanelProps<SimpleOptions> {}
  * @param {*} { options, data, width, height, id }
  * @return { Arc } Arc diagram
  */
-export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: any) => {
+export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id }: any) => {
   const [query, setQuery] = useState("");
 
   let graphOptions = {
@@ -47,6 +48,12 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
     console.error('parsing error: ', error);
   }
 
+  console.log((calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height))
+  // check if diagram fits panel
+  if (calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height) {
+    return <div>Increase panels height to fit diagram</div>;
+  }
+
   const textColor = theme.colors.text.primary;
 
   return (
@@ -59,6 +66,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
         height={height}
         query={query}
         isDarkMode={theme.isDark}
+        panelId={id}
       ></Arc>
       {options.search && <SearchField
         onQuery={setQuery}
