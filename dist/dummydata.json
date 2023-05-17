@@ -1,0 +1,142 @@
+[
+  {
+    "meta.dst_preferred_org.keyword": "University of Chicago",
+    "meta.src_preferred_org.keyword": "Brookhaven National Laboratory",
+    "Sum": "788 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "University of Chicago",
+    "meta.src_preferred_org.keyword": "Renater",
+    "Sum": "761 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "University of Chicago",
+    "meta.src_preferred_org.keyword": "TRIUMF",
+    "Sum": "656 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "University of Chicago",
+    "meta.src_preferred_org.keyword": "University of Texas-Arlington",
+    "Sum": "311 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "University of Chicago",
+    "meta.src_preferred_org.keyword": "Karlsruhe Institute of Technology",
+    "Sum": "308 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Oak Ridge National Laboratory",
+    "meta.src_preferred_org.keyword": "National Center for Atmospheric Research (NCAR/UCAR)",
+    "Sum": "2.74 Pb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Oak Ridge National Laboratory",
+    "meta.src_preferred_org.keyword": "CALCULQUEBEC",
+    "Sum": "92.9 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Oak Ridge National Laboratory",
+    "meta.src_preferred_org.keyword": "AMAZON-02",
+    "Sum": "48.5 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Oak Ridge National Laboratory",
+    "meta.src_preferred_org.keyword": "Verein zur Foerderung eines Deutschen Forschungsnetzes e.V.",
+    "Sum": "35.2 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Oak Ridge National Laboratory",
+    "meta.src_preferred_org.keyword": "APPLE-AUSTIN",
+    "Sum": "33.6 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Brookhaven National Laboratory",
+    "meta.src_preferred_org.keyword": "Renater",
+    "Sum": "915 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Brookhaven National Laboratory",
+    "meta.src_preferred_org.keyword": "TRIUMF",
+    "Sum": "243 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Brookhaven National Laboratory",
+    "meta.src_preferred_org.keyword": "ATLAS Great Lakes Tier 2",
+    "Sum": "238 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Brookhaven National Laboratory",
+    "meta.src_preferred_org.keyword": "University of Chicago",
+    "Sum": "143 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Brookhaven National Laboratory",
+    "meta.src_preferred_org.keyword": "Consortium GARR",
+    "Sum": "131 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Indiana GigaPOP",
+    "meta.src_preferred_org.keyword": "University of Chicago",
+    "Sum": "1.57 Pb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Indiana GigaPOP",
+    "meta.src_preferred_org.keyword": "Fermi National Accelerator Laboratory",
+    "Sum": "274 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Indiana GigaPOP",
+    "meta.src_preferred_org.keyword": "Vanderbilt University",
+    "Sum": "60.9 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Indiana GigaPOP",
+    "meta.src_preferred_org.keyword": "University of Wisconsin Madison",
+    "Sum": "4.69 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Indiana GigaPOP",
+    "meta.src_preferred_org.keyword": "University of Nebraska Lincoln",
+    "Sum": "4.31 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Massachusetts Institute of Technology",
+    "meta.src_preferred_org.keyword": "Fermi National Accelerator Laboratory",
+    "Sum": "801 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Massachusetts Institute of Technology",
+    "meta.src_preferred_org.keyword": "Consortium GARR",
+    "Sum": "155 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Massachusetts Institute of Technology",
+    "meta.src_preferred_org.keyword": "European Organization for Nuclear Research",
+    "Sum": "98.2 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Massachusetts Institute of Technology",
+    "meta.src_preferred_org.keyword": "University of Nebraska Lincoln",
+    "Sum": "83.0 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "Massachusetts Institute of Technology",
+    "meta.src_preferred_org.keyword": "Deutsches Elektronen-Synchrotron DESY",
+    "Sum": "75.5 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "awd",
+    "meta.src_preferred_org.keyword": "Deutsches Elektronen-Synchrotron DESY",
+    "Sum": "75.5 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "hsdf",
+    "meta.src_preferred_org.keyword": "Deutsches Elektronen-Synchrotron DESY",
+    "Sum": "75.5 Tb"
+  },
+  {
+    "meta.dst_preferred_org.keyword": "hsrse",
+    "meta.src_preferred_org.keyword": "Deutsches Elektronen-Synchrotron DESY",
+    "Sum": "75.5 Tb"
+  }
+]
