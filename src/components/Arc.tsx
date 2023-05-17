@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, ReactNode } from 'react';
-import * as d3 from '../d3.min.js';
+import * as d3 from 'd3';
 import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery } from 'utils';
 import { styles } from 'styles';
 

@@ -13,11 +13,15 @@
     ],
     "noImplicitAny": false,
     "allowJs": true,
-    "outDir": "$$ts-jest$$"
+    "outDir": "$$ts-jest$$",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "module": "CommonJS",
+    "strictNullChecks": false
   },
   "exclude": [
     "public",
     "dist",
     "node_modules"
-  ],
+  ]
 }
