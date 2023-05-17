@@ -1,14 +1,30 @@
-version: '3.0'
-
+version: "3"
 services:
-  grafana:
-    container_name: 'esnet-arcdiagram-panel'
-    build:
-      context: ./.config
-      args:
-        grafana_version: ${GRAFANA_VERSION:-9.3.8}
-    ports:
-      - 3000:3000/tcp
+  grafana-dev:
+    image: grafana:latest
+    container_name: grafana
+    restart: always
+    networks:
+      - grafana
     volumes:
-      - ./dist:/var/lib/grafana/plugins/esnet-arcdiagram-panel
-      - ./provisioning:/etc/grafana/provisioning
+      - ./grafana-plugins:~/Documents/plugins
+      - grafana-storage-dev:/var/lib/grafana
+    ports:
+      - 8080:8080
+    environment:
+      - GF_APP_MODE=development
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=0.1s
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=esnet-arcdiagram-panel
+      - GF_LIVE_ALLOWED_ORIGINS=*
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_DEFAULT_THEME=dark
+
+volumes:
+  grafana-storage-dev:
+
+networks:
+  grafana:
+    external: true
+    name: grafana

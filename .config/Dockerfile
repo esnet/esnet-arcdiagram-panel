@@ -1,7 +1,7 @@
-ARG grafana_version=9.0.0-ubuntu
+ARG grafana_version=latest
 ARG grafana_image=grafana
 
-FROM grafana/${grafana_image}:${grafana_version}
+FROM "grafana/grafana:9.0.0-ubuntu"
 
 # Make it as simple as possible to access the grafana instance for development purposes
 # Do NOT enable these settings in a public facing / production grafana instance
