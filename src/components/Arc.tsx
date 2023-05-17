@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, ReactNode } from 'react';
-import * as d3 from 'd3';
+import * as d3 from '../d3.min.js';
 import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery } from 'utils';
-import { styles } from 'styles'
+import { styles } from 'styles';
 
 let toolTip = {
   source: "",
