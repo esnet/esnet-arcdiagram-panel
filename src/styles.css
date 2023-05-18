@@ -20,12 +20,6 @@ input::placeholder { /* Most modern browsers support this now. */
  color: #808080;
 }
 
-.zoom-button {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 250ms;
-}
-
 .zoom-button:hover {
   transform: translateY(-8px);
   background-color: grey !important;

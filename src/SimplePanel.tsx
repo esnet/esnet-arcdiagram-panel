@@ -90,14 +90,14 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
         ></SearchField>}
         {options.zoom && 
         <div style={styles.zoomButtonWrapper}>
-          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={() => onClick(false)}>
-            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/area_zoom_out.svg" alt=""/>
+          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark, 0)} onClick={() => onClick(false)}>
+            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-arcdiagram-panel/img/area_zoom_out.svg" alt=""/>
           </button>
-          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={() => onClick(true)}>
-            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/area_zoom_in.svg" alt=""/>
+          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark, 1)} onClick={() => onClick(true)}>
+            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-arcdiagram-panel/img/area_zoom_in.svg" alt=""/>
           </button>
-          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark)} onClick={() => onClick(true, true)}>
-            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-test/img/reset_icon.svg" alt=""/>
+          <button className="zoom-button" style={styles.zoomButtonStyle(theme.isDark, 2)} onClick={() => onClick(true, true)}>
+            <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-arcdiagram-panel/img/reset_icon.svg" alt=""/>
           </button>
         </div>
         } 

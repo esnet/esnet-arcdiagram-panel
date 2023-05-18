@@ -48,6 +48,7 @@ export const styles = {
       display: "inline-block",
       margin: "0em 1em",
       "vertical-align": "middle",
+      "border-radius": "30px"
     } as React.CSSProperties,
     inputStyle(isDarkMode: boolean) {
       return {
@@ -66,13 +67,33 @@ export const styles = {
     zoomButtonWrapper: {
       margin: "0em 1em",
       "vertical-align": "middle",
-      display: "inline-block",
+      display: "inline-block"
     } as React.CSSProperties,
-    zoomButtonStyle(isDarkMode: boolean) {
-      return {
+    zoomButtonStyle(isDarkMode: boolean, position: number) {
+      var styles, borderRadius = "30px", padding = "5px"
+      styles = {
         display: "inline-block",
-        "background-color": isDarkMode ? "rgba(244, 245, 245, 0.83)" : "black"
+        "background-color": isDarkMode ? "rgba(244, 245, 245, 0.83)" : "black",
+        "border": "1px solid rgba(0, 0, 0, 0.1)",
+        "cursor": "pointer",
+        "transition": "all 250ms",
+        "border-top-left-radius": "0px",
+        "border-bottom-left-radius": "0px",
+        "border-top-right-radius": "0px",
+        "border-bottom-right-radius": "0px",
+        "padding-left": padding,
+        "padding-right": padding
       }
+      if(position === 0) {
+        styles["border-top-left-radius"] = borderRadius
+        styles["border-bottom-left-radius"] = borderRadius
+        styles["padding-left"] = padding
+      } else if (position === 2) {
+        styles["border-top-right-radius"] = borderRadius
+        styles["border-bottom-right-radius"] = borderRadius
+        styles["padding-right"] = padding
+      }
+      return styles
     },
     zoomIcon(isDarkMode: boolean) {
       return {
