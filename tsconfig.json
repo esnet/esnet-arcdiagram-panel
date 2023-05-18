@@ -1,11 +1,28 @@
 {
-  "extends": "./node_modules/@grafana/toolkit/src/config/tsconfig.plugin.json",
-  "include": ["src", "types", "src/globals.d.ts", "src/custom.d.ts"],
+  "extends": "./.config/tsconfig.json",
+  "include": [
+    "src",
+    "types"
+  ],
   "compilerOptions": {
+    "jsx": "react",
     "rootDir": "./src",
     "baseUrl": "./src",
-    "typeRoots": ["./node_modules/@types"],
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-  }
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "noImplicitAny": false,
+    "allowJs": true,
+    "outDir": "$$ts-jest$$",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "module": "ES6",
+    "strictNullChecks": false,
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": [
+    "public",
+    "dist",
+    "node_modules"
+  ]
 }

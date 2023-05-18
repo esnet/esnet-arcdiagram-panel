@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
+import * as React from 'react';
 import { PanelProps } from '@grafana/data';
 import { SimpleOptions } from 'types';
 import { useTheme2 } from '@grafana/ui';
@@ -22,7 +23,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
   const [zoomState, setZoomState] = useState(10);
   
   const onClick = (isIncrement: boolean, isReset?: boolean) => {
-    if(!isIncrement && zoomState == 10) {
+    if(!isIncrement && zoomState === 10) {
       return
     } else {
       setZoomState((isIncrement) ? zoomState+1 : zoomState-1)

@@ -176,13 +176,17 @@ function Arc(props: any) {
       .attr('d', function (d, i) {
         const start = values[links[i].source]
         const end = values[links[i].target]
-        return ['M', start, height-offsetBottom,
-            'A',
-            (start - end) / 2, ',',
-            (start - end) / 2, 0, 0, ',',
-            start < end ? 1 : 0, end, ',', height-offsetBottom
-          ]
-          .join(' ');
+
+        const radiusX = Math.abs(start - end) / 2; // X-axis radius
+        let radiusY = radiusX * 1; // Y-axis radius (adjust the value as desired for the desired elliptical shape)
+        if(links[i].isOverlap) { radiusY = radiusX * links[i].mapRadiusY }
+        const largeArcFlag = Math.abs(start - end) > Math.PI ? 1 : 0; // Determines whether the arc should be greater than or less than 180 degrees
+
+        return [
+          'M', start, height - offsetBottom,
+          'A', radiusX, ',', radiusY, 0, largeArcFlag, ',', start < end ? 1 : 0, end, ',', height - offsetBottom
+        ]
+        .join(' ');
       })
       .style("fill", "none")
       .attr("stroke", (l: any) => { return  l?.color })
@@ -325,7 +329,6 @@ function Arc(props: any) {
       paths
       .on("mouseover", function (d) {
         // page x. page y
-        console.log(d.clientX,d.clientY)
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("displayValue"));
         paths
           .style("opacity",(l: any) => {
