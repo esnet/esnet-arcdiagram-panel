@@ -27,4 +27,5 @@ export interface SimpleOptions {
   hopMode: boolean;
   delimiter: string;
   pathField: string;
+  yRad: number;
 }

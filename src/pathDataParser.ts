@@ -28,9 +28,11 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
     //console.log(pathString)
   }
 
+  const delimiter = options.delimiter === "space" ? " " : options.delimiter
+
   /********************************** Nodes **********************************/
 
-    let uniqueNodes = Array.from([...new Set(allData[0].values.buffer.join(" ").split(" "))]).map((str, index) => ({
+    let uniqueNodes = Array.from([...new Set(allData[0].values.buffer.join(delimiter).split(delimiter))]).map((str, index) => ({
       id: index,
       name: str,
       sum: 1,
@@ -68,16 +70,16 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
     });
 
     // assign overlap index to render elliptical arc
-    let mapRadiusY = 1.3;
+    let mapRadiusY = options.yRad;
     const overLapLinks = links.filter(link => link.isOverlap)
     
     overLapLinks.forEach(( link, i ) => {
       
       if(i > 0) {
         if(link.source === overLapLinks[i-1].source && link.target === overLapLinks[i-1].target) {
-          mapRadiusY+=.3
+          mapRadiusY+=options.yRad-1
         } else {
-          mapRadiusY = 1.3;
+          mapRadiusY = options.yRad;
         }
       }
       link.mapRadiusY = mapRadiusY

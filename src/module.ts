@@ -16,13 +16,34 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: false,
       category: ModeCategory
     })
-    .addTextInput({
-      path: "delimiter",
+    .addSelect({
+      path: 'delimiter',
       name: 'String delimiter',
-      category: ModeCategory,
-      defaultValue: "",
       description: 'Character to seperate nodes by',
-      showIf: config => config.hopMode,
+      defaultValue: "Space",
+      category: ModeCategory,
+      settings: {
+        allowCustomValue: false,
+        options: [
+          { 
+            label: "Space", 
+            value: "space"
+          },
+          { 
+            label: ",", 
+            value: ",",
+          },
+          { 
+            label: ";", 
+            value: ";",
+          },
+          { 
+            label: ":", 
+            value: ":",
+          }
+        ],
+      },
+      showIf: config => config.hopMode
     })
     .addBooleanSwitch({
       path: 'arcFromSource',
@@ -122,12 +143,6 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: 'blue',
       category: AppearanceCategory,
     })
-    .addBooleanSwitch({
-      path: 'search',
-      name: 'Activate search bar',
-      defaultValue: false,
-      category: AppearanceCategory,
-    })
     .addSliderInput({
       path: 'fontSize',
       name: 'Font size',
@@ -137,6 +152,24 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         max: 20,
         step: 1,
       },
+      category: AppearanceCategory,
+    })
+    .addSliderInput({
+      path: 'yRad',
+      name: 'Specify the margin between overlapping links',
+      defaultValue: 1.3,
+      settings: {
+        min: 1,
+        max: 3,
+        step: .1,
+      },
+      showIf: config => config.hopMode,
+      category: AppearanceCategory,
+    })
+    .addBooleanSwitch({
+      path: 'search',
+      name: 'Activate search bar',
+      defaultValue: false,
       category: AppearanceCategory,
     })
     .addBooleanSwitch({

@@ -179,9 +179,10 @@ function Arc(props: any) {
 
         const radiusX = Math.abs(start - end) / 2; // X-axis radius
         let radiusY = radiusX * 1; // Y-axis radius (adjust the value as desired for the desired elliptical shape)
-        if(links[i].isOverlap) { radiusY = radiusX * links[i].mapRadiusY }
+        if(props.graphOptions.hopMode) {
+          if(links[i].isOverlap) { radiusY = radiusX * links[i].mapRadiusY }
+        }
         const largeArcFlag = Math.abs(start - end) > Math.PI ? 1 : 0; // Determines whether the arc should be greater than or less than 180 degrees
-
         return [
           'M', start, height - offsetBottom,
           'A', radiusX, ',', radiusY, 0, largeArcFlag, ',', start < end ? 1 : 0, end, ',', height - offsetBottom
@@ -197,6 +198,7 @@ function Arc(props: any) {
       .attr("target", (d, i) => links[i].target)
       .attr("sum", (d, i) => links[i].sum)
       .attr("displayValue", (d, i) => links[i].displayValue)
+      .attr("path", (d, i) => links[i].path)
     
     /********************************** Highlighting **********************************/ 
     
@@ -252,7 +254,7 @@ function Arc(props: any) {
           })
           .attr('stroke-width', (l: any) => {
             /* eslint-disable eqeqeq */
-            return d.srcElement.id == l?.source ? l?.strokeWidth*2 : l?.strokeWidth
+            return d.srcElement.id == l?.source || d.srcElement.id == l?.target ? l?.strokeWidth*2 : l?.strokeWidth
           })
           .duration(duration)
         labels
@@ -334,6 +336,8 @@ function Arc(props: any) {
           .style("opacity",(l: any) => {
             if(props.query.length !==0) {
               return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
+            } else if (props.graphOptions.hopMode) {
+              return Number(d.srcElement.getAttribute("path")) === l.path ? props.graphOptions.arcOpacity : .1
             } else {
               return .1
             }
@@ -342,7 +346,7 @@ function Arc(props: any) {
           .duration(duration)
         d3.select(this)
           .transition()
-          .style('opacity', props.graphOptions.arcOpacity)
+          .style("opacity", props.graphOptions.arcOpacity) 
           .duration(duration)
       })
       .on('mouseout', function (d) {
