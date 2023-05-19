@@ -24,7 +24,7 @@ export const styles = {
         background: "white",
         padding: "1em",
         margin: "1em",
-        "max-width": "200px",
+        "max-width": "300px",
         "border-radius": "5px",
         opacity: 0.9
       } as React.CSSProperties,

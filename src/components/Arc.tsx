@@ -65,9 +65,11 @@ function Arc(props: any) {
 
     // update position
     const mapBounds = document.querySelectorAll(".panel-container")[0].getBoundingClientRect();
-    let offsetY = pos[1] - mapBounds.top,
+    // get canvas to calculate offset in case of zoom
+
+    let offsetY = pos[1] - mapBounds.top - 40,
     offsetX = pos[0] - mapBounds.left
-    
+
     const toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement,
     toolTipBounds = toolTipDom.getBoundingClientRect();
     
@@ -78,8 +80,7 @@ function Arc(props: any) {
     }
 
     let topOrBottom = "top"
-
-    if((offsetY + toolTipBounds.bottom-350 > mapBounds.bottom)) {
+    if((offsetY + toolTipBounds.height > mapBounds.bottom)) {
       topOrBottom = "bottom";
       offsetY = mapBounds.bottom - pos[1]
     }
@@ -290,7 +291,6 @@ function Arc(props: any) {
           })
           .style("opacity",(n: any) => {
             if(props.query.length !==0) {
-              console.log("id: ", n.id, queryMatches.has(n.id))
               return queryMatches.has(n.id) ? 1 : .1
             } else {
               return 1
@@ -330,7 +330,6 @@ function Arc(props: any) {
 
       paths
       .on("mouseover", function (d) {
-        // page x. page y
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("displayValue"));
         paths
           .style("opacity",(l: any) => {
@@ -390,25 +389,31 @@ function Arc(props: any) {
   if(document.getElementsByClassName("canvas")[0] !== undefined) {
     handleZoom(document.getElementsByClassName("canvas")[0] as HTMLElement, props.zoomState)
   }
-  
+
   return ( 
-    <div className={"canvas"} style={styles.containerStyle} > 
-      <svg style={styles.containerStyle} ref = {containerRef}>
-        <g style={styles.containerStyle} ref = {gRef}></g>
-        <svg style={styles.labelStyle} ref = {labelRef}></svg>
-      </svg>
+    <div style={styles.containerStyle}>
+      
+      <div style={styles.containerStyle}>
+        <div className={"canvas"} style={styles.containerStyle} > 
+          <svg style={styles.containerStyle} ref = {containerRef}>
+            <g style={styles.containerStyle} ref = {gRef}></g>
+            <svg style={styles.labelStyle} ref = {labelRef}></svg>
+          </svg>
 
-      {showTooltip && (
-        <div ref={tooltipRef} style={styles.toolTipStyle.box} className='tooltip'>
-          <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipSource}</b> {" "}{toolTip.source}</p>
-          <div style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>
+        </div> 
+        {showTooltip && (
+          <div ref={tooltipRef} style={styles.toolTipStyle.box} className='tooltip'>
+            <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipSource}</b> {" "}{toolTip.source}</p>
+            <div style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>
 
-          <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
+            <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
 
-          <p style={styles.toolTipStyle.text(props.zoom)} > {toolTip.field}</p>
-        </div>
-      )}
-    </div> 
+            <p style={styles.toolTipStyle.text(props.zoom)} > {toolTip.field}</p>
+          </div>
+        )}
+      </div>  
+    </div>
+    
   );
 }
 
