@@ -25,21 +25,27 @@ function Arc(props: any) {
     setShowTooltip(isActive);
   }
 
-  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, displayValue?: string): void {
+  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, displayValue?: string, linkId?: number): void {
     
     // when only sourceId is passed, display node and its targets
     if(targetId === undefined) {
       toolTip.source = idToName(sourceId,uniqueNodes)
       // get targets for passed nodes as strings
-      toolTip.target = getNodeTargets({ id: sourceId, links })
-                       .map((id) => idToName(id, uniqueNodes))
-                       .filter((value, index, array) => array.indexOf(value) === index)
-                       .map((string, index) => (
-                        <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
-                          {string}
-                          <br />
-                        </p>
-                       ))     
+      const nodeTargets = getNodeTargets({ id: sourceId, links })
+      if(nodeTargets.length > 1) {
+        toolTip.target = nodeTargets
+                        .map((id) => idToName(id, uniqueNodes))
+                        .filter((value, index, array) => array.indexOf(value) === index)
+                        .map((string, index) => (
+                          <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
+                            {string}
+                            <br />
+                          </p>
+                        ))
+      } else if (nodeTargets.length === 1) {
+        console.log(idToName(nodeTargets[0], uniqueNodes))
+        toolTip.target = idToName(nodeTargets[0], uniqueNodes)
+      }
       // reset metric and field  
       toolTip.sum = ""
       toolTip.field = <p></p>
@@ -47,15 +53,21 @@ function Arc(props: any) {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target = idToName(targetId,uniqueNodes)
       toolTip.sum = displayValue!
-      if(props.parsedData.additionalField !== undefined) {
-        toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)?.field
-                      .map((string: any, index: number) => (
-                        <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
-                          {string}
-                          <br />
-                        </p>
-                      ))}
-                      </p>
+      if(props.parsedData.additionalField !== "") {
+        if(props.graphOptions.hopMode) {
+          toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}: </b>
+                            {links.find((link: any) => link.id === Number(linkId))?.field}
+                          </p>
+        } else {
+          toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)?.field
+                          .map((string: any, index: number) => (
+                            <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
+                              {string}
+                              <br />
+                            </p>
+                          ))}
+                          </p>
+        }
       }
       
     }
@@ -98,6 +110,8 @@ function Arc(props: any) {
         toolTipDom.style.right = `${offsetX}px`;
       }
     }
+    console.log(document.querySelectorAll("#tooltip")[0])
+
   };
 
   useEffect(() => {
@@ -195,7 +209,7 @@ function Arc(props: any) {
       })
       .style("fill", "none")
       .attr("stroke", (l: any) => { return  l?.color })
-      .attr("id", "arc")
+      .attr("id", (d, i) => links[i].id)
       .attr("stroke-width", (l: any) => { return  l?.strokeWidth })
       .style("opacity", props.graphOptions.arcOpacity)
       .attr("source", (d, i) => links[i].source)
@@ -332,7 +346,7 @@ function Arc(props: any) {
 
       paths
       .on("mouseover", function (d) {
-        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("displayValue"));
+        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("displayValue"), d.srcElement.id);
         paths
           .style("opacity",(l: any) => {
             if(props.query.length !==0) {
@@ -406,8 +420,10 @@ function Arc(props: any) {
             <br/>
             <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
             <br/>
-            <p style={styles.toolTipStyle.text(props.zoom)} > {toolTip.field}</p>
-          </div>
+            { props.parsedData.additionalField !== "" &&
+              <p style={styles.toolTipStyle.text(props.zoom)} > {toolTip.field}</p>
+            
+            }</div>
         )}
       </div>      
   );

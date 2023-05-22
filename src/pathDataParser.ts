@@ -16,14 +16,10 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
   const allData = data.series[0].fields;
   const paths = allData[0].values.buffer;
 
-  //const pathString = options.pathString ? allData.find((obj: { name: any; }) => obj.name === options.pathString).name : allData[0].name;
   // get the field that's neither used as source or dest
   let additionalField = ""
   if(allData.length > 2) {
-    //const usedFields = [sourceString, targetString, allData[allData.length -1].name]
-    //const compareArray = allData.map( (obj: any) => obj.name)
-    //additionalField = compareArray.filter( (obj: any ) => !usedFields.includes(obj))[0]
-    //console.log(pathString)
+    additionalField = allData[1].name
   }
 
   const delimiter = options.delimiter === "space" ? " " : options.delimiter
@@ -41,7 +37,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
     const pathColors = getEvenlySpacedColors(paths.length, theme.isDark)
 
-    let links: { source: number | undefined; target: number | undefined; path: number; sum: number; strokeWidth: number; field: string; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number }[] = [];
+    let links: { source: number | undefined; target: number | undefined; path: number; sum: number; strokeWidth: number; field: string; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }[] = [];
 
     paths.forEach((path: string, pathIndex: number) => {
       const pathNodes = path.split(' ');
@@ -51,12 +47,13 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
         const target = uniqueNodes.find( (node: any) => node.name === pathNodes[i+1])?.id;
         const isOverlap = links.some((link: any) => link.source === source && link.target === target);
       
-        links.push({ 
+        links.push({
+          id: 0, 
           source, 
           target, 
           path: pathIndex,
           sum: allData[allData.length -1].values.buffer[pathIndex],
-          field: "",
+          field: (additionalField === "") ? [additionalField] : allData.find(( obj: any) => obj.name === additionalField).values.buffer[pathIndex],
           strokeWidth: 1,
           color: pathColors[pathIndex],
           displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix : ""}`,
@@ -66,6 +63,10 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
       }
     });
+
+    links.forEach( (link: any, index: number) => {
+      link.id = index
+    })
 
     // assign overlap index to render elliptical arc
     let mapRadiusY = options.yRad;
@@ -100,6 +101,6 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
 
   /**********************************************************************************/
-
-  return {uniqueNodes, links};
+  console.log(links)
+  return {uniqueNodes, links, additionalField};
 }
