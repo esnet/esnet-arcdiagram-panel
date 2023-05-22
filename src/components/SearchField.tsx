@@ -8,7 +8,7 @@ export default function SearchField(props: any) {
     }
 
     return (
-      <div className="search-field" style={styles.searchFieldStyle}>
+      <div id="search-field" style={styles.searchFieldStyle}>
         <input placeholder="Search nodes" style={styles.inputStyle(props.isDarkMode)} type="text" onChange={handleChange}/>
       </div>
     )

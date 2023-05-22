@@ -70,7 +70,7 @@ function Arc(props: any) {
       let offsetY = pos[1] - mapBounds.top,
       offsetX = pos[0] - mapBounds.left
       
-      const toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement,
+      const toolTipDom = document.querySelectorAll("#tooltip")[0] as HTMLElement,
       toolTipBounds = toolTipDom.getBoundingClientRect();
       
       let leftOrRight = "left";
@@ -378,23 +378,20 @@ function Arc(props: any) {
           .attr('stroke-width', (l: any) => {
             return l?.strokeWidth
           })
-      })
-    
-      // queryMatches.has(l.source) || queryMatches.has(l.target)
-    
+      })    
 
     if(props.graphOptions.search) {evaluateQuery(props.query,uniqueNodes, labels, paths, nodes, props.graphOptions.arcOpacity)}
 
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.width, uniqueNodes]);
 
-  if(document.querySelectorAll(`[data-panelid="${props.panelId}"] .canvas`)[0] !== undefined) {
-    handleZoom(document.querySelectorAll(`[data-panelid="${props.panelId}"] .canvas`)[0] as HTMLElement, props.zoomState)
+  if(document.querySelectorAll(`[data-panelid="${props.panelId}"] #canvas`)[0] !== undefined) {
+    handleZoom(document.querySelectorAll(`[data-panelid="${props.panelId}"] #canvas`)[0] as HTMLElement, props.zoomState)
   }
   
   return (       
       <div style={styles.containerStyle}>
-        <div className={"canvas"} style={styles.containerStyle} > 
+        <div id={"canvas"} style={styles.containerStyle} > 
           <svg style={styles.containerStyle} ref = {containerRef}>
             <g style={styles.containerStyle} ref = {gRef}></g>
             <svg style={styles.labelStyle} ref = {labelRef}></svg>
@@ -402,7 +399,7 @@ function Arc(props: any) {
 
         </div> 
         {showTooltip && (
-          <div ref={tooltipRef} style={styles.toolTipStyle.box} className='tooltip'>
+          <div ref={tooltipRef} style={styles.toolTipStyle.box} id='tooltip'>
             <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipSource}</b> {" "}{toolTip.source}</p>
             <br/>
             <div style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>

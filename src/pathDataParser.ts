@@ -1,5 +1,3 @@
-//import { calcStrokeWidth, mapToLogRange, getEvenlySpacedColors } from 'utils';
-
 import { calcNodeRadius, calcStrokeWidth, getEvenlySpacedColors } from "utils";
 
 /**
@@ -20,7 +18,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
   //const pathString = options.pathString ? allData.find((obj: { name: any; }) => obj.name === options.pathString).name : allData[0].name;
   // get the field that's neither used as source or dest
-  //let additionalField = ""
+  let additionalField = ""
   if(allData.length > 2) {
     //const usedFields = [sourceString, targetString, allData[allData.length -1].name]
     //const compareArray = allData.map( (obj: any) => obj.name)

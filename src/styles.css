@@ -20,28 +20,28 @@ input::placeholder { /* Most modern browsers support this now. */
  color: #808080;
 }
 
-.zoom-button:hover {
+#zoom-button:hover {
   transform: translateY(-8px);
   background-color: grey !important;
 }
 
-.search-field {
+#search-field {
   transition: all 250ms;
 }
 
-.search-field input {
+#search-field input {
   transition: all 250ms;
 }
 
-.search-field:hover {
+#search-field:hover {
   transform: translateY(-8px);
 }
 
-.search-field input:hover {
+#search-field input:hover {
   background-color: rgb(195, 188, 188) !important;
 }
 
-.panel-content div:first-child {
+#panel-content div:first-child {
   overflow: scroll;
   transform-origin: left;
 }
