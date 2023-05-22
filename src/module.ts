@@ -160,7 +160,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: 1.3,
       settings: {
         min: 1,
-        max: 3,
+        max: 2,
         step: .1,
       },
       showIf: config => config.hopMode,

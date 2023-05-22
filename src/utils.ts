@@ -129,8 +129,6 @@ export function getQueryMatches(query: string, nodeList: any[]) {
 
 export function handleZoom(canvas: HTMLElement, zoomState: number) {
     canvas.style.transform = `scale(${zoomState/10})`
-    //canvas.style.transform = "left"
-    
 }
 
 export function addNodeSum(links: any[], uniqueNodes: any[]) {
@@ -178,24 +176,57 @@ export function calcNodeRadius(uniqueNodes: any[], links: any[], options: any) {
         // check if arc thickness is set to source
         if(options.radiusFromSource) {
           // check if we apply logarithmic or linear scaling
-          if(options.scale === "log") {
-            // check if node only receiving. if yes, give it the size of the largest incoming link
-            if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
-              e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
+            if(options.scale === "log") {
+                // check if node only receiving. if yes, give it the size of the largest incoming link
+                if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
+                e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
+                } else {
+                e.radius = mapToLogRange( e.sum, nodeScaleFrom, nodeScaleTo, minNode, maxNode)
+                }
+                
             } else {
-              e.radius = mapToLogRange( e.sum, nodeScaleFrom, nodeScaleTo, minNode, maxNode)
+                if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
+                e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
+                } else {
+                // scaling factor change via options to be implemented
+                e.radius = (e.sum/100000000000000)
+                }
             }
-            
-          } else {
-            if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
-              e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
-            } else {
-              // scaling factor change via options to be implemented
-              e.radius = (e.sum/100000000000000)
-            }
-          }
         } else {
           e.radius = options.nodeRadius
         }
-    }
+    })
 }
+
+export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number) {
+    let maxNodesCrossed = 0;
+    let maxArc = null;
+
+    for (const link of links) {
+        const nodesCrossed = Math.abs(link.target - link.source) - 1;
+        if (nodesCrossed > maxNodesCrossed) {
+            maxNodesCrossed = nodesCrossed;
+            maxArc = link;
+        }
+    }
+
+    const maxArcDistance = maxArc.target - maxArc.source
+    const step = (panelWidth-50 - 50) / (nodes.length - 1);
+    const maxArcHeight = (maxArcDistance * step) / 2
+
+    const longestName = nodes.reduce((acc, curr) => {
+        if (curr.name.length > acc.name.length) {
+          return curr;
+        } else {
+          return acc;
+        }
+      }).name;
+    
+    // * 3.77 maps string to pixels, * 1.6 maps to highlighted tag
+    const longestNameSize = longestName.length * 3.77 * 1.6
+    // 31.99px is the height of the panel title
+    const graphHeight =  maxArcHeight + longestNameSize + 31.99
+
+    return graphHeight
+}
+

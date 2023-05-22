@@ -68,7 +68,6 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
     console.error('parsing error: ', error);
   }
 
-  console.log((calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height))
   // check if diagram fits panel
   if (calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height) {
     return <div>Increase panels height to fit diagram</div>;
@@ -87,6 +86,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
         query={query}
         isDarkMode={theme.isDark}
         panelId={id}
+        zoomState={zoomState}
       ></Arc>
       <div style={styles.toolBarStyle}>
         {options.search && <SearchField

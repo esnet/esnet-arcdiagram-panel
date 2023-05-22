@@ -78,28 +78,26 @@ function Arc(props: any) {
         leftOrRight = "right";
         offsetX = mapBounds.right - pos[0]
       }
-
-    let topOrBottom = "top"
-    console.log(mapBounds.bottom)
-    console.log(toolTipBounds)
-    // add margin of 10px
-    if(toolTipBounds.height+pos[1]+10 > mapBounds.bottom) {
-      topOrBottom = "bottom";
-      offsetY = mapBounds.bottom - pos[1]
-    }
     
-    if (topOrBottom === "top") {
-      toolTipDom.style.top = `${offsetY}px`;
-    } else {
-      toolTipDom.style.bottom = `${offsetY}px`;
-    }
+      let topOrBottom = "top" 
+      // add margin of 31.99px
+      if(toolTipBounds.height+pos[1]+31.99 > mapBounds.bottom) {
+        topOrBottom = "bottom";
+        offsetY = mapBounds.bottom - pos[1]
+      }
     
-    if (leftOrRight === "left") {
-      toolTipDom.style.left = `${offsetX}px`;
-    } else {
-      toolTipDom.style.right = `${offsetX}px`;
+      if (topOrBottom === "top") {
+        toolTipDom.style.top = `${offsetY}px`;
+      } else {
+        toolTipDom.style.bottom = `${offsetY}px`;
+      }
+      
+      if (leftOrRight === "left") {
+        toolTipDom.style.left = `${offsetX}px`;
+      } else {
+        toolTipDom.style.right = `${offsetX}px`;
+      }
     }
-
   };
 
   useEffect(() => {
@@ -390,13 +388,11 @@ function Arc(props: any) {
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.width, uniqueNodes]);
 
-  if(document.getElementsByClassName("canvas")[0] !== undefined) {
-    handleZoom(document.getElementsByClassName("canvas")[0] as HTMLElement, props.zoomState)
+  if(document.querySelectorAll(`[data-panelid="${props.panelId}"] .canvas`)[0] !== undefined) {
+    handleZoom(document.querySelectorAll(`[data-panelid="${props.panelId}"] .canvas`)[0] as HTMLElement, props.zoomState)
   }
   
-  return ( 
-    <div style={styles.containerStyle}>
-      
+  return (       
       <div style={styles.containerStyle}>
         <div className={"canvas"} style={styles.containerStyle} > 
           <svg style={styles.containerStyle} ref = {containerRef}>
@@ -416,9 +412,7 @@ function Arc(props: any) {
             <p style={styles.toolTipStyle.text(props.zoom)} > {toolTip.field}</p>
           </div>
         )}
-      </div>  
-    </div>
-    
+      </div>      
   );
 }
 
