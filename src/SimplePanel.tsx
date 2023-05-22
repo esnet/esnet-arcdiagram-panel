@@ -9,6 +9,7 @@ import { parseData } from 'dataParser';
 import { parsePathData } from 'pathDataParser';
 
 import { styles } from 'styles';
+import { calcDiagramHeight } from 'utils';
 
 interface Props extends PanelProps<SimpleOptions> {}
 /**
@@ -17,8 +18,7 @@ interface Props extends PanelProps<SimpleOptions> {}
  * @param {*} { options, data, width, height, id }
  * @return { Arc } Arc diagram
  */
-
-export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: any) => {
+export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id }: any) => {
   const [query, setQuery] = useState("");
   const [zoomState, setZoomState] = useState(10);
   
@@ -68,7 +68,13 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
     console.error('parsing error: ', error);
   }
 
-  const textColor = theme.colors.text.primary;  
+  console.log((calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height))
+  // check if diagram fits panel
+  if (calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height) {
+    return <div>Increase panels height to fit diagram</div>;
+  }
+
+  const textColor = theme.colors.text.primary;
 
   return (
     <div style={styles.panelContainerStyle}>
@@ -80,7 +86,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }: a
         height={height}
         query={query}
         isDarkMode={theme.isDark}
-        zoomState={zoomState}
+        panelId={id}
       ></Arc>
       <div style={styles.toolBarStyle}>
         {options.search && <SearchField

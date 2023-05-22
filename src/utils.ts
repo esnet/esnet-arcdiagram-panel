@@ -80,7 +80,7 @@ export function replaceEllipsis(label: SVGTextElement, isHighlighted: Boolean){
 
     const labelBoundingBox = label.getBoundingClientRect().width * (isHighlighted ? 1.6 : 1);
     const mapRatio = (isHighlighted ? 0.2 : 0.3);
-
+    
     const labelOffsetX = Number(label.getAttribute("transform")?.split(",")[0].substring(10))
 
     // check if label is out of bounds
@@ -197,5 +197,5 @@ export function calcNodeRadius(uniqueNodes: any[], links: any[], options: any) {
         } else {
           e.radius = options.nodeRadius
         }
-      });
+    }
 }

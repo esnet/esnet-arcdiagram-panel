@@ -19,7 +19,7 @@ function Arc(props: any) {
   gRef = useRef(null),
   labelRef = useRef(null),
   tooltipRef = useRef(null);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false)
 
   const handleToggleTooltip = (isActive: boolean) => {
     setShowTooltip(isActive);
@@ -64,20 +64,20 @@ function Arc(props: any) {
     handleToggleTooltip(isActive)
 
     // update position
-    const mapBounds = document.querySelectorAll(".panel-content")[0].getBoundingClientRect();
-    // get canvas to calculate offset in case of zoom
-
-    let offsetY = pos[1] - mapBounds.top,
-    offsetX = pos[0] - mapBounds.left
-
-    const toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement,
-    toolTipBounds = toolTipDom.getBoundingClientRect();
-    
-    let leftOrRight = "left";
-    if(offsetX + toolTipBounds.right > mapBounds.right) {
-      leftOrRight = "right";
-      offsetX = mapBounds.right - pos[0]
-    }
+    const panelContainer = document.querySelectorAll(`[data-panelid="${props.panelId}"] .panel-container`)[0]
+    if(panelContainer !== undefined) {
+      const mapBounds = panelContainer.getBoundingClientRect();
+      let offsetY = pos[1] - mapBounds.top,
+      offsetX = pos[0] - mapBounds.left
+      
+      const toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement,
+      toolTipBounds = toolTipDom.getBoundingClientRect();
+      
+      let leftOrRight = "left";
+      if(offsetX + toolTipBounds.right > mapBounds.right) {
+        leftOrRight = "right";
+        offsetX = mapBounds.right - pos[0]
+      }
 
     let topOrBottom = "top"
     console.log(mapBounds.bottom)
@@ -104,10 +104,12 @@ function Arc(props: any) {
 
   useEffect(() => {
     // removes the graph if it exists in the dom so it gets rendered with updated dimensions
-    d3.selectAll("circle, path, text").remove();
+    d3.selectAll(`[data-panelid="${props.panelId}"] circle, [data-panelid="${props.panelId}"] path, [data-panelid="${props.panelId}"] text`).remove();
 
     const width = props.width,
     height = props.height
+
+    
 
     const container = containerRef.current,
     graph = gRef.current,
@@ -115,7 +117,7 @@ function Arc(props: any) {
 
     // render labels
     const text = d3.select(labelBox)
-      .selectAll('text')
+      .selectAll(`[data-panelid="${props.panelId}"] text`)
       .data(uniqueNodes)
 
     text
@@ -130,8 +132,8 @@ function Arc(props: any) {
       .attr('font-size', props.graphOptions.fontSize)
       .attr('transform', (d, i) => ("translate(" + 0 + "," + (height) + ")rotate(-45)"))
       .style("margin-right", "5px")
-      .attr('name', (d, i) => { return uniqueNodes[i].name})
-      .attr('id', (d, i) => { return i})
+      .attr('name', (d, i) => { return uniqueNodes[i].name })
+      .attr('id', (d, i) => { return i })
 
     // after the labels are rendered, we can find out the amount of margin we need to apply
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
@@ -144,7 +146,7 @@ function Arc(props: any) {
     const values = linSpace(50, width-50, uniqueNodes.length);
 
     // Update the labels position
-    d3.selectAll("text")
+    d3.selectAll(`[data-panelid="${props.panelId}"] text`)
     .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-45)"))
 
     // check if label is out of bounds
@@ -155,7 +157,7 @@ function Arc(props: any) {
 
     // render nodes
     const svg = d3.select(container)
-    .selectAll('circle')
+    .selectAll(`[data-panelid="${props.panelId}"] circle`)
     .data(uniqueNodes)
 
     svg
@@ -171,7 +173,7 @@ function Arc(props: any) {
 
     // render links
     const g = d3.select(graph)
-      .selectAll('path')
+      .selectAll(`[data-panelid="${props.panelId}"] path`)
       .data(links)
 
     g
@@ -205,10 +207,9 @@ function Arc(props: any) {
       .attr("path", (d, i) => links[i].path)
     
     /********************************** Highlighting **********************************/ 
-    
-    const nodes = d3.selectAll("circle")
-    const paths = d3.selectAll("path")
-    const labels = d3.selectAll("text")
+    const nodes = d3.selectAll(`[data-panelid="${props.panelId}"] circle`)
+    const paths = d3.selectAll(`[data-panelid="${props.panelId}"] path`)
+    const labels = d3.selectAll(`[data-panelid="${props.panelId}"] text`)
     const duration = 200;
     const queryMatches = getQueryMatches(props.query, uniqueNodes)
 
@@ -423,3 +424,5 @@ function Arc(props: any) {
 
 
 export default Arc;
+
+
