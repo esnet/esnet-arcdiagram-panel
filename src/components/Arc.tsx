@@ -45,7 +45,7 @@ function Arc(props: any) {
       toolTip.field = <p></p>
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
-      toolTip.target =  <p style={styles.toolTipStyle.text(props.zoom)}>{idToName(targetId,uniqueNodes)}</p>
+      toolTip.target = idToName(targetId,uniqueNodes)
       toolTip.sum = displayValue!
       if(props.parsedData.additionalField !== undefined) {
         toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)?.field
@@ -64,10 +64,10 @@ function Arc(props: any) {
     handleToggleTooltip(isActive)
 
     // update position
-    const mapBounds = document.querySelectorAll(".panel-container")[0].getBoundingClientRect();
+    const mapBounds = document.querySelectorAll(".panel-content")[0].getBoundingClientRect();
     // get canvas to calculate offset in case of zoom
 
-    let offsetY = pos[1] - mapBounds.top - 40,
+    let offsetY = pos[1] - mapBounds.top,
     offsetX = pos[0] - mapBounds.left
 
     const toolTipDom = document.querySelectorAll(".tooltip")[0] as HTMLElement,
@@ -80,7 +80,10 @@ function Arc(props: any) {
     }
 
     let topOrBottom = "top"
-    if((offsetY + toolTipBounds.height > mapBounds.bottom)) {
+    console.log(mapBounds.bottom)
+    console.log(toolTipBounds)
+    // add margin of 10px
+    if(toolTipBounds.height+pos[1]+10 > mapBounds.bottom) {
       topOrBottom = "bottom";
       offsetY = mapBounds.bottom - pos[1]
     }
@@ -389,7 +392,7 @@ function Arc(props: any) {
   if(document.getElementsByClassName("canvas")[0] !== undefined) {
     handleZoom(document.getElementsByClassName("canvas")[0] as HTMLElement, props.zoomState)
   }
-
+  
   return ( 
     <div style={styles.containerStyle}>
       
@@ -404,10 +407,11 @@ function Arc(props: any) {
         {showTooltip && (
           <div ref={tooltipRef} style={styles.toolTipStyle.box} className='tooltip'>
             <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipSource}</b> {" "}{toolTip.source}</p>
+            <br/>
             <div style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>
-
+            <br/>
             <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
-
+            <br/>
             <p style={styles.toolTipStyle.text(props.zoom)} > {toolTip.field}</p>
           </div>
         )}
