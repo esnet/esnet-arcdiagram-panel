@@ -46,7 +46,7 @@ function Arc(props: any) {
         toolTip.target = idToName(nodeTargets[0], uniqueNodes)
       }
       // reset metric and field  
-      toolTip.sum = ""
+      toolTip.sum = uniqueNodes[sourceId].sum
       toolTip.field = <p></p>
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)

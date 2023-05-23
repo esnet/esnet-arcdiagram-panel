@@ -211,13 +211,13 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
     })
     .addCustomEditor({
       id: "setRange",
-      path: "NodeRange",
+      path: "nodeRange",
       editor: CustomRangeSlider,
       name: 'Range for weighted nodes',
       description: 'Range which the node radius is being mapped to',
       category: DataCategory,
       defaultValue: "1,15",
-      showIf: config => config.scale === "log" && config.radiusFromSource,
+      showIf: config => config.radiusFromSource,
     })
     .addSelect({
       path: 'pathField',

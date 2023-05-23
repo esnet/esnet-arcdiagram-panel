@@ -105,8 +105,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     });
 
     // Add accumulated sums to nodes to calculate radius from
-    addNodeSum(links, uniqueNodes)
-    calcNodeRadius(uniqueNodes, links, options)
+    
 
   /********************************** Bundle overlapping links **********************************/ 
 
@@ -115,7 +114,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       const uniqueLinks = links.reduce((acc: any, cur: any) => {
         const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
         if (existing) {
-          existing.sum += cur.sum;
           if (!existing.field.includes(cur.field)) {
             existing.field.push(cur.field);
           }
@@ -139,7 +137,10 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       })
       links = uniqueLinks;
     }
-  
+    // accumulate nodesums after potential bundling
+    addNodeSum(links, uniqueNodes)
+    calcNodeRadius(uniqueNodes, links, options)
+
   /**********************************************************************************/
 
   return {uniqueNodes, links, hexColors, additionalField};

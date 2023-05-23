@@ -136,38 +136,30 @@ export function addNodeSum(links: any[], uniqueNodes: any[]) {
     const nodeSums: {[key: number]: number} = {};
 
     // Loop through links array and populate nodeSums object
-    links.forEach((link: { source: any; sum: any; }) => {
-        const {source, sum} = link;
+    links.forEach((link: { source: any; target: any; sum: any; }) => {
+        const {source, target, sum} = link;
         if (nodeSums[source]) {
-        nodeSums[source] += sum;
+            nodeSums[source] += sum;
         } else {
-        nodeSums[source] = sum;
+            nodeSums[source] = sum;
         }
-    });
-
-    // Create array of unique nodes with aggregated sums
-    const nodes  = Object.keys(nodeSums).map(nodeId => ({
-        id: nodeId as unknown as number,
-        sum: nodeSums[nodeId as unknown as number],
-    }));
-
-    links.forEach(function(link: { target: any; }) {
-        const target = link.target;
-        if (!nodeSums[target]) {
-        nodes.push({id: target, sum: 1});
-        nodeSums[target] = 1;
+        
+        if (nodeSums[target]) {
+            nodeSums[target] += sum;
+        } else {
+            nodeSums[target] = sum;
         }
     });
 
     uniqueNodes.map(function(element, index) {
-        element.sum = nodes[index]?.sum
+        element.sum = nodeSums[index]
     });
 }
 
 export function calcNodeRadius(uniqueNodes: any[], links: any[], options: any) {
 
-    const nodeScaleFrom = options.NodeRange?.split(",").map(Number)[0]
-    const nodeScaleTo = options.NodeRange?.split(",").map(Number)[1]
+    const nodeScaleFrom = options.nodeRange?.split(",").map(Number)[0]
+    const nodeScaleTo = options.nodeRange?.split(",").map(Number)[1]
 
     const minNode = Number(Math.min(...uniqueNodes.map(( e: any ) => e.sum)))
     const maxNode = Number(Math.max(...uniqueNodes.map(( e: any ) => e.sum)))
@@ -177,20 +169,9 @@ export function calcNodeRadius(uniqueNodes: any[], links: any[], options: any) {
         if(options.radiusFromSource) {
           // check if we apply logarithmic or linear scaling
             if(options.scale === "log") {
-                // check if node only receiving. if yes, give it the size of the largest incoming link
-                if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
-                e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
-                } else {
                 e.radius = mapToLogRange( e.sum, nodeScaleFrom, nodeScaleTo, minNode, maxNode)
-                }
-                
             } else {
-                if(![...new Set(links.map((node: { source: any; }) => node.source))].includes(e.id)) {
-                e.radius = Math.max(...links.filter( (link: { target: any; }) => link.target === e.id).map((el: { strokeWidth: number}) => el.strokeWidth))/2
-                } else {
-                // scaling factor change via options to be implemented
-                e.radius = (e.sum/100000000000000)
-                }
+                e.radius = mapToLinRange(e.sum, nodeScaleFrom, nodeScaleTo, minNode, maxNode)
             }
         } else {
           e.radius = options.nodeRadius
