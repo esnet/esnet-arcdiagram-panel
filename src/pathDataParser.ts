@@ -1,3 +1,4 @@
+import { over } from "lodash";
 import { calcNodeRadius, calcStrokeWidth, getEvenlySpacedColors } from "utils";
 
 /**
@@ -32,7 +33,6 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
       sum: 1,
       radius: 5
     }));
-
   /********************************** Links **********************************/
 
     const pathColors = getEvenlySpacedColors(paths.length, theme.isDark)
@@ -42,25 +42,27 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
     paths.forEach((path: string, pathIndex: number) => {
       const pathNodes = path.split(' ');
 
-      for (let i = 0; i < pathNodes.length - 1; i++) {
+      for (let i = 0; i < pathNodes.length; i++) {
         const source = uniqueNodes.find( (node: any) => node.name === pathNodes[i])?.id;
+
         const target = uniqueNodes.find( (node: any) => node.name === pathNodes[i+1])?.id;
         const isOverlap = links.some((link: any) => link.source === source && link.target === target);
       
-        links.push({
-          id: 0, 
-          source, 
-          target, 
-          path: pathIndex,
-          sum: allData[allData.length -1].values.buffer[pathIndex],
-          field: (additionalField === "") ? [additionalField] : allData.find(( obj: any) => obj.name === additionalField).values.buffer[pathIndex],
-          strokeWidth: 1,
-          color: pathColors[pathIndex],
-          displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix : ""}`,
-          isOverlap,
-          mapRadiusY: 0
-        });
-
+        if(target !== undefined) {
+          links.push({
+            id: 0, 
+            source, 
+            target, 
+            path: pathIndex,
+            sum: allData[allData.length -1].values.buffer[pathIndex],
+            field: (additionalField === "") ? [additionalField] : allData.find(( obj: any) => obj.name === additionalField).values.buffer[pathIndex],
+            strokeWidth: 1,
+            color: pathColors[pathIndex],
+            displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix : ""}`,
+            isOverlap,
+            mapRadiusY: 0
+          });
+        }
       }
     });
 
@@ -69,20 +71,39 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
     })
 
     // assign overlap index to render elliptical arc
-    let mapRadiusY = options.yRad;
-    const overLapLinks = links.filter(link => link.isOverlap)
-    
-    overLapLinks.forEach(( link, i ) => {
-      
-      if(i > 0) {
-        if(link.source === overLapLinks[i-1].source && link.target === overLapLinks[i-1].target) {
-          mapRadiusY+=options.yRad-1
-        } else {
-          mapRadiusY = options.yRad;
+    const overlapLinks = links.filter(link => link.isOverlap)
+
+    const overlapGroups = [];
+    const visited = [];
+
+    for (let i = 0; i < overlapLinks.length; i++) {
+      const currentLink = overlapLinks[i];
+      const overlapGroup = [currentLink];
+      // keep track of visited links, go to next iteration if link already part of group
+      if(visited.includes(currentLink)) {
+        continue
+      }
+      for (let j = i + 1; j < overlapLinks.length; j++) {
+        const compareLink = overlapLinks[j]
+        if(currentLink.source === compareLink.source && currentLink.target === compareLink.target) {
+          overlapGroup.push(compareLink);
+          visited.push(compareLink)
         }
       }
-      link.mapRadiusY = mapRadiusY
-    });
+      overlapGroups.push(overlapGroup)
+    }
+      
+    // iterate over overlapGroups and assign radiusY
+    for (let i = 0; i < overlapGroups.length; i++) {
+      const currentGroup = overlapGroups[i]
+      let mapRadiusY = options.yRad
+      for (let j = 0; j < currentGroup.length; j++) {
+        const currentLink = currentGroup[j]
+        currentLink.mapRadiusY = mapRadiusY
+        console.log(currentLink )
+        mapRadiusY += options.yRad-1
+      }
+    }
 
   /********************************** Stroke width/ node radius **********************************/
 
@@ -98,9 +119,6 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
     }
 
     calcNodeRadius(uniqueNodes, links, options)
-
-
   /**********************************************************************************/
-  console.log(links)
   return {uniqueNodes, links, additionalField};
 }

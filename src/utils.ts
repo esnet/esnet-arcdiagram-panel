@@ -203,7 +203,7 @@ export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number
     let maxArc = null;
 
     for (const link of links) {
-        const nodesCrossed = Math.abs(link.target - link.source) - 1;
+        const nodesCrossed = Math.abs(link.target - link.source);
         if (nodesCrossed > maxNodesCrossed) {
             maxNodesCrossed = nodesCrossed;
             maxArc = link;

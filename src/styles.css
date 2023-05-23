@@ -41,7 +41,7 @@ input::placeholder { /* Most modern browsers support this now. */
   background-color: rgb(195, 188, 188) !important;
 }
 
-#panel-content div:first-child {
+.panel-content div:first-child {
   overflow: scroll;
   transform-origin: left;
 }

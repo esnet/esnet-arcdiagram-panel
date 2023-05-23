@@ -43,7 +43,6 @@ function Arc(props: any) {
                           </p>
                         ))
       } else if (nodeTargets.length === 1) {
-        console.log(idToName(nodeTargets[0], uniqueNodes))
         toolTip.target = idToName(nodeTargets[0], uniqueNodes)
       }
       // reset metric and field  
@@ -110,8 +109,6 @@ function Arc(props: any) {
         toolTipDom.style.right = `${offsetX}px`;
       }
     }
-    console.log(document.querySelectorAll("#tooltip")[0])
-
   };
 
   useEffect(() => {
