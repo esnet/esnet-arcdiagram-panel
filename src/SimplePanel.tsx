@@ -24,7 +24,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
   
   const theme = useTheme2();
 
-  if (data.series[0].fields.length > 3) {
+  if (data.series[0].fields.length > 4) {
     return <div>4th group by not supported</div>;
   }
 
@@ -51,7 +51,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
   console.log((calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height))
   // check if diagram fits panel
   if (calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height) {
-    return <div>Increase panels height to fit diagram</div>;
+    //return <div>Increase panels height to fit diagram</div>;
   }
 
   const textColor = theme.colors.text.primary;
