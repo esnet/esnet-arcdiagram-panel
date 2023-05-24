@@ -48,10 +48,9 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
     console.error('parsing error: ', error);
   }
 
-  console.log((calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height))
   // check if diagram fits panel
   if (calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height) {
-    //return <div>Increase panels height to fit diagram</div>;
+    return <div>Increase panels height to fit diagram</div>;
   }
 
   const textColor = theme.colors.text.primary;

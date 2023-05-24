@@ -25,7 +25,6 @@ function Arc(props: any) {
   }
 
   function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, displayValue?: string): void {
-    
     // when only sourceId is passed, display node and its targets
     if(targetId === undefined) {
       toolTip.source = idToName(sourceId,uniqueNodes)
@@ -60,7 +59,7 @@ function Arc(props: any) {
     handleToggleTooltip(isActive)
 
     // update position
-    const panelContainer = document.querySelectorAll(`[data-panelid="${props.panelId}"] .panel-container`)[0]
+    const panelContainer = document.querySelectorAll(`[data-panelid="${props.panelId}"]`)[0]
     if(panelContainer !== undefined) {
       const mapBounds = panelContainer.getBoundingClientRect();
       let offsetY = pos[1] - mapBounds.top,
@@ -206,6 +205,7 @@ function Arc(props: any) {
     nodes
       .on("mouseover", function (d) {
         // Tooltip
+
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.id));
         labelsAsHtml[d.srcElement.id].setAttribute("name", labelsAsHtml[d.srcElement.id].innerHTML)
         const nodeTargets = getNodeTargets({ id: Number(d.srcElement.id), links })

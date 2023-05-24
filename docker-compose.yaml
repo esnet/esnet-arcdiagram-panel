@@ -7,7 +7,7 @@ services:
     networks:
       - grafana
     volumes:
-      - ./grafana-plugins:~/Documents/plugins
+      - ~/Users/felix/Documents/plugins:/var/lib/grafana/plugins
       - grafana-storage-dev:/var/lib/grafana
     ports:
       - 8080:8080
