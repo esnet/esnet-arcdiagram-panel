@@ -133,8 +133,8 @@ function Arc(props: any) {
       .enter()
       .append("text")
       // if node has large radius, offset the label for readability
-      .attr("x", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 5 ? -(uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*2) : -10 })
-      .attr("y", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 5 ? (uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*2) : 10 })
+      .attr("x", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 5 ? -(uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*1.5) : -10 })
+      .attr("y", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 5 ? (uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*1.5) : 10 })
       .text((d, i) => uniqueNodes[i].name)
       .style("text-anchor", "end")
       .attr('fill', () => {return props.isDarkMode ? "white" : "black"})

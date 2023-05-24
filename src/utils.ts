@@ -167,9 +167,9 @@ export function calcNodeRadius(uniqueNodes: any[], links: any[], options: any) {
     uniqueNodes.forEach((e: { id: any, radius: any; sum: any; }) => {
         // check if arc thickness is set to source
         if(options.radiusFromSource) {
-          // check if we apply logarithmic or linear scaling
+            // check if we apply logarithmic or linear scaling
             if(options.scale === "log") {
-                e.radius = mapToLogRange( e.sum, nodeScaleFrom, nodeScaleTo, minNode, maxNode)
+                e.radius = mapToLogRange(e.sum, nodeScaleFrom, nodeScaleTo, minNode, maxNode)
             } else {
                 e.radius = mapToLinRange(e.sum, nodeScaleFrom, nodeScaleTo, minNode, maxNode)
             }
