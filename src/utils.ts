@@ -211,3 +211,63 @@ export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number
     return graphHeight
 }
 
+export function clusterNodes(uniqueNodes: any[], links: any[], options: any, theme: any, allData: any) {
+      
+      
+    const srcCluster = allData.find((obj: { name: any; }) => obj.name === options.srcCluster)?.values.buffer
+    const dstCluster = allData.find((obj: { name: any; }) => obj.name === options.dstCluster)?.values.buffer
+
+    // add cluster to nodes
+    for(let i = 0; i < links.length; i++) {
+        Object.assign(links[i], {[options.srcCluster]: srcCluster[i]})
+        Object.assign(links[i], {[options.dstCluster]: dstCluster[i]})
+
+        uniqueNodes[links[i].source].cluster = links[i][options.srcCluster]
+        uniqueNodes[links[i].target].cluster = links[i][options.dstCluster]
+    }
+
+    // order 
+    uniqueNodes.sort((a, b) => {
+        if (a.cluster < b.cluster) {
+        return -1; // a should come before b
+        }
+        if (a.cluster > b.cluster) {
+        return 1; // a should come after b
+        }
+        return 0; // the order of a and b remains unchanged
+    });
+
+    for(let i = 0; i < uniqueNodes.length; i++) {
+        uniqueNodes[i].id = i; 
+    }
+
+    // create groups for clusters
+    let clusters: any[] = []
+    
+    // create unique groups according to the setting specified in options
+    clusters = [...new Set(uniqueNodes.map( ( item: any ) => item.cluster))].map( ( cluster: any ) => ({
+      name: cluster,
+      color: ""
+    }))
+
+    const spacedColors = getEvenlySpacedColors(clusters.length, theme.isDark)
+
+    clusters.forEach( (e, i) => {
+      e.color = spacedColors[i]
+    })
+
+    uniqueNodes.forEach((e) => {
+      e.color = clusters.find( cluster => cluster.name === e.cluster as keyof typeof e)!.color
+    })
+
+    // reassign links source and target values because node order was changed
+
+    links.forEach(link => {
+      link.source = uniqueNodes.find( node => node.name === link.srcName).id
+      
+      link.target = uniqueNodes.find(node => node.name === link.dstName).id
+
+    });
+
+}
+

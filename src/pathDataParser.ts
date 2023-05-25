@@ -1,4 +1,3 @@
-import { over } from "lodash";
 import { calcNodeRadius, calcStrokeWidth, getEvenlySpacedColors } from "utils";
 
 /**
@@ -33,6 +32,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
       sum: 1,
       radius: 5
     }));
+    
   /********************************** Links **********************************/
 
     const pathColors = getEvenlySpacedColors(paths.length, theme.isDark)

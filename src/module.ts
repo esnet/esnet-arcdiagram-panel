@@ -14,7 +14,8 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       path: 'hopMode',
       name: 'Visualize traceroute',
       defaultValue: false,
-      category: ModeCategory
+      category: ModeCategory,
+      showIf: config => !config.isCluster
     })
     .addSelect({
       path: 'delimiter',
@@ -142,6 +143,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Node Color',
       defaultValue: 'blue',
       category: AppearanceCategory,
+      showIf: config => !config.isCluster
     })
     .addSliderInput({
       path: 'fontSize',
@@ -218,6 +220,62 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       category: DataCategory,
       defaultValue: "1,15",
       showIf: config => config.radiusFromSource,
+    })
+    .addBooleanSwitch({
+      path: 'isCluster',
+      name: 'Activate node clustering',
+      defaultValue: false,
+      category: DataCategory,
+    })
+    .addSelect({
+      path: 'srcCluster',
+      name: 'Source cluster',
+      description: 'Select the field to cluster the source by:',
+      category: DataCategory,
+      defaultValue: "",
+      settings: {
+        allowCustomValue: false,
+        options: [],
+        getOptions: async (context: FieldOverrideContext) => {
+          const options = [];
+          if (context && context.data) {
+            for (const frame of context.data) {
+              for (const field of frame.fields) {
+                const name = getFieldDisplayName(field, frame, context.data);
+                const value = name;
+                options.push({ value, label: name });
+              }
+            }
+          }
+          return Promise.resolve(options);
+        },
+      },
+      showIf: config => config.isCluster
+    })
+    .addSelect({
+      path: 'dstCluster',
+      name: 'Destination cluster',
+      description: 'Select the field to cluster the target by:',
+      category: DataCategory,
+      defaultValue: "",
+      settings: {
+        allowCustomValue: false,
+        options: [],
+        getOptions: async (context: FieldOverrideContext) => {
+          const options = [];
+          if (context && context.data) {
+            for (const frame of context.data) {
+              for (const field of frame.fields) {
+                const name = getFieldDisplayName(field, frame, context.data);
+                const value = name;
+                options.push({ value, label: name });
+              }
+            }
+          }
+          return Promise.resolve(options);
+        },
+      },
+      showIf: config => config.isCluster
     })
     .addSelect({
       path: 'pathField',

@@ -1,4 +1,4 @@
-import { calcStrokeWidth, getEvenlySpacedColors, addNodeSum, calcNodeRadius } from 'utils';
+import { calcStrokeWidth, getEvenlySpacedColors, addNodeSum, calcNodeRadius, clusterNodes } from 'utils';
 
 /**
  * Takes data from Grafana query and returns it in the format needed for this panel
@@ -22,17 +22,17 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
   const targetValues = allData.find((obj: { name: any; }) => obj.name === targetString)?.values
 
   // get the field that's neither used as source or dest
-  let additionalField = ""
+  let additionalFields = []
   if(allData.length > 3) {
     const usedFields = [sourceString, targetString, allData[allData.length -1].name]
     const compareArray = allData.map( (obj: any) => obj.name)
-    additionalField = compareArray.filter( (obj: any ) => !usedFields.includes(obj))[0]
+    additionalFields = compareArray.filter( (obj: any ) => !usedFields.includes(obj))
   }
 
   const hexColors = {
     nodeColor: theme.visualization.getColorByName(options.nodeColor),
   }
-
+  
   /********************************** Nodes **********************************/
   
     // get source and target arrays and create array of unique nodes from them
@@ -40,7 +40,9 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       id: index,
       name: str,
       sum: 0,
-      radius: 0
+      radius: 0,
+      cluster: "",
+      color: hexColors.nodeColor
     }));
 
   /********************************** Links **********************************/
@@ -56,16 +58,26 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     });
 
     let links = srcById.map((element: any, index: string | number) => ({
+      srcName: sourceValues.buffer[index],
+      dstName: targetValues.buffer[index],
       source: element,
       target: dstById[index],
       sum: allData.find((obj: { name: any; }) => obj.name === allData[allData.length -1].name)?.values.buffer[index] as number,
       strokeWidth: 0,
       color: allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).color,
-      field: (additionalField === "") ? [additionalField] : allData.find(( obj: any) => obj.name === additionalField).values.buffer[index],
       // for coloring the links by source, add a field with the name of the selected field
       [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values.buffer[index],
       displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix : ""}`
     }));
+
+    // assign additional fields
+    if(allData.length > 3) {
+      links.forEach( (link: any, index: string) => {
+        additionalFields.forEach(field => {
+          Object.assign(link, {field: allData.find((obj: { name: any; }) => obj.name === field)?.values.buffer[index]})
+        })
+      });
+    }
 
   /********************************** Colors **********************************/ 
 
@@ -104,8 +116,11 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       }
     });
 
-    // Add accumulated sums to nodes to calculate radius from
-    
+  /********************************** Node clustering **********************************/
+
+    if(options.isCluster) {
+      clusterNodes(uniqueNodes, links, options, theme, allData)
+    }
 
   /********************************** Bundle overlapping links **********************************/ 
 
@@ -119,6 +134,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
           }
         } else {
           acc.push({
+            srcName: cur.srcName,
+            dstName: cur.dstName,
             source: cur.source,
             target: cur.target,
             sum: cur.sum,
@@ -141,7 +158,10 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     addNodeSum(links, uniqueNodes)
     calcNodeRadius(uniqueNodes, links, options)
 
+
+
+
   /**********************************************************************************/
 
-  return {uniqueNodes, links, hexColors, additionalField};
+  return {uniqueNodes, links, hexColors, additionalFields};
 }

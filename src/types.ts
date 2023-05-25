@@ -28,4 +28,7 @@ export interface SimpleOptions {
   delimiter: string;
   pathField: string;
   yRad: number;
+  isCluster: boolean;
+  srcCluster: string;
+  dstCluster: string;
 }

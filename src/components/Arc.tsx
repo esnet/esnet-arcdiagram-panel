@@ -52,20 +52,29 @@ function Arc(props: any) {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target = idToName(targetId,uniqueNodes)
       toolTip.sum = displayValue!
-      if(props.parsedData.additionalField !== "") {
+      if(props.parsedData.additionalFields.length > 0) {
         if(props.graphOptions.hopMode) {
           toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}: </b>
                             {links.find((link: any) => link.id === Number(linkId))?.field}
                           </p>
         } else {
-          toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}</b>{links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)?.field
-                          .map((string: any, index: number) => (
-                            <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
-                              {string}
-                              <br />
-                            </p>
-                          ))}
-                          </p>
+          console.log(links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId))
+            toolTip.field = props.parsedData.additionalFields.map((field: any) => (
+                              
+                              <p><b style={styles.toolTipStyle.preface}>field</b>
+                                {
+                                links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)["meta.src_country_name.keyword"]
+                                .map((string: any, index: number) => (
+                                  <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
+                                    {string}
+                                    <br />
+                                  </p>
+                                ))
+                              }
+                              </p>
+
+                            ))
+                            
         }
       }
       
@@ -175,7 +184,7 @@ function Arc(props: any) {
       .attr("cx", (d, i) => values[i])
       .attr("cy", height-offsetBottom)
       .attr("r", (n: any) => { return  n?.radius })
-      .style("fill", props.graphOptions.nodeColor)
+      .style("fill", (d, i) => uniqueNodes[i].color)
       .attr("id", (d, i) => uniqueNodes[i].id)
       .attr("name", (d, i) => uniqueNodes[i].name)
       .attr("radius", (d, i) => uniqueNodes[i].radius);
@@ -417,7 +426,7 @@ function Arc(props: any) {
             <br/>
             <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
             <br/>
-            { props.parsedData.additionalField !== "" &&
+            { props.parsedData.additionalFields.length > 0 &&
               <p style={styles.toolTipStyle.text(props.zoom)} > {toolTip.field}</p>
             
             }</div>
