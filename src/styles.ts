@@ -31,7 +31,7 @@ export const styles = {
       text(zoom: boolean) {
         return {
           color: "black",
-        "font-size": (zoom) ? "5px" : "10px",
+        "font-size": "8px",
         margin: "0",
         "font-weight": "100"
         }

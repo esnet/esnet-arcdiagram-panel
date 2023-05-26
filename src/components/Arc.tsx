@@ -47,7 +47,7 @@ function Arc(props: any) {
       }
       toolTip.sum = uniqueNodes[sourceId].sum
       if(props.graphOptions.isCluster) {
-        toolTip.field = <p><b style={styles.toolTipStyle.preface}>Cluster: </b>{uniqueNodes[sourceId].cluster}</p>
+        toolTip.field = <p><b style={styles.toolTipStyle.preface}>Cluster: </b> {uniqueNodes[sourceId].cluster}</p>
       } else {
         toolTip.field = <p></p>
       }
@@ -57,16 +57,14 @@ function Arc(props: any) {
       toolTip.sum = displayValue!
       if(props.parsedData.additionalFields.length > 0) {
         if(props.graphOptions.hopMode) {
-          toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalField}: </b>
+          toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalFields[0]}: </b>
                             {links.find((link: any) => link.id === Number(linkId))?.field}
                           </p>
         } else {
             toolTip.field = props.parsedData.additionalFields.map((field: any) => (
                               
                               <p><b style={styles.toolTipStyle.preface}>{field}:</b>
-                                {
-                                  links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)[field]
-                                  .map((string: any, index: number) => (
+                              {links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)[field].map((string: any, index: number) => (
                                     <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
                                       {string}
                                       <br />
@@ -74,9 +72,7 @@ function Arc(props: any) {
                                   ))
                                 }
                               </p>
-
                             ))
-                            
         }
       }
       

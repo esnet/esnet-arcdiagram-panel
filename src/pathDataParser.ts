@@ -17,10 +17,12 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
   const paths = allData[0].values.buffer;
 
   // get the field that's neither used as source or dest
-  let additionalField = ""
+  let additionalFields = []
   if(allData.length > 2) {
-    additionalField = allData[1].name
+    additionalFields.push(allData[1].name)
   }
+  
+  console.log(additionalFields)
 
   const delimiter = options.delimiter === "space" ? " " : options.delimiter
 
@@ -30,14 +32,15 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
       id: index,
       name: str,
       sum: 1,
-      radius: 5
+      radius: 5,
+      color: options.nodeColor
     }));
-    
+
   /********************************** Links **********************************/
 
     const pathColors = getEvenlySpacedColors(paths.length, theme.isDark)
 
-    let links: { source: number | undefined; target: number | undefined; path: number; sum: number; strokeWidth: number; field: string; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }[] = [];
+    let links: { source: number | undefined; target: number | undefined; path: number; sum: number; strokeWidth: number; field: any[]; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }[] = [];
 
     paths.forEach((path: string, pathIndex: number) => {
       const pathNodes = path.split(' ');
@@ -55,7 +58,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
             target, 
             path: pathIndex,
             sum: allData[allData.length -1].values.buffer[pathIndex],
-            field: (additionalField === "") ? [additionalField] : allData.find(( obj: any) => obj.name === additionalField).values.buffer[pathIndex],
+            field: (additionalFields.length === 0) ? additionalFields : [allData.find(( obj: any) => obj.name === additionalFields[0]).values.buffer[pathIndex]],
             strokeWidth: 1,
             color: pathColors[pathIndex],
             displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix : ""}`,
@@ -120,5 +123,5 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
     calcNodeRadius(uniqueNodes, links, options)
   /**********************************************************************************/
-  return {uniqueNodes, links, additionalField};
+  return {uniqueNodes, links, additionalFields};
 }

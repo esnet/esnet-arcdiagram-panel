@@ -113,6 +113,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           }
         ],
       },
+      showIf: config => !config.isCluster,
     })
     .addSelect({
       path: 'colorConfigField',
