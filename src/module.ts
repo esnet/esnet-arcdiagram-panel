@@ -159,7 +159,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
     })
     .addSliderInput({
       path: 'yRad',
-      name: 'Specify the margin between overlapping links',
+      name: 'Margin between overlapping links',
       defaultValue: 1.3,
       settings: {
         min: 1,
@@ -171,13 +171,13 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
     })
     .addBooleanSwitch({
       path: 'search',
-      name: 'Activate search bar',
+      name: 'Show search bar',
       defaultValue: false,
       category: AppearanceCategory,
     })
     .addBooleanSwitch({
       path: 'zoom',
-      name: 'Activate zoom button',
+      name: 'Show zoom button',
       defaultValue: false,
       category: AppearanceCategory,
     })
