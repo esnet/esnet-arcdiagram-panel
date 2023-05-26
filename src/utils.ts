@@ -213,17 +213,18 @@ export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number
 
 export function clusterNodes(uniqueNodes: any[], links: any[], options: any, theme: any, allData: any) {
       
-      
     const srcCluster = allData.find((obj: { name: any; }) => obj.name === options.srcCluster)?.values.buffer
     const dstCluster = allData.find((obj: { name: any; }) => obj.name === options.dstCluster)?.values.buffer
 
     // add cluster to nodes
     for(let i = 0; i < links.length; i++) {
-        Object.assign(links[i], {[options.srcCluster]: srcCluster[i]})
-        Object.assign(links[i], {[options.dstCluster]: dstCluster[i]})
+        Object.assign(links[i], {[options.srcCluster]: []})
+        links[i][options.srcCluster].push(srcCluster[i])
+        Object.assign(links[i], {[options.dstCluster]: []})
+        links[i][options.dstCluster].push(dstCluster[i])
 
-        uniqueNodes[links[i].source].cluster = links[i][options.srcCluster]
-        uniqueNodes[links[i].target].cluster = links[i][options.dstCluster]
+        uniqueNodes[links[i].source].cluster = links[i][options.srcCluster][0]
+        uniqueNodes[links[i].target].cluster = links[i][options.dstCluster][0]
     }
 
     // order 

@@ -70,11 +70,11 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).suffix : ""}`
     }));
 
-    // assign additional fields
-    if(allData.length > 3) {
-      links.forEach( (link: any, index: string) => {
-        additionalFields.forEach(field => {
-          Object.assign(link, {field: allData.find((obj: { name: any; }) => obj.name === field)?.values.buffer[index]})
+    if(!options.isCluster) {
+      links.forEach((link: any, index: number) => {
+        additionalFields.forEach( field => {
+          Object.assign(link, {[field]: []})
+          link[field].push(allData.find((obj: { name: any; }) => obj.name === field)?.values.buffer[index])
         })
       });
     }
@@ -126,14 +126,20 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
 
     if(allData.length > 3) {
 
-      const uniqueLinks = links.reduce((acc: any, cur: any) => {
+      const uniqueLinks = links.reduce((acc: any, cur: any, index: number) => {
         const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
         if (existing) {
-          if (!existing.field.includes(cur.field)) {
-            existing.field.push(cur.field);
-          }
+          console.log(existing)
+          additionalFields.forEach(field => {
+            if (!existing[field].includes(cur[field])) {
+              cur[field].forEach(fieldEntry => {
+                existing[field].push(fieldEntry);
+              });
+            }
+          })
+          
         } else {
-          acc.push({
+          const addLink = {
             srcName: cur.srcName,
             dstName: cur.dstName,
             source: cur.source,
@@ -142,9 +148,13 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
             displayValue: cur.displayValue,
             strokeWidth: 0,
             color: cur.color,
-            field: [cur.field],
             [options.colorConfigField]: cur[options.colorConfigField]
-          });
+          }
+          additionalFields.forEach(field => {
+            Object.assign(addLink, {[field]: []})
+            addLink[field] = cur[field]
+          })
+          acc.push(addLink);
         }
         return acc;
       }, []);
@@ -158,8 +168,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     addNodeSum(links, uniqueNodes)
     calcNodeRadius(uniqueNodes, links, options)
 
-
-
+    console.log(links)
 
   /**********************************************************************************/
 

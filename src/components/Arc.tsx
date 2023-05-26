@@ -45,9 +45,12 @@ function Arc(props: any) {
       } else if (nodeTargets.length === 1) {
         toolTip.target = idToName(nodeTargets[0], uniqueNodes)
       }
-      // reset metric and field  
       toolTip.sum = uniqueNodes[sourceId].sum
-      toolTip.field = <p></p>
+      if(props.graphOptions.isCluster) {
+        toolTip.field = <p><b style={styles.toolTipStyle.preface}>Cluster: </b>{uniqueNodes[sourceId].cluster}</p>
+      } else {
+        toolTip.field = <p></p>
+      }
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target = idToName(targetId,uniqueNodes)
@@ -58,19 +61,18 @@ function Arc(props: any) {
                             {links.find((link: any) => link.id === Number(linkId))?.field}
                           </p>
         } else {
-          console.log(links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId))
             toolTip.field = props.parsedData.additionalFields.map((field: any) => (
                               
-                              <p><b style={styles.toolTipStyle.preface}>field</b>
+                              <p><b style={styles.toolTipStyle.preface}>{field}:</b>
                                 {
-                                links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)["meta.src_country_name.keyword"]
-                                .map((string: any, index: number) => (
-                                  <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
-                                    {string}
-                                    <br />
-                                  </p>
-                                ))
-                              }
+                                  links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)[field]
+                                  .map((string: any, index: number) => (
+                                    <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
+                                      {string}
+                                      <br />
+                                    </p>
+                                  ))
+                                }
                               </p>
 
                             ))
@@ -428,7 +430,6 @@ function Arc(props: any) {
             <br/>
             { props.parsedData.additionalFields.length > 0 &&
               <p style={styles.toolTipStyle.text(props.zoom)} > {toolTip.field}</p>
-            
             }</div>
         )}
       </div>      
