@@ -42,7 +42,10 @@ input::placeholder { /* Most modern browsers support this now. */
 }
 
 #canvas {
-  overflow: scroll;
-  overflow-y: hidden;
+  overflow: hidden;
   transform-origin: left;
+}
+
+#scroll-box {
+  overflow: scroll
 }

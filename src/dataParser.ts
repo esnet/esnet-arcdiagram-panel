@@ -129,6 +129,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       const uniqueLinks = links.reduce((acc: any, cur: any, index: number) => {
         const existing = acc.find((e: any) => e.source === cur.source && e.target === cur.target);
         if (existing) {
+          console.log(existing)
           additionalFields.forEach(field => {
             if (!existing[field].includes(cur[field])) {
               cur[field].forEach(fieldEntry => {

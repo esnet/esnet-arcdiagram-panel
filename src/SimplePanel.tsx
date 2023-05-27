@@ -39,9 +39,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
 
   const theme = useTheme2();
 
-  if (data.series[0].fields.length > 4  && !options.isCluster) {
-    return <div>4th group by not supported</div>;
-  }
+ 
 
   if (options.isCluster && data.series[0].fields.length < 5) {
     return <div>Node clustering requires a 4th group by</div>;
@@ -55,8 +53,6 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
     return <div>Choose fields for clustering</div>;
   }
 
-
-
   // check if source equals dst
   if(!options.hopMode) {
     const source = options.src ? data.series[0].fields.find((obj: { name: any; }) => obj.name === options.src).name : data.series[0].fields[0].name;
@@ -65,8 +61,12 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
     if (source === target) {
       return <div>Source equals target</div>;
     }
+
+    if(options.srcCluster === source || options.srcCluster === target || options.dstCluster === source || options.dstCluster === target) {
+      return <div>Fields for clustering can't be links source or target fields</div>;
+    }
   }
-  
+
   let parsedData: { uniqueNodes: any[]; links: any[] } = {
     uniqueNodes: [],
     links: []
@@ -91,7 +91,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
   const textColor = theme.colors.text.primary;
 
   return (
-    <div style={styles.panelContainerStyle}>
+    <div id='scroll-box' style={styles.panelContainerStyle}>
       <Arc
         textColor={textColor}
         parsedData={parsedData}
