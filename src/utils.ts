@@ -188,6 +188,7 @@ export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number
         if (nodesCrossed > maxNodesCrossed) {
             maxNodesCrossed = nodesCrossed;
             maxArc = link;
+            console.log(maxArc)
         }
     }
 
@@ -197,11 +198,11 @@ export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number
 
     const longestName = nodes.reduce((acc, curr) => {
         if (curr.name.length > acc.name.length) {
-          return curr;
+            return curr;
         } else {
-          return acc;
+            return acc;
         }
-      }).name;
+    }).name;
     
     // * 3.77 maps string to pixels, * 1.6 maps to highlighted tag
     const longestNameSize = longestName.length * 3.77 * 1.6

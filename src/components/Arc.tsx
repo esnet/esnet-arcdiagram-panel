@@ -154,7 +154,7 @@ function Arc(props: any) {
     // after the labels are rendered, we can find out the amount of margin we need to apply
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
     // the boundingbox of the largest highlighted label and the most left label
-    let offsetBottom = Math.max(...Array.from($("text"), (text) => text.getBoundingClientRect().height));
+    let offsetBottom = Math.max(...Array.from(document.querySelectorAll(`[data-panelid="${props.panelId}"] text`), (text) => text.getBoundingClientRect().height));
     // Map to highlighted labels (size increases by 60%)
     offsetBottom*=1.6
 
