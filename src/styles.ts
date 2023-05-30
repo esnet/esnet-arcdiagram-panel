@@ -28,10 +28,10 @@ export const styles = {
         "border-radius": "5px",
         opacity: 0.9
       } as React.CSSProperties,
-      text(zoom: boolean) {
+      text(fontSize: number) {
         return {
           color: "black",
-        "font-size": "8px",
+        "font-size": `${fontSize}px`,
         margin: "0",
         "font-weight": "100"
         }

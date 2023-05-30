@@ -419,14 +419,14 @@ function Arc(props: any) {
         </div> 
         {showTooltip && (
           <div ref={tooltipRef} style={styles.toolTipStyle.box} id='tooltip'>
-            <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipSource}</b> {" "}{toolTip.source}</p>
+            <p style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipSource}</b> {" "}{toolTip.source}</p>
             <br/>
-            <div style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>
+            <div style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>
             <br/>
-            <p style={styles.toolTipStyle.text(props.zoom)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
+            <p style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
             <br/>
             { props.parsedData.additionalFields.length > 0 &&
-              <p style={styles.toolTipStyle.text(props.zoom)} > {toolTip.field}</p>
+              <p style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} > {toolTip.field}</p>
             }</div>
         )}
       </div>      

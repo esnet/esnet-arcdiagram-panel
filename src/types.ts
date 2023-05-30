@@ -33,4 +33,5 @@ export interface SimpleOptions {
   dstCluster: string;
   marginLeft: number;
   marginRight: number;
+  tooltipFontSize: number;
 }

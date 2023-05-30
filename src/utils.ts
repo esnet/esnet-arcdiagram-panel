@@ -188,7 +188,6 @@ export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number
         if (nodesCrossed > maxNodesCrossed) {
             maxNodesCrossed = nodesCrossed;
             maxArc = link;
-            console.log(maxArc)
         }
     }
 

@@ -158,6 +158,17 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       category: AppearanceCategory,
     })
     .addSliderInput({
+      path: 'tooltipFontSize',
+      name: 'Tooltip font size',
+      defaultValue: 8,
+      settings: {
+        min: 8,
+        max: 20,
+        step: 1,
+      },
+      category: AppearanceCategory,
+    })
+    .addSliderInput({
       path: 'yRad',
       name: 'Margin between overlapping links',
       defaultValue: 1.3,
