@@ -76,7 +76,7 @@ export function calcStrokeWidth(arcFromSource: boolean, scale: string, arcThickn
     }
 }
 
-export function replaceEllipsis(label: SVGTextElement, isHighlighted: Boolean){
+export function replaceEllipsis(label: Element, isHighlighted: Boolean){
 
     const labelBoundingBox = label.getBoundingClientRect().width * (isHighlighted ? 1.6 : 1);
     const mapRatio = (isHighlighted ? 0.2 : 0.3);
@@ -92,7 +92,7 @@ export function replaceEllipsis(label: SVGTextElement, isHighlighted: Boolean){
     }
 }
 
-export function resetLabel(label: SVGTextElement) {
+export function resetLabel(label: Element) {
     label.innerHTML = label.getAttribute("name")!;
 }
 

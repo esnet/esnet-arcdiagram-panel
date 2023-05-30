@@ -31,4 +31,6 @@ export interface SimpleOptions {
   isCluster: boolean;
   srcCluster: string;
   dstCluster: string;
+  marginLeft: number;
+  marginRight: number;
 }

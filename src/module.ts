@@ -169,6 +169,28 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       showIf: config => config.hopMode,
       category: AppearanceCategory,
     })
+    .addSliderInput({
+      path: 'marginLeft',
+      name: 'Margin from left border',
+      defaultValue: 50,
+      settings: {
+        min: 0,
+        max: 200,
+        step: 1,
+      },
+      category: AppearanceCategory,
+    })
+    .addSliderInput({
+      path: 'marginRight',
+      name: 'Margin from right border',
+      defaultValue: 50,
+      settings: {
+        min: 0,
+        max: 200,
+        step: 1,
+      },
+      category: AppearanceCategory,
+    })
     .addBooleanSwitch({
       path: 'search',
       name: 'Show search bar',

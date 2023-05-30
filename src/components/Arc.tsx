@@ -44,6 +44,8 @@ function Arc(props: any) {
                         ))
       } else if (nodeTargets.length === 1) {
         toolTip.target = idToName(nodeTargets[0], uniqueNodes)
+      } else {
+        toolTip.target = "";
       }
       toolTip.sum = uniqueNodes[sourceId].sum
       if(props.graphOptions.isCluster) {
@@ -125,8 +127,6 @@ function Arc(props: any) {
     const width = props.width,
     height = props.height
 
-    
-
     const container = containerRef.current,
     graph = gRef.current,
     labelBox = labelRef.current;
@@ -159,14 +159,14 @@ function Arc(props: any) {
     offsetBottom*=1.6
 
     // get array of equally spaced values for positioning of graph on x axis
-    const values = linSpace(50, width-50, uniqueNodes.length);
+    const values = linSpace(props.graphOptions.marginLeft, width-props.graphOptions.marginRight, uniqueNodes.length);
 
     // Update the labels position
     d3.selectAll(`[data-panelid="${props.panelId}"] text`)
     .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-45)"))
 
     // check if label is out of bounds
-    const labelsAsHtml = document.getElementsByTagName("text")
+    const labelsAsHtml = document.querySelectorAll(`[data-panelid="${props.panelId}"] text`)
     Array.from(labelsAsHtml).forEach(element => {
       replaceEllipsis(element, false)
     });
