@@ -70,7 +70,7 @@ export const styles = {
       display: "inline-block"
     } as React.CSSProperties,
     zoomButtonStyle(isDarkMode: boolean, position: number) {
-      var styles, borderRadius = "30px", padding = "5px"
+      let styles, borderRadius = "30px", padding = "5px"
       styles = {
         display: "inline-block",
         "background-color": isDarkMode ? "rgba(244, 245, 245, 0.83)" : "black",
