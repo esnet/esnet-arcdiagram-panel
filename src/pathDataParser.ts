@@ -40,7 +40,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
     const pathColors = getEvenlySpacedColors(paths.length, theme.isDark)
 
-    let links: { source: number | undefined; target: number | undefined; path: number; sum: number; strokeWidth: number; field: Array<any>; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }[] = [];
+    let links: Array<{ source: number | undefined; target: number | undefined; path: number; sum: number; strokeWidth: number; field: any[]; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }> = [];
 
     paths.forEach((path: string, pathIndex: number) => {
       const pathNodes = path.split(' ');

@@ -65,7 +65,7 @@ function Arc(props: any) {
         } else {
             toolTip.field = props.parsedData.additionalFields.map((field: any, index: number) => (
                               
-                              <p><b style={styles.toolTipStyle.preface} key={index}>{field}:</b>
+                              <p key={index}><b style={styles.toolTipStyle.preface}>{field}:</b>
                               {links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)[field].map((string: any, index: number) => (
                                     <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
                                       {string}
