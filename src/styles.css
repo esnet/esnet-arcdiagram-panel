@@ -43,7 +43,7 @@ input::placeholder { /* Most modern browsers support this now. */
 
 #canvas {
   overflow: hidden;
-  transform-origin: left;
+  transform-origin: -50px -50px;
 }
 
 #scroll-box {
