@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
-import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery, handleZoom, getQueryMatches } from 'utils';
+import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery, handleZoom, getQueryMatches, calcBottomOffset } from 'utils';
 import '../styles.css'
 import { styles } from 'styles'
 
@@ -140,8 +140,8 @@ function Arc(props: any) {
       .enter()
       .append("text")
       // if node has large radius, offset the label for readability
-      .attr("x", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 5 ? -(uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*1.5) : -10 })
-      .attr("y", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 5 ? (uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*1.5) : 10 })
+      .attr("x", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 7 ? -(uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*1.6) : -10 })
+      .attr("y", (d: any) => { return uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius >= 7 ? (uniqueNodes.find((e: { id: any; }) => e.id === d.id).radius*0.8) : 10 })
       .text((d, i) => uniqueNodes[i].name)
       .style("text-anchor", "end")
       .attr('fill', () => {return props.isDarkMode ? "white" : "black"})
@@ -151,25 +151,27 @@ function Arc(props: any) {
       .attr('name', (d, i) => { return uniqueNodes[i].name })
       .attr('id', (d, i) => { return i })
 
-    // after the labels are rendered, we can find out the amount of margin we need to apply
-    // from the bottom and left so that the diagram is readable. The amount is being calculated from
-    // the boundingbox of the largest highlighted label and the most left label
-    let offsetBottom = Math.max(...Array.from(document.querySelectorAll(`[data-panelid="${props.panelId}"] text`), (text) => text.getBoundingClientRect().height));
-    // Map to highlighted labels (size increases by 60%)
-    offsetBottom*=1.6
-
     // get array of equally spaced values for positioning of graph on x axis
     const values = linSpace(props.graphOptions.marginLeft, width-props.graphOptions.marginRight, uniqueNodes.length);
+
+    const labelsAsHtml = document.querySelectorAll(`[data-panelid="${props.panelId}"] text`)
+
+    let offsetBottom = calcBottomOffset(labelsAsHtml)
+
+    // Update the labels position
+    d3.selectAll(`[data-panelid="${props.panelId}"] text`)
+    .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-calcBottomOffset(labelsAsHtml)) + ")rotate(-45)"))
+
+    // check if label is out of bounds
+    Array.from(labelsAsHtml).forEach(element => {
+      replaceEllipsis(element, false)
+    });
+
+    offsetBottom = calcBottomOffset(labelsAsHtml)
 
     // Update the labels position
     d3.selectAll(`[data-panelid="${props.panelId}"] text`)
     .attr('transform', (d, i) => ("translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-45)"))
-
-    // check if label is out of bounds
-    const labelsAsHtml = document.querySelectorAll(`[data-panelid="${props.panelId}"] text`)
-    Array.from(labelsAsHtml).forEach(element => {
-      replaceEllipsis(element, false)
-    });
 
     // render nodes
     const svg = d3.select(container)
@@ -299,6 +301,7 @@ function Arc(props: any) {
       })
       .on('mouseout', function (d) {
         const nodeTargets = getNodeTargets({ id: Number(d.srcElement.id), links })
+        replaceEllipsis(labelsAsHtml[d.srcElement.id], false)
         resetLabel(labelsAsHtml[d.srcElement.id])
         nodeTargets.forEach(e => {
           resetLabel(labelsAsHtml[e])

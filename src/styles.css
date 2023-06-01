@@ -44,6 +44,7 @@ input::placeholder { /* Most modern browsers support this now. */
 #canvas {
   overflow: hidden;
   transform-origin: -50px -50px;
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) 0s;
 }
 
 #scroll-box {

@@ -269,6 +269,17 @@ export function clusterNodes(uniqueNodes: any[], links: any[], options: any, the
       link.target = uniqueNodes.find(node => node.name === link.dstName).id
 
     });
-
 }
+
+export function calcBottomOffset(labels: NodeListOf<Element>) {
+    // after the labels are rendered, we can find out the amount of margin we need to apply
+    // from the bottom and left so that the diagram is readable. The amount is being calculated from
+    // the boundingbox of the largest highlighted label
+    let labelHeights = Array.from(labels, (label) => label.getBoundingClientRect().height);
+    // Map to highlighted labels (size increases by 60%)
+    let offsetBottom = Math.max(...labelHeights)
+    offsetBottom*=1.6
+    return offsetBottom
+}
+    
 
