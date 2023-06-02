@@ -98,7 +98,7 @@ export function resetLabel(label: Element) {
 
 export function evaluateQuery(query: string, nodeList: any[], labels: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, links: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, nodes: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, arcOpacity: number) {
     let matches = nodeList.map(({ name, id }) => ({ name, id }));
-    matches = matches.filter((e: any) => e.name.toLowerCase().includes(query.toLowerCase()))
+    matches = matches.filter((e: any) => String(e.name).toLowerCase().includes(query.toLowerCase()))
     const numericalMatches = new Set(matches.map((e: any) => e.id));
     
     if (query) {
@@ -122,7 +122,7 @@ export function evaluateQuery(query: string, nodeList: any[], labels: d3.Selecti
 
 export function getQueryMatches(query: string, nodeList: any[]) {
     let matches = nodeList.map(({ name, id }) => ({ name, id }));
-    matches = matches.filter((e: any) => e.name.toLowerCase().includes(query.toLowerCase()))
+    matches = matches.filter((e: any) => String(e.name).toLowerCase().includes(query.toLowerCase()))
     const numericalMatches = new Set(matches.map((e: any) => e.id));
     return numericalMatches;
 }
@@ -180,20 +180,23 @@ export function calcNodeRadius(uniqueNodes: any[], links: any[], options: any) {
 }
 
 export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number) {
-    let maxNodesCrossed = 0;
-    let maxArc = null;
+    let maxArcHeight = 0
+    if(links.length !== 0) {
+        let maxNodesCrossed = 0;
+        let maxArc = null;
 
-    for (const link of links) {
-        const nodesCrossed = Math.abs(link.target - link.source);
-        if (nodesCrossed > maxNodesCrossed) {
-            maxNodesCrossed = nodesCrossed;
-            maxArc = link;
+        for (const link of links) {
+            const nodesCrossed = Math.abs(link.target - link.source);
+            if (nodesCrossed > maxNodesCrossed) {
+                maxNodesCrossed = nodesCrossed;
+                maxArc = link;
+            }
         }
+    
+        const maxArcDistance = maxArc.target - maxArc.source
+        const step = (panelWidth-50 - 50) / (nodes.length - 1);
+        maxArcHeight = (maxArcDistance * step) / 2
     }
-
-    const maxArcDistance = maxArc.target - maxArc.source
-    const step = (panelWidth-50 - 50) / (nodes.length - 1);
-    const maxArcHeight = (maxArcDistance * step) / 2
 
     const longestName = nodes.reduce((acc, curr) => {
         if (curr.name.length > acc.name.length) {
@@ -206,8 +209,8 @@ export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number
     // * 3.77 maps string to pixels, * 1.6 maps to highlighted tag
     const longestNameSize = longestName.length * 3.77 * 1.6
     // 31.99px is the height of the panel title
-    const graphHeight =  maxArcHeight + longestNameSize + 31.99
-
+    const graphHeight = maxArcHeight + longestNameSize + 31.99
+    
     return graphHeight
 }
 

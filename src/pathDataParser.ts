@@ -22,8 +22,6 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
     additionalFields.push(allData[1].name)
   }
   
-  console.log(additionalFields)
-
   const delimiter = options.delimiter === "space" ? " " : options.delimiter
 
   /********************************** Nodes **********************************/
@@ -43,7 +41,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
     let links: Array<{ source: number | undefined; target: number | undefined; path: number; sum: number; strokeWidth: number; field: any[]; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }> = [];
 
     paths.forEach((path: string, pathIndex: number) => {
-      const pathNodes = path.split(' ');
+      const pathNodes = String(path).split(' ');
 
       for (let i = 0; i < pathNodes.length; i++) {
         const source = uniqueNodes.find( (node: any) => node.name === pathNodes[i])?.id;

@@ -38,7 +38,7 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     // get source and target arrays and create array of unique nodes from them
     const uniqueNodes = Array.from([...new Set([...sourceValues, ...targetValues])]).map((str, index) => ({
       id: index,
-      name: str,
+      name: (str),
       sum: 0,
       radius: 0,
       cluster: "",

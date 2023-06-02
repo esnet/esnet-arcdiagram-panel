@@ -214,6 +214,27 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: false,
       category: AppearanceCategory,
     })
+    .addTextInput({
+      path: "toolTipSource",
+      name: 'Tooltip source',
+      category: AppearanceCategory,
+      defaultValue: "From: ",
+      description: 'Text to be displayed infront of target node.',
+    })
+    .addTextInput({
+      path: "toolTipTarget",
+      name: 'Tooltip target',
+      category: AppearanceCategory,
+      defaultValue: "To: ",
+      description: 'Text to be displayed infront of source node.',
+    })
+    .addTextInput({
+      path: "toolTipMetric",
+      name: 'Tooltip metric',
+      category: AppearanceCategory,
+      defaultValue: "Sum: ",
+      description: 'Text to be displayed infront of metric.',
+    })
     .addSelect({
       path: 'scale',
       name: 'Scaling',
@@ -384,27 +405,6 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         },
       },
       showIf: config => !config.hopMode
-    })
-    .addTextInput({
-      path: "toolTipSource",
-      name: 'Tooltip text',
-      category: DataCategory,
-      defaultValue: "From: ",
-      description: 'Text to be displayed infront of target node.',
-    })
-    .addTextInput({
-      path: "toolTipTarget",
-      name: 'Tooltip text',
-      category: DataCategory,
-      defaultValue: "To: ",
-      description: 'Text to be displayed infront of source node.',
-    })
-    .addTextInput({
-      path: "toolTipMetric",
-      name: 'Tooltip text',
-      category: DataCategory,
-      defaultValue: "Sum: ",
-      description: 'Text to be displayed infront of metric.',
     })
 })
 .useFieldConfig({

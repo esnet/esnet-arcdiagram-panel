@@ -229,9 +229,11 @@ function Arc(props: any) {
     const paths = d3.selectAll(`[data-panelid="${props.panelId}"] path`)
     const labels = d3.selectAll(`[data-panelid="${props.panelId}"] text`)
     const duration = 200;
+
+    const isQuery = props.query.length !==0
     const queryMatches = getQueryMatches(props.query, uniqueNodes)
 
-      nodes
+    nodes
       .on("mouseover", function (d) {
         // Tooltip
 
@@ -245,7 +247,7 @@ function Arc(props: any) {
         })
         nodes
           .style("opacity", ( n: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return queryMatches.has(n.id) ? 1 : 0.1
             } else {
               return nodeTargets.includes(n.id) ? 1 : 0.1
@@ -254,7 +256,7 @@ function Arc(props: any) {
           })
           .transition()
           .attr("r", (n: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return uniqueNodes[n.id].radius
             } else {
               return nodeTargets.includes(n.id) ? uniqueNodes[n.id].radius*2 : uniqueNodes[n.id].radius
@@ -269,7 +271,7 @@ function Arc(props: any) {
         paths
           .transition()
           .style('opacity', (l: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
             } else {
               /* eslint-disable eqeqeq */
@@ -285,14 +287,14 @@ function Arc(props: any) {
           .transition()
           .duration(duration)
           .attr("font-size", (label_d: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return label_d.name === d.srcElement.getAttribute("name") ? props.graphOptions.fontSize*1.6 : props.graphOptions.fontSize
             } else {
               return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? props.graphOptions.fontSize*1.6 : props.graphOptions.fontSize
             }
           })
           .style("opacity", (label_d: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return label_d.name === d.srcElement.getAttribute("name") ? 1 : .1
             } else {
               return label_d.name === d.srcElement.getAttribute("name") || nodeTargets.includes(label_d.id) ? 1 : .1
@@ -314,7 +316,7 @@ function Arc(props: any) {
             return uniqueNodes[n.id].radius
           })
           .style("opacity",(n: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return queryMatches.has(n.id) ? 1 : .1
             } else {
               return 1
@@ -328,7 +330,7 @@ function Arc(props: any) {
           .transition()
           .duration(duration)
           .style("opacity",(l: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
             } else {
               return props.graphOptions.arcOpacity
@@ -342,7 +344,7 @@ function Arc(props: any) {
           .duration(duration)
           .attr("font-size", props.graphOptions.fontSize)
           .style("opacity",(l: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return queryMatches.has(l.id) ? 1 : .1
             } else {
               return 1
@@ -357,7 +359,7 @@ function Arc(props: any) {
         updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")), d.srcElement.getAttribute("displayValue"), d.srcElement.id);
         paths
           .style("opacity",(l: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
             } else if (props.graphOptions.hopMode) {
               return Number(d.srcElement.getAttribute("path")) === l.path ? props.graphOptions.arcOpacity : .1
@@ -378,7 +380,7 @@ function Arc(props: any) {
           .transition()
           .duration(duration)
           .style("opacity",(l: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
             } else {
               return props.graphOptions.arcOpacity
@@ -390,7 +392,7 @@ function Arc(props: any) {
         d3.select(this)
           .transition()
           .style("opacity",(l: any) => {
-            if(props.query.length !==0) {
+            if(isQuery) {
               return queryMatches.has(l.source) || queryMatches.has(l.target) ? props.graphOptions.arcOpacity : .1
             } else {
               return props.graphOptions.arcOpacity
@@ -402,7 +404,7 @@ function Arc(props: any) {
           })
       })    
 
-    if(props.graphOptions.search) {evaluateQuery(props.query,uniqueNodes, labels, paths, nodes, props.graphOptions.arcOpacity)}
+    if(props.graphOptions.search && isQuery) {evaluateQuery(props.query,uniqueNodes, labels, paths, nodes, props.graphOptions.arcOpacity)}
 
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [props.graphOptions, links, props.height, props.width, uniqueNodes]);
