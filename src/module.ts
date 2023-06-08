@@ -52,6 +52,36 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: false,
       category: AppearanceCategory,
     })
+    .addBooleanSwitch({
+      path: 'radiusFromSource',
+      name: 'Node radius from source',
+      defaultValue: false,
+      category: AppearanceCategory,
+      showIf: config => !config.hopMode
+    })
+    .addSelect({
+      path: 'arcWeightSource',
+      name: 'Weight field',
+      description: 'Select a field for the arc and node weight (has to be a metric):',
+      category: AppearanceCategory,
+      settings: {
+        allowCustomValue: false,
+        options: [],
+        getOptions: async (context: FieldOverrideContext) => {
+          const options = [];
+          if (context && context.data) {
+            for (const frame of context.data) {
+              for (const field of frame.fields) {
+                const value = field.name;
+                options.push({ value, label: value });
+              }
+            }
+          }
+          return Promise.resolve(options);
+        },
+      },
+      showIf: config => config.arcFromSource || config.radiusFromSource,
+    })
     .addSliderInput({
       path: 'arcThickness',
       name: 'Arc thickness',
@@ -74,13 +104,6 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         step: .1,
       },
       category: AppearanceCategory,
-    })
-    .addBooleanSwitch({
-      path: 'radiusFromSource',
-      name: 'Node radius from source',
-      defaultValue: false,
-      category: AppearanceCategory,
-      showIf: config => !config.hopMode
     })
     .addSliderInput({
       path: 'nodeRadius',
@@ -227,13 +250,6 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       category: AppearanceCategory,
       defaultValue: "To: ",
       description: 'Text to be displayed infront of source node.',
-    })
-    .addTextInput({
-      path: "toolTipMetric",
-      name: 'Tooltip metric',
-      category: AppearanceCategory,
-      defaultValue: "Sum: ",
-      description: 'Text to be displayed infront of metric.',
     })
     .addSelect({
       path: 'scale',

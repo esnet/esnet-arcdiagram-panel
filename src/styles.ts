@@ -48,7 +48,6 @@ export const styles = {
       display: "inline-block",
       margin: "0em 1em",
       "vertical-align": "middle",
-      "border-radius": "30px"
     } as React.CSSProperties,
     inputStyle(isDarkMode: boolean) {
       return {
@@ -56,7 +55,8 @@ export const styles = {
         height: "40px",
         background: (isDarkMode) ? "rgb(244 245 245 / 83%)" : "hsla(0, 0%, 0%, 1)",
         color: (isDarkMode) ? "black" : "white",
-        padding: "1em"
+        padding: "1em",
+        "border-radius": "30px"
       }
     },
     toolBarStyle: {

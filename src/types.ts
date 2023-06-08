@@ -34,4 +34,5 @@ export interface SimpleOptions {
   marginLeft: number;
   marginRight: number;
   tooltipFontSize: number;
+  arcWeightSource: number;
 }

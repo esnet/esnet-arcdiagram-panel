@@ -46,7 +46,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
   }
 
   if (options.isCluster && data.series[0].fields.length > 5) {
-    return <div>Node clustering does not support a 5th group by</div>;
+    //return <div>Node clustering does not support a 5th group by</div>;
   }
 
   if (options.isCluster && (options.srcCluster === ""  || options.dstCluster === "")) {

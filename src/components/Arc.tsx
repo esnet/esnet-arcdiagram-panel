@@ -7,7 +7,6 @@ import { styles } from 'styles'
 let toolTip = {
   source: "",
   target: <p></p> as ReactNode,
-  sum: "",
   field: <p></p> as ReactNode,
   pos: [0,0]
 }
@@ -47,36 +46,29 @@ function Arc(props: any) {
       } else {
         toolTip.target = "";
       }
-      toolTip.sum = uniqueNodes[sourceId].sum
       if(props.graphOptions.isCluster) {
         toolTip.field = <p><b style={styles.toolTipStyle.preface}>Cluster: </b> {uniqueNodes[sourceId].cluster}</p>
       } else {
-        toolTip.field = <p></p>
+        toolTip.field = <p><b style={styles.toolTipStyle.preface}>Weight: </b>{uniqueNodes[sourceId].sum}</p>
       }
     } else {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target = idToName(targetId,uniqueNodes)
-      toolTip.sum = displayValue!
-      if(props.parsedData.additionalFields.length > 0) {
-        if(props.graphOptions.hopMode) {
-          toolTip.field = <p><b style={styles.toolTipStyle.preface}>{props.parsedData.additionalFields[0]}: </b>
-                            {links.find((link: any) => link.id === Number(linkId))?.field}
-                          </p>
-        } else {
-            toolTip.field = props.parsedData.additionalFields.map((field: any, index: number) => (
-                              
-                              <p key={index}><b style={styles.toolTipStyle.preface}>{field}:</b>
-                              {links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId)[field].map((string: any, index: number) => (
-                                    <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
-                                      {string}
-                                      <br />
-                                    </p>
-                                  ))
-                                }
+     
+      const hoverLink = (links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId))
+      toolTip.field = props.parsedData.fields.map((field: any, index: number) => (    
+                        <p key={index}><b style={styles.toolTipStyle.preface}>{field.displayName}:</b>
+                        {hoverLink[`${field.field}Display`].map((string: any, index: number) => (
+                              <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
+                                {string}
+                                <br />
                               </p>
                             ))
-        }
-      }
+                          }
+                        </p>
+                      ))
+      
+      
       
     }
    
@@ -428,11 +420,8 @@ function Arc(props: any) {
             <br/>
             <div style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>
             <br/>
-            <p style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipMetric}</b> {toolTip.sum}</p>
-            <br/>
-            { props.parsedData.additionalFields.length > 0 &&
-              <p style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} > {toolTip.field}</p>
-            }</div>
+            <p style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} > {toolTip.field}</p>
+          </div>
         )}
       </div>      
   );

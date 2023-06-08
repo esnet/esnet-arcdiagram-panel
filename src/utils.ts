@@ -18,7 +18,6 @@ export function getNodeTargets({ id, links }: { id: number; links: any[]; }): nu
 
 // map number to log
 export function mapToLogRange(value: number, rangeMin: number, rangeMax: number,  minLinkSum: number, maxLinkSum: number) {
-    
     const logMinValue = Math.log10(minLinkSum);
     const logMaxValue = Math.log10(maxLinkSum);
     const logRange = logMaxValue - logMinValue;
@@ -66,10 +65,10 @@ export function calcStrokeWidth(arcFromSource: boolean, scale: string, arcThickn
     if(arcFromSource) {
         // check if we apply logarithmic or linear scaling
         if(scale === "log") {
-            e.strokeWidth = mapToLogRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)          
+            e.strokeWidth = mapToLogRange(e.arcWeightValue, linkScaleFrom, linkScaleTo, minLink, maxLink)
         } else {
             // call function to map to lin range instead
-            e.strokeWidth = mapToLinRange(e.sum, linkScaleFrom, linkScaleTo, minLink, maxLink)
+            e.strokeWidth = mapToLinRange(e.arcWeightValue, linkScaleFrom, linkScaleTo, minLink, maxLink)
         }
     } else {
         e.strokeWidth = arcThickness
@@ -136,18 +135,18 @@ export function addNodeSum(links: any[], uniqueNodes: any[]) {
     const nodeSums: {[key: number]: number} = {};
 
     // Loop through links array and populate nodeSums object
-    links.forEach((link: { source: any; target: any; sum: any; }) => {
-        const {source, target, sum} = link;
+    links.forEach((link: { source: any; target: any; arcWeightValue: any; }) => {
+        const {source, target, arcWeightValue} = link;
         if (nodeSums[source]) {
-            nodeSums[source] += sum;
+            nodeSums[source] += arcWeightValue;
         } else {
-            nodeSums[source] = sum;
+            nodeSums[source] = arcWeightValue;
         }
         
         if (nodeSums[target]) {
-            nodeSums[target] += sum;
+            nodeSums[target] += arcWeightValue;
         } else {
-            nodeSums[target] = sum;
+            nodeSums[target] = arcWeightValue;
         }
     });
 
@@ -283,6 +282,23 @@ export function calcBottomOffset(labels: NodeListOf<Element>) {
     let offsetBottom = Math.max(...labelHeights)
     offsetBottom*=1.6
     return offsetBottom
+}
+
+export function getFieldDisplayNames(allData: any[], sourceString?: string, targetString?: string) {
+    let displayNames = []
+    allData.forEach( field => {
+        const displayName = (field.state.displayName !== undefined) ? field.state.displayName : field.name
+        // check if the displayname is defined
+        if(field.name !== sourceString && field.name !== targetString) {
+            displayNames.push({
+                field: field.name,
+                displayName: displayName
+            })
+        }
+    })
+
+    return displayNames
+
 }
     
 

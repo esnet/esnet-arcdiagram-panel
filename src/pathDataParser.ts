@@ -1,4 +1,4 @@
-import { calcNodeRadius, calcStrokeWidth, getEvenlySpacedColors } from "utils";
+import { calcNodeRadius, calcStrokeWidth, getEvenlySpacedColors, getFieldDisplayNames } from "utils";
 
 /**
  * Takes data from Grafana query and returns it in the format needed for this panel
@@ -16,12 +16,11 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
   const allData = data.series[0].fields;
   const paths = allData[0].values.buffer;
 
-  // get the field that's neither used as source or dest
-  let additionalFields = []
-  if(allData.length > 2) {
-    additionalFields.push(allData[1].name)
-  }
+  const arcWeightString = options.arcWeightSource ? allData.find((obj: { name: any; }) => obj.name === options.arcWeightSource).name : allData[allData.length -1].name
+  const arcWeightValues = allData.find((obj: { name: any; }) => obj.name === arcWeightString)?.values
   
+  const fields = getFieldDisplayNames(allData)
+
   const delimiter = options.delimiter === "space" ? " " : options.delimiter
 
   /********************************** Nodes **********************************/
@@ -38,7 +37,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
     const pathColors = getEvenlySpacedColors(paths.length, theme.isDark)
 
-    let links: Array<{ source: number | undefined; target: number | undefined; path: number; sum: number; strokeWidth: number; field: any[]; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }> = [];
+    let links: Array<{ source: number | undefined; target: number | undefined; path: number; sum: number; arcWeightValue: number; strokeWidth: number; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }> = [];
 
     paths.forEach((path: string, pathIndex: number) => {
       const pathNodes = String(path).split(' ');
@@ -56,7 +55,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
             target, 
             path: pathIndex,
             sum: allData[allData.length -1].values.buffer[pathIndex],
-            field: (additionalFields.length === 0) ? additionalFields : [allData.find(( obj: any) => obj.name === additionalFields[0]).values.buffer[pathIndex]],
+            arcWeightValue: arcWeightValues.buffer[pathIndex],
             strokeWidth: 1,
             color: pathColors[pathIndex],
             displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix : ""}`,
@@ -101,10 +100,18 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
       for (let j = 0; j < currentGroup.length; j++) {
         const currentLink = currentGroup[j]
         currentLink.mapRadiusY = mapRadiusY
-        console.log(currentLink )
         mapRadiusY += options.yRad-1
       }
     }
+
+    links.forEach((link: any, index: number) => {
+      fields.forEach( field => {
+        Object.assign(link, {[field.field]: []})
+        link[field.field].push(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[index])
+        const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[index])
+        Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${display.suffix}`]})
+      })
+    });
 
   /********************************** Stroke width/ node radius **********************************/
 
@@ -121,5 +128,5 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
     calcNodeRadius(uniqueNodes, links, options)
   /**********************************************************************************/
-  return {uniqueNodes, links, additionalFields};
+  return {uniqueNodes, links, fields};
 }
