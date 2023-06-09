@@ -37,7 +37,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
     const pathColors = getEvenlySpacedColors(paths.length, theme.isDark)
 
-    let links: Array<{ source: number | undefined; target: number | undefined; path: number; sum: number; arcWeightValue: number; strokeWidth: number; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }> = [];
+    let links: Array<{ source: number | undefined; target: number | undefined; path: number; arcWeightValue: number; strokeWidth: number; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }> = [];
 
     paths.forEach((path: string, pathIndex: number) => {
       const pathNodes = String(path).split(' ');
@@ -49,23 +49,29 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
         const isOverlap = links.some((link: any) => link.source === source && link.target === target);
       
         if(target !== undefined) {
-          links.push({
+          const link = {
             id: 0, 
             source, 
             target, 
             path: pathIndex,
-            sum: allData[allData.length -1].values.buffer[pathIndex],
             arcWeightValue: arcWeightValues.buffer[pathIndex],
             strokeWidth: 1,
             color: pathColors[pathIndex],
             displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix : ""}`,
             isOverlap,
             mapRadiusY: 0
-          });
+          }
+          fields.forEach( field => {
+            Object.assign(link, {[field.field]: []})
+            link[field.field].push(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[pathIndex])
+            const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[pathIndex])
+            Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${display.suffix}`]})
+          })
+          links.push(link);
         }
       }
     });
-
+ 
     links.forEach( (link: any, index: number) => {
       link.id = index
     })
@@ -104,14 +110,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
       }
     }
 
-    links.forEach((link: any, index: number) => {
-      fields.forEach( field => {
-        Object.assign(link, {[field.field]: []})
-        link[field.field].push(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[index])
-        const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[index])
-        Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${display.suffix}`]})
-      })
-    });
+    
 
   /********************************** Stroke width/ node radius **********************************/
 
@@ -119,8 +118,8 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
     const linkScaleFrom = options.arcRange?.split(",").map(Number)[0]
     const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
 
-    const minLink = Number(Math.min(...links.map(( e: any ) => e.sum)))
-    const maxLink = Number(Math.max(...links.map(( e: any ) => e.sum)))
+    const minLink = Number(Math.min(...links.map(( e: any ) => e.arcWeightValue)))
+    const maxLink = Number(Math.max(...links.map(( e: any ) => e.arcWeightValue)))
 
     for (let i = 0; i < links.length; i++) {
       calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, links[i], linkScaleFrom, linkScaleTo, minLink, maxLink)
