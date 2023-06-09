@@ -71,7 +71,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
           Object.assign(link, {[field.field]: []})
           link[field.field].push(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[index])
           const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[index])
-          Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${display.suffix}`]})
+          const suffix = display.suffix === undefined ? "" : display.suffix
+          Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${suffix}`]})
         })
       });
       
@@ -157,8 +158,9 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
             Object.assign(addLink, {[field.field]: []})
             addLink[field.field] = cur[field.field]
             const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(cur[field.field][0])
+            const suffix = display.suffix === undefined ? "" : display.suffix
             if(allData.find( (obj: any) => obj.name === field.field).state.range !== undefined) {
-              Object.assign(addLink, {[`${field.field}Display`]: [`${display.text} ${display.suffix}`]})
+              Object.assign(addLink, {[`${field.field}Display`]: [`${display.text} ${suffix}`]})
             } else {
               Object.assign(addLink, {[`${field.field}Display`]: cur[field.field]})
             }
