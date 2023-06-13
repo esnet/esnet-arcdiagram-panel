@@ -65,7 +65,8 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
             Object.assign(link, {[field.field]: []})
             link[field.field].push(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[pathIndex])
             const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[pathIndex])
-            Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${display.suffix}`]})
+            const suffix = display.suffix === undefined ? "" : display.suffix
+            Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${suffix}`]})
           })
           links.push(link);
         }

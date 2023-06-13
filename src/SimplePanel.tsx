@@ -62,7 +62,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
       return <div>Source equals target</div>;
     }
 
-    if(options.srcCluster === source || options.srcCluster === target || options.dstCluster === source || options.dstCluster === target) {
+    if(options.isCluster && (options.srcCluster === source || options.srcCluster === target || options.dstCluster === source || options.dstCluster === target)) {
       return <div>Fields for clustering can not be links source or target fields</div>;
     }
   }

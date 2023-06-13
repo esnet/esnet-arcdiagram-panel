@@ -78,42 +78,9 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       
     //}
 
-  /********************************** Colors **********************************/ 
+  
 
-    // create groups for the field specified
-    let groups: any[] = []
-    if(options.linkColorConfig !== "default" && options.colorConfigField) {
-      // create unique groups according to the setting specified in options
-      groups = [...new Set(links.map( ( item: any ) => item[options.colorConfigField]))].map( ( group: any ) => ({
-        [options.colorConfigField]: group,
-        color: ""
-      }))
-
-      const spacedColors = getEvenlySpacedColors(groups.length, theme.isDark)
-
-      groups.forEach( (e, i) => {
-        e.color = spacedColors[i]
-      })
-    }
-
-  /********************************** Stroke width/ node radius **********************************/
-
-    // set range for mapping
-    const linkScaleFrom = options.arcRange?.split(",").map(Number)[0],
-    linkScaleTo = options.arcRange?.split(",").map(Number)[1]
-
-    const minLink = Number(Math.min(...links.map(( e: any ) => e.arcWeightValue))),
-    maxLink = Number(Math.max(...links.map(( e: any ) => e.arcWeightValue)))
-    
-    links.forEach((e: {source: number, strokeWidth: number; arcWeightValue: number; color: string; field: string;}) => {
-      calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
-      // link color by field
-      if (options.linkColorConfig === "field" && groups) {
-        e.color = groups.find( group => group[options.colorConfigField] === e[options.colorConfigField as keyof typeof e])!.color
-      } else {
-        e.color = e.color
-      }
-    });
+  
 
   /********************************** Node clustering **********************************/
 
@@ -122,6 +89,8 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     }
 
   /********************************** Bundle overlapping links **********************************/ 
+
+
 
     if(allData.length > 3) {
       const uniqueLinks = links.reduce((acc: any, cur: any, index: number) => {
@@ -169,15 +138,57 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         }
         return acc;
       }, []);
-
-      uniqueLinks.forEach((e: {source: number, strokeWidth: number; arcWeightValue: number; color: string; field: string;}) => {
-        calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
-      })
       links = uniqueLinks;
     }
     // accumulate nodesums after potential bundling
     addNodeSum(links, uniqueNodes)
     calcNodeRadius(uniqueNodes, links, options)
+
+  /********************************** Colors **********************************/ 
+
+    // create groups for the field specified
+    let groups: any[] = []
+    if(options.linkColorConfig !== "default" && options.colorConfigField) {
+      // create unique groups according to the setting specified in options
+      groups = [...new Set(links.map(item => {
+        if (Array.isArray(item[options.colorConfigField])) {
+          return item[options.colorConfigField][item[options.colorConfigField].length - 1];
+        }
+        return item[options.colorConfigField];
+      }))].map(group => ({
+        [options.colorConfigField]: group,
+        color: ""
+      }));
+
+      console.log(groups)
+
+      const spacedColors = getEvenlySpacedColors(groups.length, theme.isDark)
+
+      groups.forEach( (e, i) => {
+        e.color = spacedColors[i]
+      })
+    }
+
+  /********************************** Stroke width/ node radius **********************************/
+
+    // set range for mapping
+    const linkScaleFrom = options.arcRange?.split(",").map(Number)[0],
+    linkScaleTo = options.arcRange?.split(",").map(Number)[1]
+
+    const minLink = Number(Math.min(...links.map(( e: any ) => e.arcWeightValue))),
+    maxLink = Number(Math.max(...links.map(( e: any ) => e.arcWeightValue)))
+      
+    console.log(links)
+    links.forEach((e: {source: number, strokeWidth: number; arcWeightValue: number; color: string; field: string; srcName: string}) => {
+      calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
+      // link color by field
+      if (options.linkColorConfig === "field" && groups) {
+        const linkGroup = (!Array.isArray(e[options.colorConfigField])) ? e[options.colorConfigField] : e[options.colorConfigField][e[options.colorConfigField].length - 1]
+        console.log(linkGroup)
+        e.color = groups.find( group => group[options.colorConfigField] === linkGroup)!.color
+      }
+    });
+    
   /**********************************************************************************/
   return {uniqueNodes, links, hexColors, fields};
 }
