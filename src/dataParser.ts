@@ -78,10 +78,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
       
     //}
 
-  
-
-  
-
   /********************************** Node clustering **********************************/
 
     if(options.isCluster) {
@@ -89,8 +85,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     }
 
   /********************************** Bundle overlapping links **********************************/ 
-
-
 
     if(allData.length > 3) {
       const uniqueLinks = links.reduce((acc: any, cur: any, index: number) => {
@@ -160,8 +154,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         color: ""
       }));
 
-      console.log(groups)
-
       const spacedColors = getEvenlySpacedColors(groups.length, theme.isDark)
 
       groups.forEach( (e, i) => {
@@ -178,16 +170,15 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     const minLink = Number(Math.min(...links.map(( e: any ) => e.arcWeightValue))),
     maxLink = Number(Math.max(...links.map(( e: any ) => e.arcWeightValue)))
       
-    console.log(links)
-    links.forEach((e: {source: number, strokeWidth: number; arcWeightValue: number; color: string; field: string; srcName: string}) => {
+    links.forEach((e: {source: number, strokeWidth: number; arcWeightValue: number; color: string; field: string; srcName: string}, index: number) => {
       calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
       // link color by field
       if (options.linkColorConfig === "field" && groups) {
         const linkGroup = (!Array.isArray(e[options.colorConfigField])) ? e[options.colorConfigField] : e[options.colorConfigField][e[options.colorConfigField].length - 1]
-        console.log(linkGroup)
         e.color = groups.find( group => group[options.colorConfigField] === linkGroup)!.color
       }
     });
+    console.log(links)
     
   /**********************************************************************************/
   return {uniqueNodes, links, hexColors, fields};

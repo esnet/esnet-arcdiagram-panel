@@ -194,7 +194,7 @@ function Arc(props: any) {
         const end = values[links[i].target]
 
         const radiusX = Math.abs(start - end) / 2; // X-axis radius
-        let radiusY = radiusX * 1; // Y-axis radius (adjust the value as desired for the desired elliptical shape)
+        let radiusY = radiusX * 1; // Y-axis radius (adjust the value as desired for the elliptical shape)
         if(props.graphOptions.hopMode) {
           if(links[i].isOverlap) { radiusY = radiusX * links[i].mapRadiusY }
         }

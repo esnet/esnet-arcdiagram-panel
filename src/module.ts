@@ -12,7 +12,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
   return builder
     .addBooleanSwitch({
       path: 'hopMode',
-      name: 'Visualize traceroute',
+      name: 'Visualize AS path',
       defaultValue: false,
       category: ModeCategory,
       showIf: config => !config.isCluster
@@ -136,7 +136,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           }
         ],
       },
-      //showIf: config => !config.isCluster,
+      showIf: config => !config.hopMode,
     })
     .addSelect({
       path: 'colorConfigField',
