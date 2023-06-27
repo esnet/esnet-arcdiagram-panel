@@ -120,7 +120,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
     .addSelect({
       path: 'linkColorConfig',
       name: 'Link color',
-      description: 'Select configuration for the link color',
+      description: 'Select configuration for the link color ("By Field" will overwrite threshold)',
       defaultValue: "default",
       category: AppearanceCategory,
       settings: {
@@ -141,7 +141,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
     .addSelect({
       path: 'colorConfigField',
       name: 'Field',
-      description: 'Select a field to base the link color on:',
+      description: 'Select a field to base the link color on',
       category: AppearanceCategory,
       settings: {
         allowCustomValue: false,
