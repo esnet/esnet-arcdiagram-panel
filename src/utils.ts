@@ -178,7 +178,7 @@ export function calcNodeRadius(uniqueNodes: any[], links: any[], options: any) {
     })
 }
 
-export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number) {
+export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number, fontSize: number) {
     let maxArcHeight = 0
     if(links.length !== 0) {
         let maxNodesCrossed = 0;
@@ -206,10 +206,11 @@ export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number
     }).name;
     
     // * 3.77 maps string to pixels, * 1.6 maps to highlighted tag
-    const longestNameSize = longestName.length * 3.77 * 1.6
+    // add mapping to font size configured in the options
+    const longestNameSize = longestName.length * 3.77 * 1.6 * (fontSize/10)
     // 31.99px is the height of the panel title
     const graphHeight = maxArcHeight + longestNameSize + 31.99
-    
+
     return graphHeight
 }
 
@@ -300,5 +301,3 @@ export function getFieldDisplayNames(allData: any[], sourceString?: string, targ
     return displayNames
 
 }
-    
-

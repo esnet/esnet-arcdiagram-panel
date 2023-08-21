@@ -39,8 +39,6 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
 
   const theme = useTheme2();
 
- 
-
   if (options.isCluster && data.series[0].fields.length < 5) {
     return <div>Node clustering requires a 4th group by</div>;
   }
@@ -52,6 +50,24 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
   if (options.isCluster && (options.srcCluster === ""  || options.dstCluster === "")) {
     return <div>Choose fields for clustering</div>;
   }
+
+  // check if datasource is timeseries
+  const bucketAggs = data.request.targets[0].bucketAggs
+  let dataSourceConflict;
+  for (let i = 0; i < bucketAggs.length; i++) {
+    const dataSource = bucketAggs[i];
+    if (dataSource.type === "date_histogram") {
+      dataSourceConflict = true;
+      break;
+    } else {
+      dataSourceConflict = false;
+    }
+  }
+
+  if(dataSourceConflict) {
+    return <div>Datasource type "Date Histogram" not supported</div>;
+  }
+
 
   // check if source equals dst
   if(!options.hopMode) {
@@ -83,7 +99,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
   }
 
   // check if diagram fits panel
-  if (calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width) > height) {
+  if (calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width, options.fontSize) > height) {
     return <div>Increase panels height to fit diagram</div>;
   }
   

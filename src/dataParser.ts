@@ -178,7 +178,6 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
         e.color = groups.find( group => group[options.colorConfigField] === linkGroup)!.color
       }
     });
-    console.log(links)
     
   /**********************************************************************************/
   return {uniqueNodes, links, hexColors, fields};
