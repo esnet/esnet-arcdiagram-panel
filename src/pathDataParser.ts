@@ -14,7 +14,7 @@ import { calcNodeRadius, calcStrokeWidth, getEvenlySpacedColors, getFieldDisplay
 export function parsePathData(data: { series: any[] }, options: any, theme: any) { // <- should that have proper typing?
 
   const allData = data.series[0].fields;
-  const paths = allData[0].values.buffer;
+  const paths = allData[0].values;
 
   const arcWeightString = options.arcWeightSource ? allData.find((obj: { name: any; }) => obj.name === options.arcWeightSource).name : allData[allData.length -1].name
   const arcWeightValues = allData.find((obj: { name: any; }) => obj.name === arcWeightString)?.values
@@ -25,7 +25,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
   /********************************** Nodes **********************************/
 
-    let uniqueNodes = Array.from([...new Set(allData[0].values.buffer.join(delimiter).split(delimiter))]).map((str, index) => ({
+    let uniqueNodes = Array.from([...new Set(allData[0].values.join(delimiter).split(delimiter))]).map((str, index) => ({
       id: index,
       name: str,
       sum: 1,
@@ -54,17 +54,17 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
             source, 
             target, 
             path: pathIndex,
-            arcWeightValue: arcWeightValues.buffer[pathIndex],
+            arcWeightValue: arcWeightValues[pathIndex],
             strokeWidth: 1,
             color: pathColors[pathIndex],
-            displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values.buffer[pathIndex]).suffix : ""}`,
+            displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values[pathIndex]).suffix : ""}`,
             isOverlap,
             mapRadiusY: 0
           }
           fields.forEach( field => {
             Object.assign(link, {[field.field]: []})
-            link[field.field].push(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[pathIndex])
-            const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[pathIndex])
+            link[field.field].push(allData.find((obj: { name: any; }) => obj.name === field.field)?.values[pathIndex])
+            const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(allData.find((obj: { name: any; }) => obj.name === field.field)?.values[pathIndex])
             const suffix = display.suffix === undefined ? "" : display.suffix
             Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${suffix}`]})
           })
