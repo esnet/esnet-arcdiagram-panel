@@ -65,7 +65,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
   }
 
   if(dataSourceConflict) {
-    return <div>Datasource type "Date Histogram" not supported</div>;
+    return <div>Datasource type Date Histogram not supported</div>;
   }
 
 
