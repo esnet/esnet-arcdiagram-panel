@@ -54,23 +54,23 @@ export function parseData(data: { series: any[] }, options: any, theme: any) { /
     });
 
     let links = srcById.map((element: any, index: string | number) => ({
-      srcName: sourceValues.buffer[index],
-      dstName: targetValues.buffer[index],
+      srcName: sourceValues[index],
+      dstName: targetValues[index],
       source: element,
       target: dstById[index],
-      arcWeightValue: arcWeightValues.buffer[index],
+      arcWeightValue: arcWeightValues[index],
       strokeWidth: 0,
-      color: allData[allData.length -1].display(allData[allData.length -1].values.buffer[index]).color,
+      color: allData[allData.length -1].display(allData[allData.length -1].values[index]).color,
       // for coloring the links by source, add a field with the name of the selected field
-      [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values.buffer[index],
+      [options.colorConfigField]: allData.find((obj: { name: any; }) => obj.name === options.colorConfigField)?.values[index],
     }));
 
     //if(!options.isCluster) {
       links.forEach((link: any, index: number) => {
         fields.forEach( field => {
           Object.assign(link, {[field.field]: []})
-          link[field.field].push(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[index])
-          const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(allData.find((obj: { name: any; }) => obj.name === field.field)?.values.buffer[index])
+          link[field.field].push(allData.find((obj: { name: any; }) => obj.name === field.field)?.values[index])
+          const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(allData.find((obj: { name: any; }) => obj.name === field.field)?.values[index])
           const suffix = display.suffix === undefined ? "" : display.suffix
           Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${suffix}`]})
         })
