@@ -297,7 +297,26 @@ export function getFieldDisplayNames(allData: any[], sourceString?: string, targ
             })
         }
     })
-
     return displayNames
+}
 
+export function isTimeSeries(data: any): boolean {
+    // check if datasource is timeseries
+    const dataSources = data.request.targets
+    if(dataSources !== undefined) {
+        for(let i = 0; i < dataSources.length; i++) {
+            if (dataSources[i].type === "date_histogram") {
+                return true;
+            }
+        }
+    }
+    const fields = data.series[0].fields
+    for(let i = 0; i < fields.length; i++) {
+        if (fields[i].type === "time") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    return false;
 }

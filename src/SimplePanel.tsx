@@ -9,7 +9,7 @@ import { parseData } from 'dataParser';
 import { parsePathData } from 'pathDataParser';
 
 import { styles } from 'styles';
-import { calcDiagramHeight } from 'utils';
+import { calcDiagramHeight, isTimeSeries } from 'utils';
 
 interface Props extends PanelProps<SimpleOptions> {}
 /**
@@ -51,21 +51,10 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
     return <div>Choose fields for clustering</div>;
   }
 
-  // check if datasource is timeseries
-  const bucketAggs = data.request.targets[0].bucketAggs
-  let dataSourceConflict;
-  for (let i = 0; i < bucketAggs.length; i++) {
-    const dataSource = bucketAggs[i];
-    if (dataSource.type === "date_histogram") {
-      dataSourceConflict = true;
-      break;
-    } else {
-      dataSourceConflict = false;
-    }
-  }
+  console.log(isTimeSeries(data))
 
-  if(dataSourceConflict) {
-    return <div>Datasource type Date Histogram not supported</div>;
+  if(isTimeSeries(data)) {
+    return <div>Time series not supported</div>;
   }
 
 
@@ -142,6 +131,4 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
     </div>
   );
 };
-
-
 
