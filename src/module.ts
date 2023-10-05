@@ -204,6 +204,18 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       category: AppearanceCategory,
     })
     .addSliderInput({
+      path: 'arcHeight',
+      name: 'Height of links',
+      defaultValue: 0.4,
+      settings: {
+        min: 0.2,
+        max: 1.5,
+        step: .1,
+      },
+      showIf: config => !config.hopMode,
+      category: AppearanceCategory,
+    })
+    .addSliderInput({
       path: 'marginLeft',
       name: 'Margin from left border',
       defaultValue: 50,

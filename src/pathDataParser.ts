@@ -111,8 +111,6 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
       }
     }
 
-    
-
   /********************************** Stroke width/ node radius **********************************/
 
     // set range for mapping

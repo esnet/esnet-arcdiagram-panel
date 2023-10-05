@@ -9,7 +9,7 @@ import { parseData } from 'dataParser';
 import { parsePathData } from 'pathDataParser';
 
 import { styles } from 'styles';
-import { calcDiagramHeight, isTimeSeries } from 'utils';
+import { isTimeSeries } from 'utils';
 
 interface Props extends PanelProps<SimpleOptions> {}
 /**
@@ -18,10 +18,9 @@ interface Props extends PanelProps<SimpleOptions> {}
  * @param {*} { options, data, width, height, id }
  * @return { Arc } Arc diagram
  */
-export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id }: any) => {
+export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id, renderCounter }: any) => {
   const [query, setQuery] = useState("");
   const [zoomState, setZoomState] = useState(10);
-  
   const onClick = (isIncrement: boolean, isReset?: boolean) => {
     if(!isIncrement && zoomState === 10) {
       return
@@ -36,7 +35,6 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
   let graphOptions = {
     ...options,
   };
-
   const theme = useTheme2();
 
   if (options.isCluster && data.series[0].fields.length < 5) {
@@ -51,12 +49,9 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
     return <div>Choose fields for clustering</div>;
   }
 
-  console.log(isTimeSeries(data))
-
   if(isTimeSeries(data)) {
     return <div>Time series not supported</div>;
   }
-
 
   // check if source equals dst
   if(!options.hopMode) {
@@ -88,10 +83,10 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
   }
 
   // check if diagram fits panel
+  /*
   if (calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width, options.fontSize) > height) {
     return <div>Increase panels height to fit diagram</div>;
-  }
-  
+  }*/
 
   const textColor = theme.colors.text.primary;
 
@@ -107,6 +102,8 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
         isDarkMode={theme.isDark}
         panelId={id}
         zoomState={zoomState}
+        renderCounter={renderCounter}
+        data={data}
       ></Arc>
       <div style={styles.toolBarStyle}>
         {options.search && <SearchField
