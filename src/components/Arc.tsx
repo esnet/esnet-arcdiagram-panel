@@ -436,7 +436,6 @@ function Arc(props: any) {
     // edge case for rendering the graph on first render when editing editMode
     if(firstRender) {
       setTimeout( () => {
-        console.log("first Render")
 
         let newValues = [...values, ...values]
 
@@ -462,7 +461,6 @@ function Arc(props: any) {
 
         labelsAsHtml = document.querySelectorAll(`[data-panelid="${props.panelId}"] text`)
         offsetBottom = calcBottomOffset(labelsAsHtml)
-        console.log(offsetBottom)
         const offsetFirstRender = 40
 
 
