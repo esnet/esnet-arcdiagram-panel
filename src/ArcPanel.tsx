@@ -105,6 +105,7 @@ export const ArcPanel: React.FC<Props> = ({ options, data, width, height, id, re
         zoomState={zoomState}
         renderCounter={renderCounter}
         data={data}
+        tooltip={options.tooltip}
       ></Arc>
       <div style={styles.toolBarStyle}>
         {options.search && <SearchField

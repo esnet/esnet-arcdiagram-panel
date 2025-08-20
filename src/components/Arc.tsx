@@ -305,8 +305,11 @@ function Arc(props: any) {
       nodes
         .on('mouseover', function (d) {
           // Tooltip
-          updateTooltip([d.clientX, d.clientY], true, Number(d.srcElement.id));
-          labelsAsHtml[d.srcElement.id].setAttribute('name', labelsAsHtml[d.srcElement.id].innerHTML);
+          if(props.tooltip) {
+            updateTooltip([d.clientX, d.clientY], true, Number(d.srcElement.id));
+            labelsAsHtml[d.srcElement.id].setAttribute('name', labelsAsHtml[d.srcElement.id].innerHTML);
+          }
+          
           const nodeTargets = getNodeTargets({ id: Number(d.srcElement.id), links });
           // add ellipsis for node being hovered over & target nodes
           replaceEllipsis(labelsAsHtml[d.srcElement.id], true);
@@ -435,14 +438,17 @@ function Arc(props: any) {
 
       paths
         .on('mouseover', function (d) {
-          updateTooltip(
-            [d.clientX, d.clientY],
-            true,
-            Number(d.srcElement.getAttribute('source')),
-            Number(d.srcElement.getAttribute('target')),
-            d.srcElement.getAttribute('displayValue'),
-            d.srcElement.id
-          );
+          if(props.tooltip) {
+            updateTooltip(
+              [d.clientX, d.clientY],
+              true,
+              Number(d.srcElement.getAttribute('source')),
+              Number(d.srcElement.getAttribute('target')),
+              d.srcElement.getAttribute('displayValue'),
+              d.srcElement.id
+            );
+          }
+          
           paths
             .style('opacity', (l: any) => {
               if (isQuery) {

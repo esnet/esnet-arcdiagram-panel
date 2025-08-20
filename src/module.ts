@@ -1,6 +1,6 @@
 import { PanelPlugin, getFieldDisplayName, FieldOverrideContext, FieldConfigProperty } from '@grafana/data';
-import { SimpleOptions } from './types';
-import { SimplePanel } from './SimplePanel';
+import { ArcOptions } from './types';
+import { ArcPanel } from './ArcPanel';
 import { CustomRangeSlider } from './components/CustomRangeSlider'
 
 const AppearanceCategory = ['Appearance'];
@@ -8,43 +8,43 @@ const DataCategory = ['Data'];
 const ModeCategory = ['Mode'];
 
 
-export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOptions(builder => {
+export const plugin = new PanelPlugin<ArcOptions>(ArcPanel).setPanelOptions(builder => {
   return builder
     .addBooleanSwitch({
       path: 'hopMode',
-      name: 'Visualize AS path',
+      name: 'Path Hop Mode',
       defaultValue: false,
       category: ModeCategory,
-      showIf: config => !config.isCluster
+      showIf: (config) => !config.isCluster,
     })
     .addSelect({
       path: 'delimiter',
       name: 'String delimiter',
       description: 'Character to seperate nodes by',
-      defaultValue: "Space",
+      defaultValue: 'Space',
       category: ModeCategory,
       settings: {
         allowCustomValue: false,
         options: [
-          { 
-            label: "Space", 
-            value: "space"
+          {
+            label: 'Space',
+            value: 'space',
           },
-          { 
-            label: ",", 
-            value: ",",
+          {
+            label: ',',
+            value: ',',
           },
-          { 
-            label: ";", 
-            value: ";",
+          {
+            label: ';',
+            value: ';',
           },
-          { 
-            label: ":", 
-            value: ":",
-          }
+          {
+            label: ':',
+            value: ':',
+          },
         ],
       },
-      showIf: config => config.hopMode
+      showIf: (config) => config.hopMode,
     })
     .addBooleanSwitch({
       path: 'arcFromSource',
@@ -57,7 +57,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Node radius from source',
       defaultValue: false,
       category: AppearanceCategory,
-      showIf: config => !config.hopMode
+      showIf: (config) => !config.hopMode,
     })
     .addSelect({
       path: 'arcWeightSource',
@@ -80,7 +80,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
-      showIf: config => config.arcFromSource || config.radiusFromSource,
+      showIf: (config) => config.arcFromSource || config.radiusFromSource,
     })
     .addSliderInput({
       path: 'arcThickness',
@@ -91,7 +91,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         max: 15,
         step: 1,
       },
-      showIf: config => !config.arcFromSource,
+      showIf: (config) => !config.arcFromSource,
       category: AppearanceCategory,
     })
     .addSliderInput({
@@ -99,9 +99,9 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Arc opacity',
       defaultValue: 1,
       settings: {
-        min: .6,
+        min: 0.6,
         max: 1,
-        step: .1,
+        step: 0.1,
       },
       category: AppearanceCategory,
     })
@@ -114,29 +114,29 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         max: 15,
         step: 1,
       },
-      showIf: config => !config.radiusFromSource,
+      showIf: (config) => !config.radiusFromSource,
       category: AppearanceCategory,
     })
     .addSelect({
       path: 'linkColorConfig',
       name: 'Link color',
       description: 'Select configuration for the link color ("By Field" will overwrite threshold)',
-      defaultValue: "default",
+      defaultValue: 'default',
       category: AppearanceCategory,
       settings: {
         allowCustomValue: false,
         options: [
-          { 
-            label: "Default", 
-            value: "default"
+          {
+            label: 'Default',
+            value: 'default',
           },
-          { 
-            label: "By field", 
-            value: "field",
-          }
+          {
+            label: 'By field',
+            value: 'field',
+          },
         ],
       },
-      showIf: config => !config.hopMode,
+      showIf: (config) => !config.hopMode,
     })
     .addSelect({
       path: 'colorConfigField',
@@ -160,14 +160,14 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
-      showIf: config => config.linkColorConfig !== "default",
+      showIf: (config) => config.linkColorConfig !== 'default',
     })
     .addColorPicker({
       path: 'nodeColor',
       name: 'Node Color',
       defaultValue: 'blue',
       category: AppearanceCategory,
-      showIf: config => !config.isCluster
+      showIf: (config) => !config.isCluster,
     })
     .addSliderInput({
       path: 'fontSize',
@@ -180,17 +180,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       },
       category: AppearanceCategory,
     })
-    .addSliderInput({
-      path: 'tooltipFontSize',
-      name: 'Tooltip font size',
-      defaultValue: 8,
-      settings: {
-        min: 8,
-        max: 20,
-        step: 1,
-      },
-      category: AppearanceCategory,
-    })
+
     .addSliderInput({
       path: 'yRad',
       name: 'Margin between overlapping links',
@@ -198,9 +188,9 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       settings: {
         min: 1,
         max: 2,
-        step: .1,
+        step: 0.1,
       },
-      showIf: config => config.hopMode,
+      showIf: (config) => config.hopMode,
       category: AppearanceCategory,
     })
     .addSliderInput({
@@ -210,9 +200,9 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       settings: {
         min: 0.2,
         max: 1.5,
-        step: .1,
+        step: 0.1,
       },
-      showIf: config => !config.hopMode,
+      showIf: (config) => !config.hopMode,
       category: AppearanceCategory,
     })
     .addSliderInput({
@@ -249,24 +239,10 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       defaultValue: false,
       category: AppearanceCategory,
     })
-    .addTextInput({
-      path: "toolTipSource",
-      name: 'Tooltip source',
-      category: AppearanceCategory,
-      defaultValue: "From: ",
-      description: 'Text to be displayed infront of target node.',
-    })
-    .addTextInput({
-      path: "toolTipTarget",
-      name: 'Tooltip target',
-      category: AppearanceCategory,
-      defaultValue: "To: ",
-      description: 'Text to be displayed infront of source node.',
-    })
     .addSelect({
       path: 'scale',
       name: 'Scaling',
-      defaultValue: "lin",
+      defaultValue: 'lin',
       description: 'Select the scaling of the diagram',
       settings: {
         allowCustomValue: false,
@@ -276,33 +252,33 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
             value: 'lin',
           },
           {
-            label: "Logarithmic",
-            value: "log"
-          }
+            label: 'Logarithmic',
+            value: 'log',
+          },
         ],
       },
-      showIf: config => config.radiusFromSource || config.arcFromSource,
+      showIf: (config) => config.radiusFromSource || config.arcFromSource,
       category: DataCategory,
     })
     .addCustomEditor({
-      id: "setRange",
-      path: "arcRange",
+      id: 'setRange',
+      path: 'arcRange',
       editor: CustomRangeSlider,
       name: 'Range for weighted links',
       description: 'Range which the arc thickness is being mapped to',
       category: DataCategory,
-      defaultValue: "1,15",
-      showIf: config => config.arcFromSource,
+      defaultValue: '1,15',
+      showIf: (config) => config.arcFromSource,
     })
     .addCustomEditor({
-      id: "setRange",
-      path: "nodeRange",
+      id: 'setRange',
+      path: 'nodeRange',
       editor: CustomRangeSlider,
       name: 'Range for weighted nodes',
       description: 'Range which the node radius is being mapped to',
       category: DataCategory,
-      defaultValue: "1,15",
-      showIf: config => config.radiusFromSource,
+      defaultValue: '1,15',
+      showIf: (config) => config.radiusFromSource,
     })
     .addBooleanSwitch({
       path: 'isCluster',
@@ -315,7 +291,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Source cluster',
       description: 'Select the field to cluster the source by:',
       category: DataCategory,
-      defaultValue: "",
+      defaultValue: '',
       settings: {
         allowCustomValue: false,
         options: [],
@@ -333,14 +309,14 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
-      showIf: config => config.isCluster
+      showIf: (config) => config.isCluster,
     })
     .addSelect({
       path: 'dstCluster',
       name: 'Destination cluster',
       description: 'Select the field to cluster the target by:',
       category: DataCategory,
-      defaultValue: "",
+      defaultValue: '',
       settings: {
         allowCustomValue: false,
         options: [],
@@ -358,14 +334,14 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
-      showIf: config => config.isCluster
+      showIf: (config) => config.isCluster,
     })
     .addSelect({
       path: 'pathField',
       name: 'Path',
       description: 'Select the field to use as traceroute:',
       category: DataCategory,
-      defaultValue: "",
+      defaultValue: '',
       settings: {
         allowCustomValue: false,
         options: [],
@@ -383,7 +359,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
-      showIf: config => config.hopMode
+      showIf: (config) => config.hopMode,
     })
     .addSelect({
       path: 'src',
@@ -407,14 +383,14 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
-      showIf: config => !config.hopMode
+      showIf: (config) => !config.hopMode,
     })
     .addSelect({
       path: 'dest',
       name: 'Destination',
       description: 'Select the field to use as target:',
       category: DataCategory,
-      defaultValue: "",
+      defaultValue: '',
       settings: {
         allowCustomValue: false,
         options: [],
@@ -432,9 +408,44 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
           return Promise.resolve(options);
         },
       },
-      showIf: config => !config.hopMode
+      showIf: (config) => !config.hopMode,
     })
+    .addBooleanSwitch({
+      path: 'tooltip',
+      name: 'Tooltip',
+      defaultValue: true,
+      category: DataCategory,
+    })
+    .addSliderInput({
+      path: 'tooltipFontSize',
+      name: 'Tooltip font size',
+      defaultValue: 8,
+      settings: {
+        min: 8,
+        max: 20,
+        step: 1,
+      },
+      category: DataCategory,
+      showIf: (config) => config.tooltip,
+    })
+    .addTextInput({
+      path: 'toolTipSource',
+      name: 'Tooltip source',
+      category: DataCategory,
+      defaultValue: 'From: ',
+      description: 'Text to be displayed infront of target node.',
+      showIf: (config) => config.tooltip,
+    })
+    .addTextInput({
+      path: 'toolTipTarget',
+      name: 'Tooltip target',
+      category: DataCategory,
+      defaultValue: 'To: ',
+      description: 'Text to be displayed infront of source node.',
+      showIf: (config) => config.tooltip,
+    });
 })
+
 .useFieldConfig({
   disableStandardOptions: [FieldConfigProperty.NoValue, FieldConfigProperty.Max, FieldConfigProperty.Min],
   standardOptions: {

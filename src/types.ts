@@ -1,4 +1,4 @@
-export interface SimpleOptions {
+export interface ArcOptions {
   text: string;
   labelsOnHover: boolean;
   arcFromSource: boolean;
@@ -12,6 +12,7 @@ export interface SimpleOptions {
   scale: string;
   src: string;
   dest: string;
+  tooltip: boolean;
   toolTipMetric: string;
   toolTipGroupBy: string;
   linkColorConfig: string;
