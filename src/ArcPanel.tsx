@@ -1,7 +1,7 @@
 import  { useState } from 'react';
 import * as React from 'react';
 import { PanelProps } from '@grafana/data';
-import { SimpleOptions } from 'types';
+import { ArcOptions } from 'types';
 import { useTheme2 } from '@grafana/ui';
 import Arc from './components/Arc';
 import SearchField from './components/SearchField';
@@ -11,14 +11,14 @@ import { parsePathData } from 'pathDataParser';
 import { styles } from 'styles';
 import { isTimeSeries } from 'utils';
 
-interface Props extends PanelProps<SimpleOptions> {}
+interface Props extends PanelProps<ArcOptions> {}
 /**
  * Grafana Arc diagram panel
  *
  * @param {*} { options, data, width, height, id }
  * @return { Arc } Arc diagram
  */
-export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id, renderCounter }: any) => {
+export const ArcPanel: React.FC<Props> = ({ options, data, width, height, id, renderCounter }: any) => {
   const [query, setQuery] = useState("");
   const [zoomState, setZoomState] = useState(10);
   const onClick = (isIncrement: boolean, isReset?: boolean) => {
@@ -89,6 +89,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
   }*/
 
   const textColor = theme.colors.text.primary;
+  console.log(parsedData);
 
   return (
     <div id='scroll-box' style={styles.panelContainerStyle}>
