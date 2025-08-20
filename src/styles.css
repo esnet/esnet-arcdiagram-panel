@@ -48,5 +48,5 @@ input::placeholder { /* Most modern browsers support this now. */
 }
 
 #scroll-box {
-  overflow: scroll
+  overflow: auto
 }
