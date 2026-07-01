@@ -20,11 +20,11 @@
     "links": [
       {
         "name": "Website",
-        "url": "https://github.com/grafana/grafana-starter-panel"
+        "url": "https://github.com/esnet/esnet-arcdiagram-panel"
       },
       {
         "name": "License",
-        "url": "https://github.com/grafana/grafana-starter-panel/blob/master/LICENSE"
+        "url": "https://github.com/esnet/esnet-arcdiagram-panel/blob/main/LICENSE"
       }
     ],
     "screenshots": [
@@ -33,8 +33,8 @@
         "path": "img/arcdiagram-plugin.png"
       }
     ],
-    "version": "1.0.3",
-    "updated": "2023-10-01"
+    "version": "2.0.0",
+    "updated": "2025-10-28"
   },
   "dependencies": {
     "grafanaDependency": ">=9.4.0",
