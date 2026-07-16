@@ -1,19 +1,25 @@
+// [refactor] All CSS keys in this file were converted from kebab-case (e.g. "z-index",
+// "border-radius") to camelCase, and the proper `CSSProperties` type is now imported instead
+// of relying on the global `React` namespace. Verified output-identical (React normalizes both
+// forms); the only change is the removal of React's dev-time "Unsupported style property" warnings.
+import { CSSProperties } from 'react';
+
 export const styles = {
     containerStyle: {
       width: "100%",
       height: "100%"
-    } as React.CSSProperties,
+    } as CSSProperties,
     labelStyle: {
       width: "100%",
       height: "100%",
-      "z-index": "10",
-    } as React.CSSProperties,
+      zIndex: 10,
+    } as CSSProperties,
     buttonStyle: {
       width: "30px",
       height: "30px",
-      top:0,
+      top: 0,
       position: "absolute"
-    } as React.CSSProperties,
+    } as CSSProperties,
     toolTipStyle: {
       box: {
         position: "absolute",
@@ -24,78 +30,82 @@ export const styles = {
         background: "white",
         padding: "1em",
         margin: "1em",
-        "max-width": "300px",
-        "border-radius": "5px",
+        maxWidth: "300px",
+        borderRadius: "5px",
         opacity: 0.9
-      } as React.CSSProperties,
-      text(fontSize: number) {
+      } as CSSProperties,
+      text(fontSize: number, color: string): CSSProperties {
         return {
-          color: "black",
-        "font-size": `${fontSize}px`,
-        margin: "0",
-        "font-weight": "100"
+          // [refactor] Color is passed in from the theme (props.textColor =
+          // theme.colors.text.primary) instead of being hard-coded "black". The tooltip now
+          // renders inside Grafana's <VizTooltipContainer>, whose background is themed (dark in
+          // dark mode), so black text was unreadable. The themed color is readable in both modes.
+          color,
+          fontSize: `${fontSize}px`,
+          margin: "0",
+          fontWeight: 100
         }
       },
       preface: {
-        "font-weight": "900"
-      } as React.CSSProperties,
-    }, 
+        fontWeight: 900
+      } as CSSProperties,
+    },
     panelContainerStyle: {
       height: "100%",
       width: "100%"
-    } as React.CSSProperties,
+    } as CSSProperties,
     searchFieldStyle: {
       display: "inline-block",
       margin: "0em 1em",
-      "vertical-align": "middle",
-    } as React.CSSProperties,
-    inputStyle(isDarkMode: boolean) {
+      verticalAlign: "middle",
+    } as CSSProperties,
+    inputStyle(isDarkMode: boolean): CSSProperties {
       return {
         width: "200px",
         height: "40px",
         background: (isDarkMode) ? "rgb(244 245 245 / 83%)" : "hsla(0, 0%, 0%, 1)",
         color: (isDarkMode) ? "black" : "white",
         padding: "1em",
-        "border-radius": "30px"
+        borderRadius: "30px"
       }
     },
     toolBarStyle: {
       top: "10px",
       right: 0,
       position: "absolute"
-    } as React.CSSProperties,
+    } as CSSProperties,
     zoomButtonWrapper: {
       margin: "0em 1em",
-      "vertical-align": "middle",
+      verticalAlign: "middle",
       display: "inline-block"
-    } as React.CSSProperties,
-    zoomButtonStyle(isDarkMode: boolean, position: number) {
-      let styles, borderRadius = "30px", padding = "5px"
-      styles = {
+    } as CSSProperties,
+    zoomButtonStyle(isDarkMode: boolean, position: number): CSSProperties {
+      const borderRadius = "30px", padding = "5px"
+      const styles: CSSProperties = {
         display: "inline-block",
-        "background-color": isDarkMode ? "rgba(244, 245, 245, 0.83)" : "black",
-        "border": "1px solid rgba(0, 0, 0, 0.1)",
-        "cursor": "pointer",
-        "transition": "all 250ms",
-        "border-top-left-radius": "0px",
-        "border-bottom-left-radius": "0px",
-        "border-top-right-radius": "0px",
-        "border-bottom-right-radius": "0px",
-        "padding-left": padding,
-        "padding-right": padding
+        backgroundColor: isDarkMode ? "rgba(244, 245, 245, 0.83)" : "black",
+        border: "1px solid rgba(0, 0, 0, 0.1)",
+        cursor: "pointer",
+        transition: "all 250ms",
+        borderTopLeftRadius: "0px",
+        borderBottomLeftRadius: "0px",
+        borderTopRightRadius: "0px",
+        borderBottomRightRadius: "0px",
+        paddingLeft: padding,
+        paddingRight: padding
       }
       if(position === 0) {
-        styles["border-top-left-radius"] = borderRadius
-        styles["border-bottom-left-radius"] = borderRadius
-        styles["padding-left"] = padding
+        styles.borderTopLeftRadius = borderRadius
+        styles.borderBottomLeftRadius = borderRadius
+        styles.paddingLeft = padding
       } else if (position === 2) {
-        styles["border-top-right-radius"] = borderRadius
-        styles["border-bottom-right-radius"] = borderRadius
-        styles["padding-right"] = padding
+        styles.borderTopRightRadius = borderRadius
+        styles.borderBottomRightRadius = borderRadius
+        styles.paddingRight = padding
       }
       return styles
     },
-    zoomIcon(isDarkMode: boolean) {
+    zoomIcon(isDarkMode: boolean): CSSProperties {
       return {
         height: "40px",
         width: "40px",

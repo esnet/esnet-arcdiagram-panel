@@ -21,7 +21,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       path: 'delimiter',
       name: 'String delimiter',
       description: 'Character to seperate nodes by',
-      defaultValue: "Space",
+      defaultValue: "space",
       category: ModeCategory,
       settings: {
         allowCustomValue: false,
@@ -254,14 +254,14 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       name: 'Tooltip source',
       category: AppearanceCategory,
       defaultValue: "From: ",
-      description: 'Text to be displayed infront of target node.',
+      description: 'Text to be displayed infront of source node.',
     })
     .addTextInput({
       path: "toolTipTarget",
       name: 'Tooltip target',
       category: AppearanceCategory,
       defaultValue: "To: ",
-      description: 'Text to be displayed infront of source node.',
+      description: 'Text to be displayed infront of target node.',
     })
     .addSelect({
       path: 'scale',
@@ -284,8 +284,10 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       showIf: config => config.radiusFromSource || config.arcFromSource,
       category: DataCategory,
     })
+    // [refactor] Bug fix: this editor and the nodeRange editor below both used id "setRange";
+    // given distinct ids ("setArcRange" / "setNodeRange") to avoid the duplicate-id collision.
     .addCustomEditor({
-      id: "setRange",
+      id: "setArcRange",
       path: "arcRange",
       editor: CustomRangeSlider,
       name: 'Range for weighted links',
@@ -295,7 +297,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
       showIf: config => config.arcFromSource,
     })
     .addCustomEditor({
-      id: "setRange",
+      id: "setNodeRange",
       path: "nodeRange",
       editor: CustomRangeSlider,
       name: 'Range for weighted nodes',

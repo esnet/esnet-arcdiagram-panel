@@ -1,0 +1,27 @@
+{
+  "uid": "arc-diagram-e2e",
+  "title": "Arc Diagram E2E",
+  "tags": ["e2e", "esnet-arcdiagram-panel"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "esnet-arcdiagram-panel",
+      "title": "Arc Diagram (e2e)",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-testdata-datasource", "uid": "arc-testdata" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-testdata-datasource", "uid": "arc-testdata" },
+          "scenarioId": "csv_content",
+          "csvContent": "source,target,weight\nA,B,10\nB,C,20\nA,C,5\nC,D,15\nD,A,8"
+        }
+      ],
+      "options": {}
+    }
+  ]
+}

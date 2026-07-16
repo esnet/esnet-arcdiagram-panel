@@ -1,0 +1,27 @@
+{
+  "uid": "arc-diagram-dense",
+  "title": "Arc Diagram E2E - Dense",
+  "tags": ["e2e", "esnet-arcdiagram-panel"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "esnet-arcdiagram-panel",
+      "title": "Arc Diagram (e2e)",
+      "gridPos": { "h": 16, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-testdata-datasource", "uid": "arc-testdata" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-testdata-datasource", "uid": "arc-testdata" },
+          "scenarioId": "csv_content",
+          "csvContent": "source,target,weight\nA,B,5\nA,C,8\nA,D,3\nA,F,5\nB,C,6\nB,E,9\nB,F,4\nB,H,4\nC,F,4\nC,G,6\nC,I,6\nD,E,7\nD,G,2\nD,H,5\nD,J,7\nE,F,5\nE,H,8\nE,I,7\nF,I,6\nF,J,3\nG,H,3\nG,J,5\nG,K,8\nH,I,7\nH,K,4\nI,J,6\nI,L,8\nJ,K,5\nK,L,9\nL,A,3"
+        }
+      ],
+      "options": {}
+    }
+  ]
+}

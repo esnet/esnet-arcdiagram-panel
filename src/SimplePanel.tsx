@@ -1,7 +1,7 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import * as React from 'react';
 import { PanelProps } from '@grafana/data';
-import { SimpleOptions } from 'types';
+import { SimpleOptions, ParsedData } from 'types';
 import { useTheme2 } from '@grafana/ui';
 import Arc from './components/Arc';
 import SearchField from './components/SearchField';
@@ -18,7 +18,10 @@ interface Props extends PanelProps<SimpleOptions> {}
  * @param {*} { options, data, width, height, id }
  * @return { Arc } Arc diagram
  */
-export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id, renderCounter }: any) => {
+// [refactor] Props are now typed via `Props extends PanelProps<SimpleOptions>` (was `: any`),
+// the dead `renderCounter` prop/destructure was removed, `parsedData` is typed `ParsedData`,
+// and the dead empty `isCluster > 5` block / commented `calcDiagramHeight` guard were deleted.
+export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id }) => {
   const [query, setQuery] = useState("");
   const [zoomState, setZoomState] = useState(10);
   const onClick = (isIncrement: boolean, isReset?: boolean) => {
@@ -32,17 +35,20 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
     }
   }
 
-  let graphOptions = {
+  // [refactor] Stylistic: `let` -> `const` (never reassigned).
+  const graphOptions = {
     ...options,
   };
   const theme = useTheme2();
 
-  if (options.isCluster && data.series[0].fields.length < 5) {
-    return <div>Node clustering requires a 4th group by</div>;
+  // [refactor] Bug fix: guard against an empty query result so we show a message instead of
+  // throwing when `data.series[0].fields` is accessed below.
+  if (!data.series.length || !data.series[0].fields.length) {
+    return <div>No data</div>;
   }
 
-  if (options.isCluster && data.series[0].fields.length > 5) {
-    //return <div>Node clustering does not support a 5th group by</div>;
+  if (options.isCluster && data.series[0].fields.length < 5) {
+    return <div>Node clustering requires a 4th group by</div>;
   }
 
   if (options.isCluster && (options.srcCluster === ""  || options.dstCluster === "")) {
@@ -55,8 +61,17 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
 
   // check if source equals dst
   if(!options.hopMode) {
-    const source = options.src ? data.series[0].fields.find((obj: { name: any; }) => obj.name === options.src).name : data.series[0].fields[0].name;
-    const target = options.dest ? data.series[0].fields.find((obj: { name: any; }) => obj.name === options.dest).name : data.series[0].fields[1].name;
+    // [refactor] Bug fix: non-hop mode needs at least a source and a target field; guard before
+    // indexing fields[1] so we show a message instead of throwing on a single-field query.
+    if (data.series[0].fields.length < 2) {
+      return <div>Requires at least a source and target field</div>;
+    }
+    const source = options.src
+      ? data.series[0].fields.find((obj) => obj.name === options.src)?.name ?? data.series[0].fields[0].name
+      : data.series[0].fields[0].name;
+    const target = options.dest
+      ? data.series[0].fields.find((obj) => obj.name === options.dest)?.name ?? data.series[0].fields[1].name
+      : data.series[0].fields[1].name;
     // catch errors
     if (source === target) {
       return <div>Source equals target</div>;
@@ -67,11 +82,15 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
     }
   }
 
-  let parsedData: { uniqueNodes: any[]; links: any[] } = {
+  let parsedData: ParsedData = {
     uniqueNodes: [],
-    links: []
+    links: [],
+    fields: []
   };
 
+  // [refactor] Bug fix: track parse failures so we surface a message instead of silently
+  // rendering a blank panel (the error was previously only logged to the console).
+  let parseError = false;
   try {
     if(!options.hopMode) {
       parsedData = parseData(data, graphOptions, theme);
@@ -80,13 +99,12 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
     }
   } catch (error) {
     console.error('parsing error: ', error);
+    parseError = true;
   }
 
-  // check if diagram fits panel
-  /*
-  if (calcDiagramHeight(parsedData.uniqueNodes, parsedData.links, width, options.fontSize) > height) {
-    return <div>Increase panels height to fit diagram</div>;
-  }*/
+  if (parseError) {
+    return <div>Error parsing data — check the panel configuration and query</div>;
+  }
 
   const textColor = theme.colors.text.primary;
 
@@ -102,7 +120,6 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
         isDarkMode={theme.isDark}
         panelId={id}
         zoomState={zoomState}
-        renderCounter={renderCounter}
         data={data}
       ></Arc>
       <div style={styles.toolBarStyle}>
@@ -111,7 +128,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
           nodeList={parsedData.uniqueNodes}
           isDarkMode={theme.isDark}
         ></SearchField>}
-        {options.zoom && 
+        {options.zoom &&
         <div style={styles.zoomButtonWrapper}>
           <button id="zoom-button" style={styles.zoomButtonStyle(theme.isDark, 0)} onClick={() => onClick(false)}>
             <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-arcdiagram-panel/img/area_zoom_out.svg" alt=""/>
@@ -123,9 +140,8 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
             <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-arcdiagram-panel/img/reset_icon.svg" alt=""/>
           </button>
         </div>
-        } 
+        }
       </div>
     </div>
   );
 };
-

@@ -7,15 +7,20 @@ interface Props extends StandardEditorProps<string, StringFieldConfigSettings> {
   suffix?: ReactNode;
 }
 
-export const CustomRangeSlider: React.FC<Props> = ({ value, onChange, item, suffix }) => {
+// [refactor] Stylistic: dropped the unused `item` and `suffix` from the destructure.
+export const CustomRangeSlider: React.FC<Props> = ({ value, onChange }) => {
 
   const onValueChange = useCallback(
     (value: number[] | undefined) => {
       onChange(String(value))
     },
-    
+
     [onChange]
   );
+
+  // [refactor] Bug fix: restore the saved range (stored as a "min,max" string) so the slider
+  // reflects the configured value instead of always resetting to the previously hard-coded [1, 15].
+  const sliderValue = value ? value.split(",").map(Number) : [1, 15];
 
   return (
     <div>
@@ -25,10 +30,7 @@ export const CustomRangeSlider: React.FC<Props> = ({ value, onChange, item, suff
           onAfterChange={onValueChange}
           onChange={onValueChange}
           orientation="horizontal"
-          value={[
-              1,
-              15
-          ]}
+          value={sliderValue}
       />
     </div>
   )

@@ -14,46 +14,24 @@ jobs:
     env:
       GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }} # Requires a Grafana API key from Grafana.com.
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
-          cache: 'yarn'
+          node-version: '22'
+          cache: 'npm'
 
       - name: Setup Go environment
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.19'
+          go-version: '1.21'
 
       - name: Install dependencies
-        run: yarn install --immutable --prefer-offline
+        run: npm ci
 
-      - name: Build and test frontend
-        run: yarn build
-
-      - name: Check for backend
-        id: check-for-backend
-        run: |
-          if [ -f "Magefile.go" ]
-          then
-            echo "has-backend=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Test backend
-        if: steps.check-for-backend.outputs.has-backend == 'true'
-        uses: magefile/mage-action@v2
-        with:
-          version: latest
-          args: coverage
-
-      - name: Build backend
-        if: steps.check-for-backend.outputs.has-backend == 'true'
-        uses: magefile/mage-action@v2
-        with:
-          version: latest
-          args: buildAll
+      - name: Build frontend
+        run: npm run build
 
       - name: Warn missing Grafana API key
         run: |
@@ -62,7 +40,7 @@ jobs:
         if: ${{ env.GRAFANA_API_KEY == '' }}
 
       - name: Sign plugin
-        run: yarn sign
+        run: npm run sign
         if: ${{ env.GRAFANA_API_KEY != '' }}
 
       - name: Get plugin metadata

@@ -1,0 +1,12 @@
+# Dashboard provider: loads the JSON dashboards in this directory into the test Grafana.
+apiVersion: 1
+
+providers:
+  - name: ESnet Arc Diagram E2E
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

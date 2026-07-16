@@ -1,0 +1,11 @@
+# Provisions a TestData datasource with a fixed uid so the e2e dashboard below can reference it.
+# Loaded by the Docker test Grafana (npm run server mounts ../provisioning).
+apiVersion: 1
+
+datasources:
+  - name: ArcTestData
+    uid: arc-testdata
+    type: grafana-testdata-datasource
+    access: proxy
+    isDefault: false
+    editable: true

@@ -1,4 +1,12 @@
+// [refactor] Added real types throughout this file: the signature is now
+// (data: PanelData, options: SimpleOptions, theme: GrafanaTheme2): ParsedData, and the local
+// `uniqueNodes`/`links`/`visited`/`overlapGroups` collections are typed (were implicit `any`).
+// `allData` is `Field[]`, so the `.find(...)` callbacks infer `Field`; the `!` assertions mark
+// the spots the original code already assumed present (a configured field exists / has a display
+// processor). Logic unchanged.
+import { GrafanaTheme2, PanelData } from '@grafana/data';
 import { calcNodeRadius, calcStrokeWidth, getEvenlySpacedColors, getFieldDisplayNames } from "utils";
+import { Link, Node, ParsedData, SimpleOptions } from "types";
 
 /**
  * Takes data from Grafana query and returns it in the format needed for this panel
@@ -11,21 +19,32 @@ import { calcNodeRadius, calcStrokeWidth, getEvenlySpacedColors, getFieldDisplay
  * @return {hexColors} colors converted to hex
  */
 
-export function parsePathData(data: { series: any[] }, options: any, theme: any) { // <- should that have proper typing?
+export function parsePathData(data: PanelData, options: SimpleOptions, theme: GrafanaTheme2): ParsedData {
 
   const allData = data.series[0].fields;
-  const paths = allData[0].values;
 
-  const arcWeightString = options.arcWeightSource ? allData.find((obj: { name: any; }) => obj.name === options.arcWeightSource).name : allData[allData.length -1].name
-  const arcWeightValues = allData.find((obj: { name: any; }) => obj.name === arcWeightString)?.values
-  
+  // [refactor] Bug fix: honor the user-selected `options.pathField` (configured in the Data ->
+  // "Path" select when hopMode is on) instead of always reading `allData[0]`. A configured-but-
+  // unmatched field name falls back to the first field, matching the src/dst fallbacks in
+  // parseData. This is what makes the "Path" option actually take effect and lets the path column
+  // sit anywhere in the query result.
+  const pathString = options.pathField ? (allData.find((obj) => obj.name === options.pathField)?.name ?? allData[0].name) : allData[0].name;
+  const pathField = allData.find((obj) => obj.name === pathString) ?? allData[0];
+  const paths = pathField.values;
+
+  // [refactor] Bug fix: optional-chain the field lookup so a configured-but-unmatched weight
+  // field falls back to the last field instead of throwing on `undefined.name`.
+  const arcWeightString = options.arcWeightSource ? (allData.find((obj) => obj.name === options.arcWeightSource)?.name ?? allData[allData.length -1].name) : allData[allData.length -1].name
+  const arcWeightValues = allData.find((obj) => obj.name === arcWeightString)?.values
+
   const fields = getFieldDisplayNames(allData)
 
   const delimiter = options.delimiter === "space" ? " " : options.delimiter
 
   /********************************** Nodes **********************************/
 
-    let uniqueNodes = Array.from([...new Set(allData[0].values.join(delimiter).split(delimiter))]).map((str, index) => ({
+    // [refactor] Stylistic: `let` -> `const` (never reassigned).
+    const uniqueNodes: Node[] = Array.from([...new Set<string>(paths.join(delimiter).split(delimiter))]).map((str, index) => ({
       id: index,
       name: str,
       sum: 1,
@@ -37,34 +56,37 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
 
     const pathColors = getEvenlySpacedColors(paths.length, theme.isDark)
 
-    let links: Array<{ source: number | undefined; target: number | undefined; path: number; arcWeightValue: number; strokeWidth: number; color: string; displayValue: string; isOverlap: boolean; mapRadiusY: number; id: number }> = [];
+    const links: Link[] = [];
 
     paths.forEach((path: string, pathIndex: number) => {
-      const pathNodes = String(path).split(' ');
+      // [refactor] Bug fix: split each path on the configured `delimiter` (matching how the
+      // unique nodes are built above). It previously hard-coded a space, so any non-space
+      // delimiter produced node names that never matched and yielded an empty diagram.
+      const pathNodes = String(path).split(delimiter);
 
       for (let i = 0; i < pathNodes.length; i++) {
-        const source = uniqueNodes.find( (node: any) => node.name === pathNodes[i])?.id;
+        const source = uniqueNodes.find((node) => node.name === pathNodes[i])?.id;
 
-        const target = uniqueNodes.find( (node: any) => node.name === pathNodes[i+1])?.id;
-        const isOverlap = links.some((link: any) => link.source === source && link.target === target);
-      
+        const target = uniqueNodes.find((node) => node.name === pathNodes[i+1])?.id;
+        const isOverlap = links.some((link) => link.source === source && link.target === target);
+
         if(target !== undefined) {
-          const link = {
-            id: 0, 
-            source, 
-            target, 
-            path: pathIndex,
-            arcWeightValue: arcWeightValues[pathIndex],
+          const link: Link = {
+            id: 0,
+            source,
+            target,
+            pathIndex,
+            arcWeightValue: arcWeightValues![pathIndex],
             strokeWidth: 1,
             color: pathColors[pathIndex],
-            displayValue: `${allData[allData.length -1].display(allData[allData.length -1].values[pathIndex]).text}${(allData[allData.length -1].display(allData[allData.length -1].values[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display(allData[allData.length -1].values[pathIndex]).suffix : ""}`,
+            displayValue: `${allData[allData.length -1].display!(allData[allData.length -1].values[pathIndex]).text}${(allData[allData.length -1].display!(allData[allData.length -1].values[pathIndex]).suffix !== undefined) ? allData[allData.length -1].display!(allData[allData.length -1].values[pathIndex]).suffix : ""}`,
             isOverlap,
             mapRadiusY: 0
           }
           fields.forEach( field => {
             Object.assign(link, {[field.field]: []})
-            link[field.field].push(allData.find((obj: { name: any; }) => obj.name === field.field)?.values[pathIndex])
-            const display = allData.find((obj: { name: any; }) => obj.name === field.field).display(allData.find((obj: { name: any; }) => obj.name === field.field)?.values[pathIndex])
+            link[field.field].push(allData.find((obj) => obj.name === field.field)?.values[pathIndex])
+            const display = allData.find((obj) => obj.name === field.field)!.display!(allData.find((obj) => obj.name === field.field)?.values[pathIndex])
             const suffix = display.suffix === undefined ? "" : display.suffix
             Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${suffix}`]})
           })
@@ -72,16 +94,16 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
         }
       }
     });
- 
-    links.forEach( (link: any, index: number) => {
+
+    links.forEach((link, index) => {
       link.id = index
     })
 
     // assign overlap index to render elliptical arc
     const overlapLinks = links.filter(link => link.isOverlap)
 
-    const overlapGroups = [];
-    const visited = [];
+    const overlapGroups: Link[][] = [];
+    const visited: Link[] = [];
 
     for (let i = 0; i < overlapLinks.length; i++) {
       const currentLink = overlapLinks[i];
@@ -99,7 +121,7 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
       }
       overlapGroups.push(overlapGroup)
     }
-      
+
     // iterate over overlapGroups and assign radiusY
     for (let i = 0; i < overlapGroups.length; i++) {
       const currentGroup = overlapGroups[i]
@@ -117,8 +139,8 @@ export function parsePathData(data: { series: any[] }, options: any, theme: any)
     const linkScaleFrom = options.arcRange?.split(",").map(Number)[0]
     const linkScaleTo = options.arcRange?.split(",").map(Number)[1]
 
-    const minLink = Number(Math.min(...links.map(( e: any ) => e.arcWeightValue)))
-    const maxLink = Number(Math.max(...links.map(( e: any ) => e.arcWeightValue)))
+    const minLink = Number(Math.min(...links.map((e) => e.arcWeightValue)))
+    const maxLink = Number(Math.max(...links.map((e) => e.arcWeightValue)))
 
     for (let i = 0; i < links.length; i++) {
       calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, links[i], linkScaleFrom, linkScaleTo, minLink, maxLink)
