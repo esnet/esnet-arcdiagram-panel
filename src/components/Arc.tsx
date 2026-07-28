@@ -12,7 +12,6 @@ import React, { useEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
 import { PanelData } from '@grafana/data';
 import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery, handleZoom, getQueryMatches, calcBottomOffset } from 'utils';
-import '../styles.css'
 import { styles } from 'styles'
 import { Link, Node, ParsedData, SimpleOptions } from 'types';
 import { locationService } from '@grafana/runtime';
@@ -49,7 +48,10 @@ function Arc(props: ArcProps) {
   const links: Link[] = props.parsedData.links;
   const containerRef = useRef(null),
   gRef = useRef(null),
-  labelRef = useRef(null);
+  labelRef = useRef(null),
+  // [refactor] Replaces a `document.querySelectorAll('#arc-<id> #canvas')` lookup — see the zoom
+  // effect below.
+  canvasRef = useRef<HTMLDivElement>(null);
   const [showTooltip, setShowTooltip] = useState(false)
 
   // [refactor] Tooltip content, scoped to this component instance via state (previously a
@@ -66,7 +68,8 @@ function Arc(props: ArcProps) {
   }
 
   // [refactor] Stylistic: dropped the unused `displayValue` and `linkId` params.
-  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number): void {
+  // `hoverLink` is the hovered path's own bound datum — see the comment at its use below.
+  function updateTooltip(pos: number[], isActive: boolean, sourceId: number,  targetId?: number, hoverLink?: Link): void {
     const toolTip: ToolTipState = {
       source: "",
       target: <div></div>,
@@ -107,15 +110,22 @@ function Arc(props: ArcProps) {
       toolTip.source = idToName(sourceId,uniqueNodes)
       toolTip.target = idToName(targetId,uniqueNodes)
 
-      const hoverLink = (links.find((item) => item.source === sourceId && item.target === targetId))
+      // [refactor] Bug fix: prefer the hovered path's own bound datum over looking the link up by
+      // source+target. `pathDataParser` deliberately creates several links for the same
+      // source->target pair (that is what `isOverlap`/`mapRadiusY` render as stacked ellipses), so
+      // `.find()` always returned the *first* of them and hovering the 2nd or 3rd stacked arc in
+      // hop mode showed the wrong arc's values. The `.find()` remains as a fallback for callers
+      // without a datum, and the lookups below are optional-chained so a miss renders nothing
+      // instead of throwing (this was previously a `hoverLink!` non-null assertion).
+      const link = hoverLink ?? links.find((item) => item.source === sourceId && item.target === targetId)
       // [refactor] Tooltip fix: build each field block with <div>/<span> instead of nesting a
       // <p> (the per-value lines) inside another <p> (the field row). Nested <p> is invalid HTML —
       // the browser implicitly closes the outer <p>, which was causing the broken tooltip
       // formatting Katrina/Copilot flagged. Same content, valid block structure.
       toolTip.field = props.parsedData.fields.map((field, index: number) => (
                         <div key={index}><b style={styles.toolTipStyle.preface}>{field.displayName}:</b>
-                        {hoverLink![`${field.field}Display`].map((string: string, index: number) => (
-                              <span style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize, props.textColor)} key={index}>
+                        {link?.[`${field.field}Display`]?.map((string: string, valueIndex: number) => (
+                              <span style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize, props.textColor)} key={valueIndex}>
                                 {string}
                                 <br />
                               </span>
@@ -292,7 +302,12 @@ function Arc(props: ArcProps) {
         .on("mouseover", function (d) {
           // Tooltip
           updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.id));
-          labelsAsHtml[d.srcElement.id].setAttribute("name", labelsAsHtml[d.srcElement.id].innerHTML)
+          // [refactor] Bug fix: a `setAttribute("name", …innerHTML)` used to sit here. The `name`
+          // attribute is what `resetLabel()` restores from on mouseout, and by this point
+          // `innerHTML` may already be the ellipsized text (see the replaceEllipsis pass after the
+          // labels are positioned). Snapshotting it therefore made `name` progressively shorter on
+          // every hover, permanently truncating long labels. `name` is set to the pristine node
+          // name when the label is appended and must stay that way.
           const nodeTargets = getNodeTargets({ id: Number(d.srcElement.id), links })
           // add ellipsis for node being hovered over & target nodes
           replaceEllipsis(labelsAsHtml[d.srcElement.id],true)
@@ -358,7 +373,8 @@ function Arc(props: ArcProps) {
         })
         .on('mouseout', function (d) {
           const nodeTargets = getNodeTargets({ id: Number(d.srcElement.id), links })
-          replaceEllipsis(labelsAsHtml[d.srcElement.id], false)
+          // [refactor] Dropped a `replaceEllipsis(…, false)` that ran here: `resetLabel` below
+          // unconditionally overwrites `innerHTML`, so its mutation was always discarded.
           resetLabel(labelsAsHtml[d.srcElement.id])
           nodeTargets.forEach(e => {
             resetLabel(labelsAsHtml[e])
@@ -419,14 +435,17 @@ function Arc(props: ArcProps) {
       }
 
       paths
-      .on("mouseover", function (d) {
-        updateTooltip([d.clientX,d.clientY], true, Number(d.srcElement.getAttribute("source")), Number(d.srcElement.getAttribute("target")));
+      // [refactor] D3 v7 calls listeners as (event, datum), so `hoverLink` is this path's own
+      // `Link`. Reading it directly replaces re-deriving the link from the `source`/`target`/`path`
+      // DOM attributes, which could not distinguish stacked arcs sharing a source->target pair.
+      .on("mouseover", function (event, hoverLink) {
+        updateTooltip([event.clientX,event.clientY], true, hoverLink.source!, hoverLink.target!, hoverLink);
         paths
           .style("opacity",(l) => {
             if(isQuery) {
               return queryMatches.has(l.source!) || queryMatches.has(l.target!) ? props.graphOptions.arcOpacity : .1
             } else if (props.graphOptions.hopMode) {
-              return Number(d.srcElement.getAttribute("path")) === l.pathIndex ? props.graphOptions.arcOpacity : .1
+              return hoverLink.pathIndex === l.pathIndex ? props.graphOptions.arcOpacity : .1
             } else {
               return .1
             }
@@ -588,12 +607,33 @@ function Arc(props: ArcProps) {
       firstRenderObserver?.disconnect();
     };
 
+  // [refactor] Every prop the effect body reads is now listed. It previously declared only
+  // [links, height, width, uniqueNodes] while reading `graphOptions`, `panelId`, `query`,
+  // `isDarkMode` and `textColor`, and only stayed correct because SimplePanel rebuilds
+  // `parsedData` unmemoized on every render, so `links`/`uniqueNodes` change identity every time
+  // and the effect always re-ran. Memoizing `parsedData` — an obvious future optimization — would
+  // otherwise have silently frozen the diagram against option changes like font size or the
+  // search query. Behavior is unchanged today (`graphOptions` is also a fresh object per render).
+  //
+  // The eslint-disable stays because `updateTooltip` is re-created every render and is
+  // deliberately not memoized, so exhaustive-deps would demand it as a dependency.
   /* eslint-disable react-hooks/exhaustive-deps */
-  }, [links, props.height, props.width, uniqueNodes]);
+  }, [links, uniqueNodes, props.width, props.height, props.panelId,
+      props.query, props.graphOptions, props.isDarkMode, props.textColor]);
 
-  if(document.querySelectorAll(`#arc-${props.panelId} #canvas`)[0] !== undefined) {
-    handleZoom(document.querySelectorAll(`#arc-${props.panelId} #canvas`)[0] as HTMLElement, props.zoomState)
-  }
+  // [refactor] The zoom transform used to be applied straight from the component body, which is a
+  // side effect during render: React may render without committing (StrictMode, concurrent
+  // interruption), so the transform could be written for a discarded render. Applying it in an
+  // effect keyed on `zoomState` also means it no longer runs on every unrelated re-render, and the
+  // ref replaces a `document.querySelectorAll` that reached across the whole page.
+  //
+  // Safe to own the inline `transform` imperatively: `styles.canvasStyle` does not set it, so
+  // React's style diffing never clobbers the value, and this div is never remounted.
+  useEffect(() => {
+    if (canvasRef.current) {
+      handleZoom(canvasRef.current, props.zoomState);
+    }
+  }, [props.zoomState]);
 
   return (
       // [refactor] Scope this panel instance with an id we control (`arc-<panelId>`) instead of
@@ -603,7 +643,9 @@ function Arc(props: ArcProps) {
       // version. Without this the label measurement returned -Infinity and the whole diagram
       // rendered at y=Infinity (off-screen).
       <div id={`arc-${props.panelId}`} style={styles.containerStyle}>
-        <div id={"canvas"} style={styles.containerStyle} >
+        {/* [refactor] Dropped `id="canvas"`: it was a bare id duplicated across every arc panel on
+            a dashboard, and the zoom effect now reaches this element through `canvasRef`. */}
+        <div ref={canvasRef} style={styles.canvasStyle} >
           <svg style={styles.containerStyle} ref = {containerRef}>
             <g style={styles.containerStyle} ref = {gRef}></g>
             <svg style={styles.labelStyle} ref = {labelRef}></svg>

@@ -90,4 +90,40 @@ test.describe('Arc Diagram panel', () => {
       expect(d).not.toContain('NaN');
     }
   });
+
+  // Regression guard for the single-node NaN bug. `linSpace` computed its step as
+  // (stop - start) / (n - 1), so one unique node gave Infinity and `start + 0 * Infinity` is NaN.
+  // A dataset of nothing but self-loops on one node (the csvContent below) therefore rendered
+  // circle cx="NaN", an arc path full of NaN and a label at translate(NaN, …) — the panel looked
+  // completely empty. None of the other fixtures reach n === 1: even arc-selfloop has 3 nodes.
+  test('renders a single-node dataset with finite coordinates (NaN regression guard)', async ({
+    gotoDashboardPage,
+    readProvisionedDashboard,
+  }) => {
+    const dashboard = await readProvisionedDashboard({ fileName: 'arc-singlenode.json' });
+    const dashboardPage = await gotoDashboardPage({ uid: dashboard.uid });
+    const panel = dashboardPage.getPanelByTitle('Arc Diagram (e2e)');
+
+    // Exactly one unique node ("A", which links only to itself).
+    const nodeCircles = panel.locator.locator('circle[name]');
+    await expect(nodeCircles.first()).toBeVisible();
+    expect(await nodeCircles.count()).toBe(1);
+
+    // Both coordinates must be finite; cx was the one that went NaN.
+    const cx = await nodeCircles.first().getAttribute('cx');
+    const cy = await nodeCircles.first().getAttribute('cy');
+    expect(cx, 'circle cx should be a finite number, not NaN').toMatch(/^-?\d+(\.\d+)?$/);
+    expect(cy, 'circle cy should be a finite number, not NaN').toMatch(/^-?\d+(\.\d+)?$/);
+
+    // The self-loop arc is drawn and its path data is usable.
+    const arcPaths = panel.locator.locator('path[source]');
+    expect(await arcPaths.count()).toBe(1);
+    const d = await arcPaths.first().getAttribute('d');
+    expect(d).not.toContain('NaN');
+    expect(d).not.toContain('Infinity');
+
+    // The label is positioned rather than translated to NaN.
+    const label = panel.locator.locator('text[name]').first();
+    expect(await label.getAttribute('transform')).not.toContain('NaN');
+  });
 });

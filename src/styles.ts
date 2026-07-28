@@ -3,11 +3,68 @@
 // of relying on the global `React` namespace. Verified output-identical (React normalizes both
 // forms); the only change is the removal of React's dev-time "Unsupported style property" warnings.
 import { CSSProperties } from 'react';
+import { css } from '@emotion/css';
+
+// [refactor] The former `styles.css` stylesheet was removed: Grafana's plugin validator rejects
+// direct CSS imports (`code-rules-no-direct-css-imports`). Its rules were split by whether they
+// need a pseudo-selector — the plain ones moved into the inline `CSSProperties` objects below
+// (`panelContainerStyle`, `canvasStyle`), the `:hover`/`::placeholder` ones into the Emotion
+// classes in `cssStyles`. `css` from '@emotion/css' is the primitive Grafana's own `useStyles2`
+// is built on; the banned API is Emotion's <Global> component, which we do not use.
+//
+// This also scopes styling that used to leak: the old rules keyed off bare ids (`#canvas`,
+// `#zoom-button`, `#search-field`) that collided between panel instances on a shared dashboard,
+// and the placeholder rules were unscoped element selectors restyling every input on the page.
+export const cssStyles = {
+  // Was `#zoom-button:hover`. The `!important` is load-bearing: the button's base
+  // `backgroundColor` comes from the inline `zoomButtonStyle()` below, and an inline declaration
+  // outranks a normal class rule.
+  zoomButton: css({
+    '&:hover': {
+      transform: 'translateY(-8px)',
+      backgroundColor: 'grey !important',
+    },
+  }),
+  // Was `#search-field` + `#search-field:hover`.
+  searchField: css({
+    transition: 'all 250ms',
+    '&:hover': {
+      transform: 'translateY(-8px)',
+    },
+  }),
+  // Was `#search-field input` (+ `:hover`, + the placeholder rules). The six placeholder rules
+  // (`input::placeholder` plus five vendor-prefixed variants) collapse into the standard
+  // `::placeholder`; the resolved color is unchanged, since CSS `grey` *is* #808080. Emotion's
+  // prefixer still emits `::-webkit-input-placeholder` alongside it, so Chrome/Safari coverage is
+  // not lost. The `opacity: 1` that accompanied the old `-moz-placeholder` rules is dropped —
+  // it existed to undo Firefox's pre-v52 default placeholder opacity, which no longer applies.
+  searchInput: css({
+    transition: 'all 250ms',
+    '&:hover': {
+      backgroundColor: 'rgb(195, 188, 188) !important',
+    },
+    '&::placeholder': {
+      color: '#808080',
+    },
+  }),
+};
+
+// Hoisted so `canvasStyle` can extend it (an object literal cannot reference its own `styles.*`).
+const containerStyle: CSSProperties = {
+  width: "100%",
+  height: "100%"
+};
 
 export const styles = {
-    containerStyle: {
-      width: "100%",
-      height: "100%"
+    containerStyle,
+    // Was the `#canvas` rule. Arc.tsx's zoom effect sets this element's `transform` imperatively
+    // via `handleZoom()` (utils.ts); that is a different property from `transformOrigin`/
+    // `transition`, so the inline values coexist and React never clobbers the transform.
+    canvasStyle: {
+      ...containerStyle,
+      overflow: "hidden",
+      transformOrigin: "-50px -50px",
+      transition: "transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) 0s"
     } as CSSProperties,
     labelStyle: {
       width: "100%",
@@ -50,9 +107,11 @@ export const styles = {
         fontWeight: 900
       } as CSSProperties,
     },
+    // `overflow` was `#scroll-box` in the removed stylesheet.
     panelContainerStyle: {
       height: "100%",
-      width: "100%"
+      width: "100%",
+      overflow: "scroll"
     } as CSSProperties,
     searchFieldStyle: {
       display: "inline-block",

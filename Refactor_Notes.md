@@ -153,29 +153,6 @@ rendered output on purpose** — the original code was broken on Grafana 13:
 
 ---
 
-## PR review fixes (boss + Copilot feedback)
-
-- **`pathField` now honored** (`pathDataParser.ts`): the parser read `allData[0]` and ignored the
-  user-selected **Data → Path** option, so the Path select did nothing and could parse the wrong
-  column. Now resolves `options.pathField` (falling back to the first field), matching the
-  src/dest handling in `dataParser.ts`. Added regression tests.
-- **Invalid nested-`<p>` tooltip fixed** (`Arc.tsx`): tooltip rows nested `<p>` inside `<p>`
-  (auto-closed by browsers → the broken formatting Katrina saw). Replaced with `<div>`/`<span>`
-  containers; content unchanged.
-- **Version aligned to `1.2.0`**: `package.json` and `CHANGELOG.md` (`plugin.json` `%VERSION%` is
-  injected from `package.json` at build).
-- **`dist/` untracked**: removed from git and added to `.gitignore` (build output).
-- **e2e now runnable without Docker**: point the suite at the local Homebrew Grafana (plugin
-  symlinked + allowed unsigned, `provisioning/` loaded via `~/.grafana-e2e-provisioning`). All 6
-  Playwright tests pass; the Docker `npm run server` path still works too.
-
-## Known issues left / deferred
-
-- **Node 26 local dev.** Builds/tests pass, but Grafana tooling officially targets Node 20/22
-  (`engines` is `>=22`). Using an LTS Node (20/22) is recommended for reproducibility. *(This is
-  the only remaining deferred item.)*
-
----
 
 ## How to build, run, and verify
 
@@ -196,6 +173,3 @@ data (source/target/weight fields, or path strings for hop mode).
 All four gates (typecheck, lint, tests, build) are green, and the plugin registers cleanly on the
 local Grafana 13.0.2.
 
-> **Recommended human visual diff:** render the panel in both normal and hop modes and compare
-> against prior behavior — paying attention to (a) the **edit-mode first render** (now driven by
-> a `ResizeObserver`) and (b) the **tooltip** (now Grafana's `VizTooltipContainer`).

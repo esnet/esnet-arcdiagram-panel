@@ -5,7 +5,7 @@
 // the spots the original code already assumed were present (a configured field exists / has a
 // display processor).
 import { GrafanaTheme2, PanelData } from '@grafana/data';
-import { calcStrokeWidth, getEvenlySpacedColors, addNodeSum, calcNodeRadius, clusterNodes, getFieldDisplayNames } from 'utils';
+import { calcStrokeWidth, getEvenlySpacedColors, addNodeSum, calcNodeRadius, clusterNodes, getFieldDisplayNames, formatDisplayValue } from 'utils';
 import { Link, Node, ParsedData, SimpleOptions } from 'types';
 
 /**
@@ -81,8 +81,7 @@ export function parseData(data: PanelData, options: SimpleOptions, theme: Grafan
           Object.assign(link, {[field.field]: []})
           link[field.field].push(allData.find((obj) => obj.name === field.field)?.values[index])
           const display = allData.find((obj) => obj.name === field.field)!.display!(allData.find((obj) => obj.name === field.field)?.values[index])
-          const suffix = display.suffix === undefined ? "" : display.suffix
-          Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${suffix}`]})
+          Object.assign(link, {[`${field.field}Display`]: [formatDisplayValue(display)]})
         })
       });
 
@@ -104,13 +103,21 @@ export function parseData(data: PanelData, options: SimpleOptions, theme: Grafan
               let newValue = (existing[field.field][0]) + (cur[field.field][0])
               existing[field.field] = [newValue]
               const display = allData.find((obj) => obj.name === field.field)!.display!(newValue)
-              existing[`${field.field}Display`] = [`${display.text} ${display.suffix}`]
+              // [refactor] Bug fix: this was the one display site that interpolated
+              // `display.suffix` unguarded, so a bundled arc whose field had no unit configured
+              // showed a literal "30 undefined" in its tooltip. Now shares the helper.
+              existing[`${field.field}Display`] = [formatDisplayValue(display)]
             } else {
-              if (!existing[field.field].includes(cur[field.field])) {
-                cur[field.field].forEach((fieldEntry: unknown) => {
+              // [refactor] Bug fix: the dedupe check was `!existing[…].includes(cur[…])`, which
+              // compared an *array* (`cur[field.field]`) against the scalar entries of
+              // `existing[field.field]`. Under SameValueZero a fresh array reference never
+              // matches, so the guard never fired and every value was appended — duplicating
+              // repeated values in bundled tooltips. Check each entry individually instead.
+              cur[field.field].forEach((fieldEntry: unknown) => {
+                if (!existing[field.field].includes(fieldEntry)) {
                   existing[field.field].push(fieldEntry);
-                });
-              }
+                }
+              });
               existing[`${field.field}Display`] = existing[field.field]
             }
           })
@@ -130,10 +137,9 @@ export function parseData(data: PanelData, options: SimpleOptions, theme: Grafan
             Object.assign(addLink, {[field.field]: []})
             addLink[field.field] = cur[field.field]
             const display = allData.find((obj) => obj.name === field.field)!.display!(cur[field.field][0])
-            const suffix = display.suffix === undefined ? "" : display.suffix
             // [refactor] Bug fix: optional-chain `.state.range` (a field may lack a state).
             if(allData.find((obj) => obj.name === field.field)?.state?.range !== undefined) {
-              Object.assign(addLink, {[`${field.field}Display`]: [`${display.text} ${suffix}`]})
+              Object.assign(addLink, {[`${field.field}Display`]: [formatDisplayValue(display)]})
             } else {
               Object.assign(addLink, {[`${field.field}Display`]: cur[field.field]})
             }
@@ -183,9 +189,15 @@ export function parseData(data: PanelData, options: SimpleOptions, theme: Grafan
     links.forEach((e: Link, index: number) => {
       calcStrokeWidth(options.arcFromSource, options.scale, options.arcThickness, e, linkScaleFrom, linkScaleTo, minLink, maxLink)
       // link color by field
-      if (options.linkColorConfig === "field" && groups) {
+      // [refactor] Bug fix: this guard was `&& groups`, and an empty array is truthy. When the
+      // user picks Link color -> "By field" the Field select only appears *afterwards*, so
+      // `colorConfigField` is briefly unset; `groups` stays [] (see its guard above), the
+      // `.find()` returned undefined and `!.color` threw, collapsing the whole panel to
+      // "Error parsing data". Require the field and a populated `groups`, and fall back to the
+      // color already derived from thresholds rather than throwing.
+      if (options.linkColorConfig === "field" && options.colorConfigField && groups.length) {
         const linkGroup = (!Array.isArray(e[options.colorConfigField])) ? e[options.colorConfigField] : e[options.colorConfigField][e[options.colorConfigField].length - 1]
-        e.color = groups.find( group => group[options.colorConfigField] === linkGroup)!.color
+        e.color = groups.find( group => group[options.colorConfigField] === linkGroup)?.color ?? e.color
       }
     });
 

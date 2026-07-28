@@ -2,8 +2,25 @@
 A collection of utility functions
 */
 
-import { Field, FieldType, GrafanaTheme2, PanelData } from '@grafana/data';
+import { DisplayValue, Field, FieldType, GrafanaTheme2, PanelData } from '@grafana/data';
 import { FieldDisplayName, Link, Node, SimpleOptions } from 'types';
+
+/**
+ * Format a Grafana display value as `"<text> <suffix>"` for the tooltip field rows.
+ *
+ * [refactor] Extracted because this was inlined at four call sites and three of them guarded a
+ * missing suffix while `dataParser`'s link-bundling branch did not — so a bundled arc's tooltip
+ * read "30 undefined" whenever the field had no unit configured (the default).
+ *
+ * The trailing space when there is no suffix is pre-existing behavior and deliberately kept, so
+ * the three already-correct call sites produce byte-identical output.
+ *
+ * Note this is NOT the format used for `Link.displayValue` in `pathDataParser`, which
+ * concatenates text and suffix with no separator.
+ */
+export function formatDisplayValue(display: DisplayValue): string {
+    return `${display.text} ${display.suffix ?? ""}`;
+}
 
 // find string by id
 export function idToName(id: number, dic: Node[]): string {
@@ -69,6 +86,17 @@ export function getEvenlySpacedColors(amount: number, darkMode: boolean): string
 
 // get array of n equally spaced values in specific range
 export function linSpace(start: number, stop: number, n: number): number[] {
+    // [refactor] Bug fix: guard the degenerate counts before dividing by `n - 1`.
+    // With n === 1 the step was (stop - start) / 0 === Infinity, and `start + 0 * Infinity` is
+    // NaN — so a query yielding a single unique node (e.g. one self-loop row, `A -> A`) rendered
+    // `<circle cx="NaN">`, an arc path full of NaN and a label at `translate(NaN, …)`, i.e. an
+    // entirely invisible diagram. A lone node is centered in the available span instead.
+    if (n <= 0) {
+        return [];
+    }
+    if (n === 1) {
+        return [(start + stop) / 2];
+    }
     const step = (stop - start) / (n - 1);
     return Array.from({ length: n }, (_, i) => start + i * step);
 }

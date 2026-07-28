@@ -8,7 +8,7 @@ import SearchField from './components/SearchField';
 import { parseData } from 'dataParser';
 import { parsePathData } from 'pathDataParser';
 
-import { styles } from 'styles';
+import { cssStyles, styles } from 'styles';
 import { isTimeSeries } from 'utils';
 
 interface Props extends PanelProps<SimpleOptions> {}
@@ -109,7 +109,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
   const textColor = theme.colors.text.primary;
 
   return (
-    <div id='scroll-box' style={styles.panelContainerStyle}>
+    <div style={styles.panelContainerStyle}>
       <Arc
         textColor={textColor}
         parsedData={parsedData}
@@ -130,13 +130,16 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id 
         ></SearchField>}
         {options.zoom &&
         <div style={styles.zoomButtonWrapper}>
-          <button id="zoom-button" style={styles.zoomButtonStyle(theme.isDark, 0)} onClick={() => onClick(false)}>
+          {/* [refactor] These three buttons all carried `id="zoom-button"` (duplicate ids, and
+              global across every arc panel on a dashboard). The hover style is now a scoped
+              Emotion class instead of a `#zoom-button:hover` rule in the removed styles.css. */}
+          <button className={cssStyles.zoomButton} style={styles.zoomButtonStyle(theme.isDark, 0)} onClick={() => onClick(false)}>
             <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-arcdiagram-panel/img/area_zoom_out.svg" alt=""/>
           </button>
-          <button id="zoom-button" style={styles.zoomButtonStyle(theme.isDark, 1)} onClick={() => onClick(true)}>
+          <button className={cssStyles.zoomButton} style={styles.zoomButtonStyle(theme.isDark, 1)} onClick={() => onClick(true)}>
             <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-arcdiagram-panel/img/area_zoom_in.svg" alt=""/>
           </button>
-          <button id="zoom-button" style={styles.zoomButtonStyle(theme.isDark, 2)} onClick={() => onClick(true, true)}>
+          <button className={cssStyles.zoomButton} style={styles.zoomButtonStyle(theme.isDark, 2)} onClick={() => onClick(true, true)}>
             <img style={styles.zoomIcon(theme.isDark)} src="public/plugins/esnet-arcdiagram-panel/img/reset_icon.svg" alt=""/>
           </button>
         </div>

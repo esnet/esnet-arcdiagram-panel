@@ -9,12 +9,45 @@ import {
   calcNodeRadius,
   calcStrokeWidth,
   isTimeSeries,
+  formatDisplayValue,
 } from 'utils';
 
 describe('linSpace', () => {
   it('returns n evenly spaced values between start and stop', () => {
     expect(linSpace(0, 10, 3)).toEqual([0, 5, 10]);
     expect(linSpace(0, 100, 5)).toEqual([0, 25, 50, 75, 100]);
+  });
+
+  // Regression: `step` was (stop - start) / (n - 1), so n === 1 gave Infinity and
+  // `start + 0 * Infinity` is NaN. A query yielding a single unique node (one self-loop row,
+  // e.g. "A,A,10") rendered circle cx="NaN", an arc path full of NaN and a label at
+  // translate(NaN, …) — an entirely invisible diagram.
+  it('centers a single node instead of returning NaN (regression)', () => {
+    const result = linSpace(50, 500, 1);
+    expect(result).toHaveLength(1);
+    expect(Number.isNaN(result[0])).toBe(false);
+    expect(Number.isFinite(result[0])).toBe(true);
+    expect(result).toEqual([275]);
+  });
+
+  it('returns an empty array for a count of zero', () => {
+    expect(linSpace(50, 500, 0)).toEqual([]);
+  });
+});
+
+describe('formatDisplayValue', () => {
+  it('appends the suffix when the field has a unit', () => {
+    expect(formatDisplayValue({ text: '30', suffix: 'Mbps', numeric: 30 })).toBe('30 Mbps');
+  });
+
+  // Regression: dataParser's link-bundling branch interpolated `display.suffix` unguarded, so a
+  // bundled arc whose field had no unit configured showed a literal "30 undefined".
+  it('renders no "undefined" when the field has no suffix (regression)', () => {
+    const result = formatDisplayValue({ text: '30', suffix: undefined, numeric: 30 });
+    expect(result).not.toContain('undefined');
+    // The trailing space is pre-existing behavior, kept so the already-correct call sites are
+    // byte-identical.
+    expect(result).toBe('30 ');
   });
 });
 

@@ -5,7 +5,7 @@
 // the spots the original code already assumed present (a configured field exists / has a display
 // processor). Logic unchanged.
 import { GrafanaTheme2, PanelData } from '@grafana/data';
-import { calcNodeRadius, calcStrokeWidth, getEvenlySpacedColors, getFieldDisplayNames } from "utils";
+import { calcNodeRadius, calcStrokeWidth, getEvenlySpacedColors, getFieldDisplayNames, formatDisplayValue } from "utils";
 import { Link, Node, ParsedData, SimpleOptions } from "types";
 
 /**
@@ -87,8 +87,7 @@ export function parsePathData(data: PanelData, options: SimpleOptions, theme: Gr
             Object.assign(link, {[field.field]: []})
             link[field.field].push(allData.find((obj) => obj.name === field.field)?.values[pathIndex])
             const display = allData.find((obj) => obj.name === field.field)!.display!(allData.find((obj) => obj.name === field.field)?.values[pathIndex])
-            const suffix = display.suffix === undefined ? "" : display.suffix
-            Object.assign(link, {[`${field.field}Display`]: [`${display.text} ${suffix}`]})
+            Object.assign(link, {[`${field.field}Display`]: [formatDisplayValue(display)]})
           })
           links.push(link);
         }

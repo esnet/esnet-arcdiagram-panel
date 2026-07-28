@@ -31,6 +31,9 @@ e2e-results/
 # Editors
 .idea
 
+# macOS folder metadata (previously committed at the repo root, in src/ and in .config/)
+.DS_Store
+
 # Generated e2e visual-review screenshots
 test files/screenshots/
 

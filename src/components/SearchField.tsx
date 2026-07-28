@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react'
-import { styles } from 'styles'
+import { cssStyles, styles } from 'styles'
 import { Node } from 'types'
 
 // [refactor] Typed the component props via this interface (was `props: any`).
@@ -16,8 +16,11 @@ export default function SearchField(props: SearchFieldProps) {
     }
 
     return (
-      <div id="search-field" style={styles.searchFieldStyle}>
-        <input placeholder="Search nodes/edges" style={styles.inputStyle(props.isDarkMode)} type="text" onChange={handleChange}/>
+      // [refactor] The `#search-field` id and its stylesheet rules were replaced by scoped Emotion
+      // classes. The placeholder color in particular used to be an unscoped `input::placeholder`
+      // rule, so it restyled every input on the Grafana page rather than just this one.
+      <div className={cssStyles.searchField} style={styles.searchFieldStyle}>
+        <input className={cssStyles.searchInput} placeholder="Search nodes/edges" style={styles.inputStyle(props.isDarkMode)} type="text" onChange={handleChange}/>
       </div>
     )
 }
