@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, ReactNode } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState, ReactNode } from 'react';
 import * as d3 from 'd3';
 import { idToName, getNodeTargets, linSpace, resetLabel, replaceEllipsis, evaluateQuery, handleZoom, getQueryMatches, calcBottomOffset } from 'utils';
 import '../styles.css'
@@ -35,6 +35,7 @@ function Arc(props: any) {
   labelRef = useRef(null),
   tooltipRef = useRef(null);
   const [showTooltip, setShowTooltip] = useState(false)
+  const [tooltipPosition, setTooltipPosition] = useState([0, 0]);
 
   const handleToggleTooltip = (isActive: boolean) => {
     setShowTooltip(isActive);
@@ -73,7 +74,7 @@ function Arc(props: any) {
      
       const hoverLink = (links.find((item: { source: any; target: any; }) => item.source === sourceId && item.target === targetId))
       toolTip.field = props.parsedData.fields.map((field: any, index: number) => (    
-                        <p key={index}><b style={styles.toolTipStyle.preface}>{field.displayName}:</b>
+                        <div key={index}><b style={styles.toolTipStyle.preface}>{field.displayName}:</b>
                         {hoverLink[`${field.field}Display`].map((string: any, index: number) => (
                               <p style={styles.toolTipStyle.text(props.zoom)} key={index}>
                                 {string}
@@ -81,34 +82,40 @@ function Arc(props: any) {
                               </p>
                             ))
                           }
-                        </p>
+                        </div>
                       ))
     }
    
-    // toggle tooltip
-    handleToggleTooltip(isActive)
+    setTooltipPosition(pos);
+    handleToggleTooltip(isActive);
+  };
 
-    // update position
-    const panelContainer = document.querySelectorAll(`[data-panelid="${props.panelId}"]`)[0]
-    if(panelContainer !== undefined) {
+  useLayoutEffect(() => {
+    const panelContainer = document.querySelectorAll(`[data-arcdiagram-panel="${props.panelId}"]`)[0]
+    const toolTipDom = tooltipRef.current as HTMLElement | null;
+    if (showTooltip && panelContainer && toolTipDom) {
       const mapBounds = panelContainer.getBoundingClientRect();
-      let offsetY = pos[1] - mapBounds.top,
-      offsetX = pos[0] - mapBounds.left
+      let offsetY = tooltipPosition[1] - mapBounds.top,
+      offsetX = tooltipPosition[0] - mapBounds.left
       
-      const toolTipDom = document.querySelectorAll("#tooltip")[0] as HTMLElement,
-      toolTipBounds = toolTipDom.getBoundingClientRect();
+      // React may batch state updates; measure only after the tooltip is mounted.
+      toolTipDom.style.top = '';
+      toolTipDom.style.bottom = '';
+      toolTipDom.style.left = '';
+      toolTipDom.style.right = '';
+      const toolTipBounds = toolTipDom.getBoundingClientRect();
       
       let leftOrRight = "left";
       if(offsetX + toolTipBounds.right > mapBounds.right) {
         leftOrRight = "right";
-        offsetX = mapBounds.right - pos[0]
+        offsetX = mapBounds.right - tooltipPosition[0]
       }
     
       let topOrBottom = "top" 
       // add margin of 31.99px
-      if(toolTipBounds.height+pos[1]+31.99 > mapBounds.bottom) {
+      if(toolTipBounds.height+tooltipPosition[1]+31.99 > mapBounds.bottom) {
         topOrBottom = "bottom";
-        offsetY = mapBounds.bottom - pos[1]
+        offsetY = mapBounds.bottom - tooltipPosition[1]
       }
     
       if (topOrBottom === "top") {
@@ -123,12 +130,12 @@ function Arc(props: any) {
         toolTipDom.style.right = `${offsetX}px`;
       }
     }
-  };
+  }, [showTooltip, tooltipPosition, props.panelId]);
 
   useEffect(() => {
 
     // removes the graph if it exists in the dom so it gets rendered with updated dimensions
-    d3.selectAll(`[data-panelid="${props.panelId}"] circle, [data-panelid="${props.panelId}"] path, [data-panelid="${props.panelId}"] text`).remove();
+    d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] circle, [data-arcdiagram-panel="${props.panelId}"] path, [data-arcdiagram-panel="${props.panelId}"] text`).remove();
     
 
     const width = props.width,
@@ -140,7 +147,7 @@ function Arc(props: any) {
 
     // render labels
     const text = d3.select(labelBox)
-      .selectAll(`[data-panelid="${props.panelId}"] text`)
+      .selectAll(`[data-arcdiagram-panel="${props.panelId}"] text`)
       .data(uniqueNodes)
 
     text
@@ -162,12 +169,12 @@ function Arc(props: any) {
     // get array of equally spaced values for positioning of graph on x axis
     let values = linSpace(props.graphOptions.marginLeft, width-props.graphOptions.marginRight, uniqueNodes.length);
     
-    let labelsAsHtml = document.querySelectorAll(`[data-panelid="${props.panelId}"] text`)
+    let labelsAsHtml = document.querySelectorAll(`[data-arcdiagram-panel="${props.panelId}"] text`)
 
     let offsetBottom = calcBottomOffset(labelsAsHtml)
 
       // Update the labels position
-        d3.selectAll(`[data-panelid="${props.panelId}"] text`)
+        d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] text`)
       .attr('transform', (d, i) => {
           return (
             "translate(" + values[i] + "," + (height-offsetBottom) + ")rotate(-45)")
@@ -180,7 +187,7 @@ function Arc(props: any) {
     
     // render nodes
     const svg = d3.select(container)
-    .selectAll(`[data-panelid="${props.panelId}"] circle`)
+    .selectAll(`[data-arcdiagram-panel="${props.panelId}"] circle`)
     .data(uniqueNodes)
 
     svg
@@ -198,7 +205,7 @@ function Arc(props: any) {
 
     // render links
     const g = d3.select(graph)
-      .selectAll(`[data-panelid="${props.panelId}"] path`)
+      .selectAll(`[data-arcdiagram-panel="${props.panelId}"] path`)
       .data(links)
 
     g
@@ -231,9 +238,9 @@ function Arc(props: any) {
       .attr("displayValue", (d, i) => links[i].displayValue)
       .attr("path", (d, i) => links[i].path)
 
-    let nodes = d3.selectAll(`[data-panelid="${props.panelId}"] circle`)
-    let paths = d3.selectAll(`[data-panelid="${props.panelId}"] path`)
-    let labels = d3.selectAll(`[data-panelid="${props.panelId}"] text`)
+    let nodes = d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] circle`)
+    let paths = d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] path`)
+    let labels = d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] text`)
     const duration = 200;
 
     const isQuery = props.query.length !==0
@@ -243,9 +250,9 @@ function Arc(props: any) {
       /********************************** Highlighting **********************************/ 
 
       if(firstRender) {
-        nodes = d3.selectAll(`[data-panelid="${props.panelId}"] circle`)
-        paths = d3.selectAll(`[data-panelid="${props.panelId}"] path`)
-        labels = d3.selectAll(`[data-panelid="${props.panelId}"] text`)
+        nodes = d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] circle`)
+        paths = d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] path`)
+        labels = d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] text`)
       }
 
       nodes
@@ -372,9 +379,9 @@ function Arc(props: any) {
       /********************************** Link tooltip **********************************/ 
 
       if(firstRender) {
-        nodes = d3.selectAll(`[data-panelid="${props.panelId}"] circle`)
-        paths = d3.selectAll(`[data-panelid="${props.panelId}"] path`)
-        labels = d3.selectAll(`[data-panelid="${props.panelId}"] text`)
+        nodes = d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] circle`)
+        paths = d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] path`)
+        labels = d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] text`)
       }
       
       paths
@@ -441,7 +448,7 @@ function Arc(props: any) {
 
         // render labels
         const text = d3.select(labelBox)
-        .selectAll(`[data-panelid="${props.panelId}"] text`)
+        .selectAll(`[data-arcdiagram-panel="${props.panelId}"] text`)
         .data(uniqueNodes)
 
         text
@@ -459,13 +466,13 @@ function Arc(props: any) {
           .attr('name', (d, i) => { return uniqueNodes[i].name })
           .attr('id', (d, i) => { return i })
 
-        labelsAsHtml = document.querySelectorAll(`[data-panelid="${props.panelId}"] text`)
+        labelsAsHtml = document.querySelectorAll(`[data-arcdiagram-panel="${props.panelId}"] text`)
         offsetBottom = calcBottomOffset(labelsAsHtml)
         const offsetFirstRender = 40
 
 
         // Update the labels position
-        d3.selectAll(`[data-panelid="${props.panelId}"] text`)
+        d3.selectAll(`[data-arcdiagram-panel="${props.panelId}"] text`)
         .attr('transform', (d, i) => {
             return (
               "translate(" + newValues[i] + "," + (height-offsetBottom-offsetFirstRender) + ")rotate(-45)")
@@ -478,7 +485,7 @@ function Arc(props: any) {
 
         // render nodes
         const svg = d3.select(container)
-        .selectAll(`[data-panelid="${props.panelId}"] circle`)
+        .selectAll(`[data-arcdiagram-panel="${props.panelId}"] circle`)
         .data(uniqueNodes)
 
         svg
@@ -497,7 +504,7 @@ function Arc(props: any) {
         
 
         const g = d3.select(graph)
-        .selectAll(`[data-panelid="${props.panelId}"] path`)
+        .selectAll(`[data-arcdiagram-panel="${props.panelId}"] path`)
         .data(links)
 
         g
@@ -541,8 +548,8 @@ function Arc(props: any) {
   /* eslint-disable react-hooks/exhaustive-deps */
   }, [links, props.height, props.width, uniqueNodes]);
 
-  if(document.querySelectorAll(`[data-panelid="${props.panelId}"] #canvas`)[0] !== undefined) {
-    handleZoom(document.querySelectorAll(`[data-panelid="${props.panelId}"] #canvas`)[0] as HTMLElement, props.zoomState)
+  if(document.querySelectorAll(`[data-arcdiagram-panel="${props.panelId}"] #canvas`)[0] !== undefined) {
+    handleZoom(document.querySelectorAll(`[data-arcdiagram-panel="${props.panelId}"] #canvas`)[0] as HTMLElement, props.zoomState)
   }
   
   return (       
@@ -560,7 +567,7 @@ function Arc(props: any) {
             <br/>
             <div style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} ><b style={styles.toolTipStyle.preface}>{props.graphOptions.toolTipTarget}</b>{toolTip.target}</div>
             <br/>
-            <p style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} > {toolTip.field}</p>
+            <div style={styles.toolTipStyle.text(props.graphOptions.tooltipFontSize)} > {toolTip.field}</div>
           </div>
         )}
       </div>      

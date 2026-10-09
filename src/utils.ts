@@ -216,8 +216,8 @@ export function calcDiagramHeight(nodes: any[], links: any[], panelWidth: number
 
 export function clusterNodes(uniqueNodes: any[], links: any[], options: any, theme: any, allData: any) {
       
-    const srcCluster = allData.find((obj: { name: any; }) => obj.name === options.srcCluster)?.values.buffer
-    const dstCluster = allData.find((obj: { name: any; }) => obj.name === options.dstCluster)?.values.buffer
+    const srcCluster = allData.find((obj: { name: any; }) => obj.name === options.srcCluster)?.values
+    const dstCluster = allData.find((obj: { name: any; }) => obj.name === options.dstCluster)?.values
 
     // add cluster to nodes
     for(let i = 0; i < links.length; i++) {
@@ -278,9 +278,9 @@ export function calcBottomOffset(labels: NodeListOf<Element>) {
     // after the labels are rendered, we can find out the amount of margin we need to apply
     // from the bottom and left so that the diagram is readable. The amount is being calculated from
     // the boundingbox of the largest highlighted label
-    let labelHeights = Array.from(labels, (label) => label.getBoundingClientRect().height);
+    let labelHeights = Array.from(labels, (label) => label.getBoundingClientRect().height).filter(Number.isFinite);
     // Map to highlighted labels (size increases by 60%)
-    let offsetBottom = Math.max(...labelHeights)
+    let offsetBottom = Math.max(0, ...labelHeights)
     offsetBottom*=1.6
     return offsetBottom
 }
@@ -288,7 +288,7 @@ export function calcBottomOffset(labels: NodeListOf<Element>) {
 export function getFieldDisplayNames(allData: any[], sourceString?: string, targetString?: string) {
     let displayNames = []
     allData.forEach( field => {
-        const displayName = (field.state.displayName !== undefined) ? field.state.displayName : field.name
+        const displayName = field.state?.displayName ?? field.config?.displayName ?? field.name
         // check if the displayname is defined
         if(field.name !== sourceString && field.name !== targetString) {
             displayNames.push({
@@ -302,7 +302,7 @@ export function getFieldDisplayNames(allData: any[], sourceString?: string, targ
 
 export function isTimeSeries(data: any): boolean {
     // check if datasource is timeseries
-    const dataSources = data.request.targets
+    const dataSources = data.request?.targets
     if(dataSources !== undefined) {
         for(let i = 0; i < dataSources.length; i++) {
             if (dataSources[i].type === "date_histogram") {
@@ -310,7 +310,7 @@ export function isTimeSeries(data: any): boolean {
             }
         }
     }
-    const fields = data.series[0].fields
+    const fields = data.series[0]?.fields ?? []
     for(let i = 0; i < fields.length; i++) {
         if (fields[i].type === "time") {
             return true;

@@ -6,7 +6,7 @@ export const styles = {
     labelStyle: {
       width: "100%",
       height: "100%",
-      "z-index": "10",
+      "zIndex": "10",
     } as React.CSSProperties,
     buttonStyle: {
       width: "30px",
@@ -24,20 +24,20 @@ export const styles = {
         background: "white",
         padding: "1em",
         margin: "1em",
-        "max-width": "300px",
-        "border-radius": "5px",
+        "maxWidth": "300px",
+        "borderRadius": "5px",
         opacity: 0.9
       } as React.CSSProperties,
       text(fontSize: number) {
         return {
           color: "black",
-        "font-size": `${fontSize}px`,
+        "fontSize": `${fontSize}px`,
         margin: "0",
-        "font-weight": "100"
+        "fontWeight": "100"
         }
       },
       preface: {
-        "font-weight": "900"
+        "fontWeight": "900"
       } as React.CSSProperties,
     }, 
     panelContainerStyle: {
@@ -47,7 +47,7 @@ export const styles = {
     searchFieldStyle: {
       display: "inline-block",
       margin: "0em 1em",
-      "vertical-align": "middle",
+      "verticalAlign": "middle",
     } as React.CSSProperties,
     inputStyle(isDarkMode: boolean) {
       return {
@@ -56,7 +56,7 @@ export const styles = {
         background: (isDarkMode) ? "rgb(244 245 245 / 83%)" : "hsla(0, 0%, 0%, 1)",
         color: (isDarkMode) ? "black" : "white",
         padding: "1em",
-        "border-radius": "30px"
+        "borderRadius": "30px"
       }
     },
     toolBarStyle: {
@@ -66,32 +66,32 @@ export const styles = {
     } as React.CSSProperties,
     zoomButtonWrapper: {
       margin: "0em 1em",
-      "vertical-align": "middle",
+      "verticalAlign": "middle",
       display: "inline-block"
     } as React.CSSProperties,
     zoomButtonStyle(isDarkMode: boolean, position: number) {
       let styles, borderRadius = "30px", padding = "5px"
       styles = {
         display: "inline-block",
-        "background-color": isDarkMode ? "rgba(244, 245, 245, 0.83)" : "black",
+        "backgroundColor": isDarkMode ? "rgba(244, 245, 245, 0.83)" : "black",
         "border": "1px solid rgba(0, 0, 0, 0.1)",
         "cursor": "pointer",
         "transition": "all 250ms",
-        "border-top-left-radius": "0px",
-        "border-bottom-left-radius": "0px",
-        "border-top-right-radius": "0px",
-        "border-bottom-right-radius": "0px",
-        "padding-left": padding,
-        "padding-right": padding
+        "borderTopLeftRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomRightRadius": "0px",
+        "paddingLeft": padding,
+        "paddingRight": padding
       }
       if(position === 0) {
-        styles["border-top-left-radius"] = borderRadius
-        styles["border-bottom-left-radius"] = borderRadius
-        styles["padding-left"] = padding
+        styles["borderTopLeftRadius"] = borderRadius
+        styles["borderBottomLeftRadius"] = borderRadius
+        styles["paddingLeft"] = padding
       } else if (position === 2) {
-        styles["border-top-right-radius"] = borderRadius
-        styles["border-bottom-right-radius"] = borderRadius
-        styles["padding-right"] = padding
+        styles["borderTopRightRadius"] = borderRadius
+        styles["borderBottomRightRadius"] = borderRadius
+        styles["paddingRight"] = padding
       }
       return styles
     },

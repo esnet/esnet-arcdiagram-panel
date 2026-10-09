@@ -10,6 +10,7 @@ import { parsePathData } from 'pathDataParser';
 
 import { styles } from 'styles';
 import { isTimeSeries } from 'utils';
+import { preparePanelData } from './dataFrame';
 
 interface Props extends PanelProps<SimpleOptions> {}
 /**
@@ -32,10 +33,31 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
     }
   }
 
-  let graphOptions = {
-    ...options,
-  };
   const theme = useTheme2();
+  const prepared = preparePanelData(data, options);
+  data = prepared.data;
+  options = prepared.options;
+  const graphOptions = options;
+  const fields = data.series[0]?.fields ?? [];
+  if (fields.length === 0 || fields.every((field: any) => field.values.length === 0)) {
+    return <div>No data</div>;
+  }
+  const selectedFields = options.hopMode
+    ? [options.pathField, options.arcWeightSource]
+    : [options.src, options.dest, options.arcWeightSource];
+  if (options.isCluster) {
+    selectedFields.push(options.srcCluster, options.dstCluster);
+  }
+  if (options.linkColorConfig !== 'default') {
+    selectedFields.push(options.colorConfigField);
+  }
+  const missing = selectedFields.find((name: string) => name && !fields.some((field: any) => field.name === name));
+  if (missing) {
+    return <div>Selected field is unavailable: {missing}</div>;
+  }
+  if (!options.hopMode && fields.length < 2) {
+    return <div>Source and destination fields are required</div>;
+  }
 
   if (options.isCluster && data.series[0].fields.length < 5) {
     return <div>Node clustering requires a 4th group by</div>;
@@ -91,7 +113,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
   const textColor = theme.colors.text.primary;
 
   return (
-    <div id='scroll-box' style={styles.panelContainerStyle}>
+    <div id='scroll-box' data-arcdiagram-panel={id} style={styles.panelContainerStyle}>
       <Arc
         textColor={textColor}
         parsedData={parsedData}
@@ -128,4 +150,3 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, id,
     </div>
   );
 };
-
